@@ -1,0 +1,8 @@
+build
+.idea
+*.iml
+*~
+/dependency-reduced-pom.xml
+.gradle
+/gradlew.bat
+/compiler/out
