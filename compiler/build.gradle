@@ -9,10 +9,10 @@ group = 'io.github.jbock-java'
 
 compileJava {
     options.encoding = 'UTF-8'
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
     options.compilerArgs << '--release'
-    options.compilerArgs << '11'
+    options.compilerArgs << '17'
 }
 
 javadoc {

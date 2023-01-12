@@ -21,7 +21,7 @@ public final class SourceFileGenerator {
         this.messager = messager;
     }
 
-    void write(Element element, JavaFile javaFile) {
+    public void write(Element element, JavaFile javaFile) {
         try {
             javaFile.writeTo(filer);
         } catch (IOException e) {

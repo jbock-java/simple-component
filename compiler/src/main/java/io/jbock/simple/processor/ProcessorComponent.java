@@ -2,6 +2,8 @@ package io.jbock.simple.processor;
 
 import io.jbock.simple.processor.step.ComponentStep;
 import io.jbock.simple.processor.step.InjectStep;
+import io.jbock.simple.processor.util.ComponentRegistry;
+import io.jbock.simple.processor.util.InjectBindingRegistry;
 import io.jbock.simple.processor.util.SafeElements;
 import io.jbock.simple.processor.util.SafeTypes;
 import io.jbock.simple.processor.util.SourceFileGenerator;
@@ -18,22 +20,44 @@ final class ProcessorComponent {
     private final TypeTool tool;
     private final Messager messager;
     private final SourceFileGenerator sourceFileGenerator;
+    private final InjectBindingRegistry injectBindingRegistry;
+    private final ComponentRegistry componentRegistry;
+    private final ComponentGenerator generator;
+    private final ComponentStep componentStep;
+    private final InjectStep injectStep;
 
     ProcessorComponent(ProcessingEnvironment processingEnvironment) {
         SafeTypes types = new SafeTypes(processingEnvironment.getTypeUtils());
         SafeElements elements = new SafeElements(processingEnvironment.getElementUtils());
         Filer filer = processingEnvironment.getFiler();
+        this.componentRegistry = new ComponentRegistry();
         this.tool = new TypeTool(elements, types);
         this.util = new Util(types, tool);
         this.messager = processingEnvironment.getMessager();
         this.sourceFileGenerator = new SourceFileGenerator(filer, messager);
+        this.injectBindingRegistry = new InjectBindingRegistry();
+        this.generator = new ComponentGenerator();
+        this.componentStep = new ComponentStep(componentRegistry);
+        this.injectStep = new InjectStep(injectBindingRegistry);
     }
 
     ComponentStep componentStep() {
-        return new ComponentStep();
+        return componentStep;
     }
 
     InjectStep injectStep() {
-        return new InjectStep();
+        return new InjectStep(injectBindingRegistry);
+    }
+
+    ComponentRegistry componentRegistry() {
+        return componentRegistry;
+    }
+
+    SourceFileGenerator sourceFileGenerator() {
+        return sourceFileGenerator;
+    }
+
+    ComponentGenerator componentGenerator() {
+        return generator;
     }
 }
