@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class InjectStep implements Step {
-    
+
     private final InjectBindingRegistry registry;
 
     public InjectStep(InjectBindingRegistry registry) {

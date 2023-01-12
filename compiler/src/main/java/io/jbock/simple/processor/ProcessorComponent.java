@@ -36,7 +36,7 @@ final class ProcessorComponent {
         this.messager = processingEnvironment.getMessager();
         this.sourceFileGenerator = new SourceFileGenerator(filer, messager);
         this.injectBindingRegistry = new InjectBindingRegistry();
-        this.generator = new ComponentGenerator();
+        this.generator = new ComponentGenerator(injectBindingRegistry);
         this.componentStep = new ComponentStep(componentRegistry);
         this.injectStep = new InjectStep(injectBindingRegistry);
     }

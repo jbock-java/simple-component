@@ -24,7 +24,8 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
 
     @Override
     protected void postRound(RoundEnvironment roundEnv) {
-        if (roundEnv.processingOver()) {
+        boolean lastRound = roundEnv.getRootElements().isEmpty();
+        if (lastRound && roundEnv.processingOver()) {
             for (TypeElement element : component.componentRegistry().components()) {
                 ComponentElement componentElement = ComponentElement.create(element);
                 TypeSpec typeSpec = component.componentGenerator().generate(componentElement);
@@ -43,7 +44,6 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
                 .build();
         component.sourceFileGenerator().write(componentElement.element(), javaFile);
     }
-
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
