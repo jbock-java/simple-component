@@ -4,6 +4,7 @@ import io.jbock.auto.common.BasicAnnotationProcessor;
 import io.jbock.javapoet.JavaFile;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.processor.util.ComponentElement;
+import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -27,9 +28,13 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
         boolean lastRound = roundEnv.getRootElements().isEmpty();
         if (lastRound && roundEnv.processingOver()) {
             for (TypeElement element : component.componentRegistry().components()) {
-                ComponentElement componentElement = ComponentElement.create(element);
-                TypeSpec typeSpec = component.componentGenerator().generate(componentElement);
-                writeSpec(componentElement, typeSpec);
+                try {
+                    ComponentElement componentElement = ComponentElement.create(element);
+                    TypeSpec typeSpec = component.componentGenerator().generate(componentElement);
+                    writeSpec(componentElement, typeSpec);
+                } catch (ValidationFailure f) {
+                    f.writeTo(component.messager());
+                }
             }
         }
     }

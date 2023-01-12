@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.binding;
 
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.Element;
 
-public record DependencyRequest(Key key, VariableElement requestElement) {
+public record DependencyRequest(Key key, Element requestElement) {
 }

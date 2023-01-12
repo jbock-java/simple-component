@@ -25,14 +25,17 @@ class ProcessorComponentTest {
                 "  }",
                 "",
                 "  static class B {}",
-                "",
                 "  static class C {}",
+                "  static class D {}",
                 "",
                 "  @Inject",
                 "  static B createB(C c) { return null; }",
                 "",
                 "  @Inject",
                 "  static C createC() { return null; }",
+                "",
+                "  @Inject",
+                "  static D createD() { return null; }",
                 "",
                 "  @Component",
                 "  interface AComponent {",
@@ -42,5 +45,11 @@ class ProcessorComponentTest {
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).succeeded();
+        assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
+                .containsLines(
+                        "package test;",
+                        "",
+                        "class TestClass_AComponent_Impl {",
+                        "}");
     }
 }

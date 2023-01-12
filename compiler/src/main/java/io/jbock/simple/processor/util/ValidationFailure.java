@@ -5,7 +5,7 @@ import javax.lang.model.element.Element;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
-public final class ValidationFailure {
+public final class ValidationFailure extends RuntimeException {
 
     private final Element about;
     private final String message;

@@ -60,4 +60,8 @@ final class ProcessorComponent {
     ComponentGenerator componentGenerator() {
         return generator;
     }
+
+    public Messager messager() {
+        return messager;
+    }
 }
