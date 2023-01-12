@@ -9,7 +9,10 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
 
     @Override
     protected Iterable<? extends Step> steps() {
-        return List.of();
+        ProcessorComponent component = new ProcessorComponent(processingEnv);
+        return List.of(
+                component.injectStep(),
+                component.componentStep());
     }
 
     @Override
