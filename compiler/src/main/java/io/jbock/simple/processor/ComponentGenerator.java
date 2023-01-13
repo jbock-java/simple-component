@@ -9,7 +9,6 @@ import io.jbock.simple.processor.util.InjectBindingRegistry;
 import io.jbock.simple.processor.util.ValidationFailure;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,17 +35,17 @@ public class ComponentGenerator {
             for (DependencyRequest request : component.getRequests()) {
                 edges.addAll(injectBindingRegistry.getDependencies(request));
             }
-            List<InjectBinding> sorted = sortEdges(edges);
+            Set<InjectBinding> sorted = sortEdges(edges);
             return TypeSpec.classBuilder(component.generatedClass())
                     .addOriginatingElement(component.element())
                     .build();
         }
 
         // https://en.wikipedia.org/wiki/Topological_sorting
-        private List<InjectBinding> sortEdges(Set<Edge> edges) {
-            List<InjectBinding> result = new ArrayList<>();
-            Deque<InjectBinding> s = new ArrayDeque<>(startNodes(edges));
+        private Set<InjectBinding> sortEdges(Set<Edge> edges) {
+            Set<InjectBinding> result = new LinkedHashSet<>();
             Graph graph = createGraph(edges);
+            Deque<InjectBinding> s = new ArrayDeque<>(graph.startNodes());
             while (!s.isEmpty()) {
                 InjectBinding n = s.pop();
                 result.add(n);
@@ -69,35 +68,27 @@ public class ComponentGenerator {
         return new Generator(component).generate();
     }
 
-    private List<InjectBinding> startNodes(Set<Edge> edges) {
-        List<InjectBinding> requests = edges.stream().map(Edge::dependency).toList();
-        return requests.stream()
-                .filter(r -> edges.stream().noneMatch(edge -> edge.destination().key().equals(r.key())))
-                .toList();
-    }
-
-    private static class Graph {
-
-        final Set<Edge> edges;
-        final Set<InjectBinding> nodes;
-
-        Graph(Set<Edge> edges, Set<InjectBinding> nodes) {
-            this.edges = edges;
-            this.nodes = nodes;
-        }
+    private record Graph(Set<Edge> edges, Set<InjectBinding> nodes) {
 
         List<Edge> edgesFrom(InjectBinding n) {
-            return edges.stream().filter(edge -> edge.source().equals(n)).toList();
+                return edges.stream().filter(edge -> edge.source().equals(n)).toList();
+            }
+    
+            List<Edge> edgesTo(InjectBinding m) {
+                return edges.stream().filter(edge -> edge.destination().equals(m)).toList();
+            }
+    
+            List<InjectBinding> startNodes() {
+                List<InjectBinding> sources = edges.stream().map(Edge::source).toList();
+                return sources.stream()
+                        .filter(r -> edgesTo(r).isEmpty())
+                        .toList();
+            }
+    
+            void removeEdge(Edge edge) {
+                edges.remove(edge);
+            }
         }
-
-        List<Edge> edgesTo(InjectBinding m) {
-            return edges.stream().filter(edge -> edge.destination().equals(m)).toList();
-        }
-
-        void removeEdge(Edge edge) {
-            edges.remove(edge);
-        }
-    }
 
     private Graph createGraph(Set<Edge> edges) {
         Set<InjectBinding> nodes = new LinkedHashSet<>();

@@ -6,14 +6,12 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 
-public final class InjectBinding implements Binding {
-    
-    private final Key key;
+public final class InjectBinding extends Binding {
+
     private final ExecutableElement bindingElement;
 
     private final Supplier<List<DependencyRequest>> dependencies = memoize(() -> {
@@ -27,30 +25,12 @@ public final class InjectBinding implements Binding {
     public InjectBinding(
             Key key,
             ExecutableElement bindingElement) {
-        this.key = key;
+        super(key);
         this.bindingElement = bindingElement;
-    }
-
-    public Key key() {
-        return key;
     }
 
     public ExecutableElement bindingElement() {
         return bindingElement;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (InjectBinding) obj;
-        return Objects.equals(this.key, that.key) &&
-                Objects.equals(this.bindingElement, that.bindingElement);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(key, bindingElement);
     }
 
     public List<DependencyRequest> dependencies() {
@@ -59,6 +39,6 @@ public final class InjectBinding implements Binding {
 
     @Override
     public String toString() {
-        return "InjectBinding[" + "" + key + ", " + "" + bindingElement + ']';
+        return "InjectBinding[" + "" + key() + ']';
     }
 }

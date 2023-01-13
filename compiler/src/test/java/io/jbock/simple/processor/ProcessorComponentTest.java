@@ -52,4 +52,45 @@ class ProcessorComponentTest {
                         "class TestClass_AComponent_Impl {",
                         "}");
     }
+
+    @Test
+    void simpleDiamond() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "",
+                "import io.jbock.simple.Component;",
+                "import jakarta.inject.Inject;",
+                "",
+                "final class TestClass {",
+                "  static class A {",
+                "    @Inject A(B b, C c) {}",
+                "  }",
+                "",
+                "  static class B {",
+                "    @Inject B(E e) {}",
+                "  }",
+                "",
+                "  static class C {",
+                "    @Inject C(E e) {}",
+                "  }",
+                "",
+                "  static class E {",
+                "    @Inject E() {}",
+                "  }",
+                "",
+                "  @Component",
+                "  interface AComponent {",
+                "    A getA();",
+                "  }",
+                "}");
+
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
+        assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
+                .containsLines(
+                        "package test;",
+                        "",
+                        "class TestClass_AComponent_Impl {",
+                        "}");
+    }
 }

@@ -20,13 +20,19 @@ public class InjectBindingRegistry {
     public void registerConstructor(ExecutableElement element) {
         Element typeElement = element.getEnclosingElement();
         Key key = new Key(TypeName.get(typeElement.asType()));
-        register(key, element);
+        InjectBinding previousValue = bindingsByKey.put(key, new InjectBinding(key, element));
+        if (previousValue != null) {
+            throw new ValidationFailure("Duplicate binding", element);
+        }
     }
 
     public void registerFactoryMethod(ExecutableElement element) {
         TypeMirror returnType = element.getReturnType();
         Key key = new Key(TypeName.get(returnType));
-        register(key, element);
+        InjectBinding previousValue = bindingsByKey.put(key, new InjectBinding(key, element));
+        if (previousValue != null) {
+            throw new ValidationFailure("Duplicate binding", element);
+        }
     }
 
     public List<Edge> getDependencies(DependencyRequest request) {
@@ -49,12 +55,9 @@ public class InjectBindingRegistry {
                 throw new ValidationFailure("Binding not found", dependency.requestElement());
             }
             addDependencies(acc, depBinding);
-            Edge edge = new Edge(injectBinding, depBinding);
+            Edge edge = new Edge(depBinding, injectBinding);
             acc.add(edge);
         }
     }
 
-    private void register(Key key, ExecutableElement element) {
-        bindingsByKey.put(key, new InjectBinding(key, element));
-    }
 }
