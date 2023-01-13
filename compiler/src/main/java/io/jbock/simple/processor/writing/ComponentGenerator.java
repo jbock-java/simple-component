@@ -14,7 +14,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,14 +37,12 @@ public class ComponentGenerator {
         }
 
         Set<InjectBinding> generate() {
-            Set<Edge> edges = new LinkedHashSet<>();
-            Set<InjectBinding> nodes = new LinkedHashSet<>();
+            Graph graph = Graph.newGraph();
             for (DependencyRequest request : component.getRequests()) {
                 InjectBinding binding = injectBindingRegistry.getBinding(request);
-                nodes.add(binding);
-                edges.addAll(injectBindingRegistry.getDependencies(binding));
+                graph.addAll((injectBindingRegistry.getDependencies(binding)));
             }
-            return sortEdges(new Graph(edges, nodes));
+            return sortEdges(graph);
         }
 
         // https://en.wikipedia.org/wiki/Topological_sorting
@@ -63,7 +60,7 @@ public class ComponentGenerator {
                     }
                 }
             }
-            if (!graph.edges.isEmpty()) {
+            if (!graph.isEdgeless()) {
                 throw new ValidationFailure("cycle detected", component.element());
             }
             return result;
@@ -83,26 +80,5 @@ public class ComponentGenerator {
             result.put(b.key(), new NamedBinding(b, name));
         }
         return result;
-    }
-
-    private record Graph(Set<Edge> edges, Set<InjectBinding> nodes) {
-
-        List<Edge> edgesFrom(InjectBinding n) {
-            return edges.stream().filter(edge -> edge.source().equals(n)).toList();
-        }
-
-        List<Edge> edgesTo(InjectBinding m) {
-            return edges.stream().filter(edge -> edge.destination().equals(m)).toList();
-        }
-
-        List<InjectBinding> startNodes() {
-            return nodes.stream()
-                    .filter(r -> edgesTo(r).isEmpty())
-                    .toList();
-        }
-
-        void removeEdge(Edge edge) {
-            edges.remove(edge);
-        }
     }
 }

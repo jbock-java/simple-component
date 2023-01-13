@@ -5,14 +5,15 @@ import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.writing.Graph;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class InjectBindingRegistry {
 
@@ -21,7 +22,7 @@ public class InjectBindingRegistry {
     public void registerConstructor(ExecutableElement element) {
         Element typeElement = element.getEnclosingElement();
         Key key = new Key(TypeName.get(typeElement.asType()));
-        InjectBinding previousValue = bindingsByKey.put(key, new InjectBinding(key, element, 
+        InjectBinding previousValue = bindingsByKey.put(key, new InjectBinding(key, element,
                 params -> CodeBlock.of("new $T($L)", typeElement.asType(), params)));
         if (previousValue != null) {
             throw new ValidationFailure("Duplicate binding", element);
@@ -31,13 +32,13 @@ public class InjectBindingRegistry {
     public void registerFactoryMethod(ExecutableElement element) {
         TypeMirror returnType = element.getReturnType();
         Key key = new Key(TypeName.get(returnType));
-        InjectBinding previousValue = bindingsByKey.put(key, new InjectBinding(key, element, 
+        InjectBinding previousValue = bindingsByKey.put(key, new InjectBinding(key, element,
                 params -> CodeBlock.of("$T.$L($L)", element.getEnclosingElement().asType(), element.getSimpleName().toString(), params)));
         if (previousValue != null) {
             throw new ValidationFailure("Duplicate binding", element);
         }
     }
-    
+
     public InjectBinding getBinding(DependencyRequest request) {
         InjectBinding injectBinding = bindingsByKey.get(request.key());
         if (injectBinding == null) {
@@ -46,22 +47,26 @@ public class InjectBindingRegistry {
         return injectBinding;
     }
 
-    public List<Edge> getDependencies(InjectBinding injectBinding) {
-        List<Edge> acc = new ArrayList<>();
-        addDependencies(acc, injectBinding);
-        return acc;
+    public Graph getDependencies(InjectBinding startNode) {
+        Set<Edge> edges = new LinkedHashSet<>();
+        Set<InjectBinding> nodes = new LinkedHashSet<>();
+        nodes.add(startNode);
+        addDependencies(nodes, edges, startNode);
+        return new Graph(edges, nodes);
     }
 
     private void addDependencies(
-            List<Edge> acc,
-            InjectBinding injectBinding) {
-        List<DependencyRequest> dependencies = injectBinding.dependencies();
-        for (DependencyRequest dependency : dependencies) {
-            InjectBinding depBinding = getBinding(dependency);
-            addDependencies(acc, depBinding);
-            Edge edge = new Edge(depBinding, injectBinding);
-            acc.add(edge);
+            Set<InjectBinding> nodes,
+            Set<Edge> edges,
+            InjectBinding node) {
+        for (DependencyRequest d : node.dependencies()) {
+            InjectBinding dependency = getBinding(d);
+            Edge edge = new Edge(dependency, node);
+            edges.add(edge);
+            if (!nodes.add(dependency)) {
+                return; // probably cyclic dependency
+            }
+            addDependencies(nodes, edges, dependency);
         }
     }
-
 }
