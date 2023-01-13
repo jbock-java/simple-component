@@ -49,7 +49,21 @@ class ProcessorComponentTest {
                 .containsLines(
                         "package test;",
                         "",
-                        "class TestClass_AComponent_Impl {",
+                        "class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "  private final TestClass.C c;",
+                        "  private final TestClass.B b;",
+                        "  private final TestClass.A a;",
+                        "",
+                        "  private TestClass_AComponent_Impl() {",
+                        "    this.c = TestClass.createC();",
+                        "    this.b = TestClass.createB(c);",
+                        "    this.a = new TestClass.A(b);",
+                        "  }",
+                        "",
+                        "  @Override",
+                        "  public TestClass.A getA() {",
+                        "    return a;",
+                        "  }",
                         "}");
     }
 
@@ -90,7 +104,23 @@ class ProcessorComponentTest {
                 .containsLines(
                         "package test;",
                         "",
-                        "class TestClass_AComponent_Impl {",
+                        "class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "  private final TestClass.E e;",
+                        "  private final TestClass.C c;",
+                        "  private final TestClass.B b;",
+                        "  private final TestClass.A a;",
+                        "",
+                        "  private TestClass_AComponent_Impl() {",
+                        "    this.e = new TestClass.E();",
+                        "    this.c = new TestClass.C(e);",
+                        "    this.b = new TestClass.B(e);",
+                        "    this.a = new TestClass.A(b, c);",
+                        "  }",
+                        "",
+                        "  @Override",
+                        "  public TestClass.A getA() {",
+                        "    return a;",
+                        "  }",
                         "}");
     }
 }

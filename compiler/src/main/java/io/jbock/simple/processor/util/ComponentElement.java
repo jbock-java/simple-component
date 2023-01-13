@@ -28,6 +28,24 @@ public final class ComponentElement {
                 .peerClass(String.join("_", className.simpleNames()) + "_Impl");
     });
 
+    private final Supplier<List<DependencyRequest>> requests = memoize(() -> {
+        List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
+        List<DependencyRequest> result = new ArrayList<>();
+        for (ExecutableElement method : methods) {
+            if (!method.getParameters().isEmpty()) {
+                throw new ValidationFailure("The method may not have any parameters", method);
+            }
+            if (method.getModifiers().contains(Modifier.STATIC)) {
+                throw new ValidationFailure("The method may not be static", method);
+            }
+            if (method.getReturnType().getKind() == TypeKind.VOID) {
+                throw new ValidationFailure("The method may not return void", method);
+            }
+            result.add(new DependencyRequest(new Key(TypeName.get(method.getReturnType())), method));
+        }
+        return result;
+    });
+
     private ComponentElement(TypeElement element) {
         this.element = element;
     }
@@ -44,21 +62,7 @@ public final class ComponentElement {
     }
 
     public List<DependencyRequest> getRequests() {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(element.getEnclosedElements());
-        List<DependencyRequest> result = new ArrayList<>();
-        for (ExecutableElement method : methods) {
-            if (!method.getParameters().isEmpty()) {
-                throw new ValidationFailure("The method may not have any parameters", method);
-            }
-            if (method.getModifiers().contains(Modifier.STATIC)) {
-                throw new ValidationFailure("The method may not be static", method);
-            }
-            if (method.getReturnType().getKind() == TypeKind.VOID) {
-                throw new ValidationFailure("The method may not return void", method);
-            }
-            result.add(new DependencyRequest(new Key(TypeName.get(method.getReturnType())), method));
-        }
-        return result;        
+        return requests.get();
     }
 
     public ClassName generatedClass() {
