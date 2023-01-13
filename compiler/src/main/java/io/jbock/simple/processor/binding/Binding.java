@@ -2,7 +2,7 @@ package io.jbock.simple.processor.binding;
 
 import java.util.Objects;
 
-public abstract sealed class Binding permits InjectBinding {
+public abstract sealed class Binding permits InjectBinding, ParameterBinding {
 
     private final Key key;
 

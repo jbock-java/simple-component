@@ -10,11 +10,8 @@ import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.FactoryElement;
-import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.util.ElementFilter;
-import java.util.List;
 import java.util.Map;
 
 import static javax.lang.model.element.Modifier.FINAL;
@@ -30,6 +27,13 @@ public class ComponentImpl {
             Map<Key, NamedBinding> sorted) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass()).addSuperinterface(component.element().asType());
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
+        if (component.factoryElement().isEmpty()) {
+            spec.addMethod(MethodSpec.methodBuilder("create")
+                    .addModifiers(STATIC)
+                    .returns(TypeName.get(component.element().asType()))
+                    .addStatement("return new $T()", component.generatedClass())
+                    .build());
+        }
         for (Map.Entry<Key, NamedBinding> e : sorted.entrySet()) {
             InjectBinding b = e.getValue().binding();
             Key key = b.key();
@@ -67,14 +71,7 @@ public class ComponentImpl {
             FactoryElement factory) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
         spec.addSuperinterface(factory.element().asType());
-        List<ExecutableElement> methods = ElementFilter.methodsIn(factory.element().getEnclosedElements());
-        if (methods.size() != 1) {
-            throw new ValidationFailure("Only one method allowed", factory.element());
-        }
-        ExecutableElement method = methods.get(0);
-        if (method.getModifiers().contains(STATIC)) {
-            throw new ValidationFailure("The method may not be static", method);
-        }
+        ExecutableElement method = factory.singleAbstractMethod();
         spec.addMethod(MethodSpec.methodBuilder(method.getSimpleName().toString())
                 .addAnnotation(Override.class)
                 .addModifiers(method.getModifiers().stream()

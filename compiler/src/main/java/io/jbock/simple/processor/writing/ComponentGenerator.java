@@ -29,24 +29,24 @@ public class ComponentGenerator {
         this.componentImpl = componentImpl;
     }
 
-    private class Generator {
+    private class Analyzer {
         final ComponentElement component;
 
-        Generator(ComponentElement component) {
+        Analyzer(ComponentElement component) {
             this.component = component;
         }
 
-        Set<InjectBinding> generate() {
+        Set<InjectBinding> analyze() {
             Graph graph = Graph.newGraph();
             for (DependencyRequest request : component.getRequests()) {
                 InjectBinding binding = injectBindingRegistry.getBinding(request);
                 graph.addAll((injectBindingRegistry.getDependencies(binding)));
             }
-            return sortEdges(graph);
+            return sortNodes(graph);
         }
 
         // https://en.wikipedia.org/wiki/Topological_sorting
-        Set<InjectBinding> sortEdges(Graph graph) {
+        Set<InjectBinding> sortNodes(Graph graph) {
             Set<InjectBinding> result = new LinkedHashSet<>();
             Deque<InjectBinding> s = new ArrayDeque<>(graph.startNodes());
             while (!s.isEmpty()) {
@@ -68,7 +68,7 @@ public class ComponentGenerator {
     }
 
     public TypeSpec generate(ComponentElement component) {
-        Set<InjectBinding> sorted = new Generator(component).generate();
+        Set<InjectBinding> sorted = new Analyzer(component).analyze();
         return componentImpl.generate(component, addNames(sorted));
     }
 

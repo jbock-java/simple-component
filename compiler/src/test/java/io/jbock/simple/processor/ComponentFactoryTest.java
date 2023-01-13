@@ -1,6 +1,7 @@
 package io.jbock.simple.processor;
 
 import io.jbock.testing.compile.Compilation;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.tools.JavaFileObject;
@@ -64,5 +65,33 @@ class ComponentFactoryTest {
                         "    }",
                         "  }",
                         "}");
+    }
+
+    @Disabled("WIP ParameterBinding")
+    @Test
+    void factoryParameter() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "",
+                "import io.jbock.simple.Component;",
+                "import jakarta.inject.Inject;",
+                "",
+                "final class TestClass {",
+                "  static class A {",
+                "    @Inject A(String s) {}",
+                "  }",
+                "",
+                "  @Component",
+                "  interface AComponent {",
+                "    A getA();",
+                "",
+                "    @Component.Factory",
+                "    interface Factory {",
+                "      AComponent create(String s);",
+                "    }",
+                "  }",
+                "}");
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
     }
 }

@@ -1,18 +1,17 @@
 package io.jbock.simple.processor.util;
 
-import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class ComponentRegistry {
 
-    private final Set<TypeElement> components = new LinkedHashSet<>();
+    private final Set<ComponentElement> components = new LinkedHashSet<>();
 
-    public void registerComponent(TypeElement typeElement) {
+    public void registerComponent(ComponentElement typeElement) {
         components.add(typeElement);
     }
 
-    public Set<TypeElement> components() {
+    public Set<ComponentElement> components() {
         return components;
     }
 }

@@ -43,7 +43,7 @@ final class ProcessorComponent {
         this.injectBindingRegistry = new InjectBindingRegistry();
         this.componentImpl = new ComponentImpl();
         this.generator = new ComponentGenerator(injectBindingRegistry, componentImpl);
-        this.componentStep = new ComponentStep(componentRegistry);
+        this.componentStep = new ComponentStep(componentRegistry, messager, tool);
         this.injectStep = new InjectStep(injectBindingRegistry);
     }
 
