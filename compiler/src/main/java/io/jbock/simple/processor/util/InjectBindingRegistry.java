@@ -37,13 +37,17 @@ public class InjectBindingRegistry {
             throw new ValidationFailure("Duplicate binding", element);
         }
     }
-
-    public List<Edge> getDependencies(DependencyRequest request) {
-        List<Edge> acc = new ArrayList<>();
+    
+    public InjectBinding getBinding(DependencyRequest request) {
         InjectBinding injectBinding = bindingsByKey.get(request.key());
         if (injectBinding == null) {
             throw new ValidationFailure("Binding not found", request.requestElement());
         }
+        return injectBinding;
+    }
+
+    public List<Edge> getDependencies(InjectBinding injectBinding) {
+        List<Edge> acc = new ArrayList<>();
         addDependencies(acc, injectBinding);
         return acc;
     }
@@ -53,10 +57,7 @@ public class InjectBindingRegistry {
             InjectBinding injectBinding) {
         List<DependencyRequest> dependencies = injectBinding.dependencies();
         for (DependencyRequest dependency : dependencies) {
-            InjectBinding depBinding = bindingsByKey.get(dependency.key());
-            if (depBinding == null) {
-                throw new ValidationFailure("Binding not found", dependency.requestElement());
-            }
+            InjectBinding depBinding = getBinding(dependency);
             addDependencies(acc, depBinding);
             Edge edge = new Edge(depBinding, injectBinding);
             acc.add(edge);

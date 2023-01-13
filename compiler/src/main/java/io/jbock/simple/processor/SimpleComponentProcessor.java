@@ -29,7 +29,7 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
         if (lastRound && roundEnv.processingOver()) {
             for (TypeElement element : component.componentRegistry().components()) {
                 try {
-                    ComponentElement componentElement = ComponentElement.create(element);
+                    ComponentElement componentElement = ComponentElement.create(element, component.tool());
                     TypeSpec typeSpec = component.componentGenerator().generate(componentElement);
                     writeSpec(componentElement, typeSpec);
                 } catch (ValidationFailure f) {

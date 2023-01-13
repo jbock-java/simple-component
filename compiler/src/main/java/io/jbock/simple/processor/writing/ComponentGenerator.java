@@ -39,16 +39,18 @@ public class ComponentGenerator {
 
         Set<InjectBinding> generate() {
             Set<Edge> edges = new LinkedHashSet<>();
+            Set<InjectBinding> nodes = new LinkedHashSet<>();
             for (DependencyRequest request : component.getRequests()) {
-                edges.addAll(injectBindingRegistry.getDependencies(request));
+                InjectBinding binding = injectBindingRegistry.getBinding(request);
+                nodes.add(binding);
+                edges.addAll(injectBindingRegistry.getDependencies(binding));
             }
-            return sortEdges(edges);
+            return sortEdges(new Graph(edges, nodes));
         }
 
         // https://en.wikipedia.org/wiki/Topological_sorting
-        Set<InjectBinding> sortEdges(Set<Edge> edges) {
+        Set<InjectBinding> sortEdges(Graph graph) {
             Set<InjectBinding> result = new LinkedHashSet<>();
-            Graph graph = createGraph(edges);
             Deque<InjectBinding> s = new ArrayDeque<>(graph.startNodes());
             while (!s.isEmpty()) {
                 InjectBinding n = s.pop();
@@ -94,8 +96,7 @@ public class ComponentGenerator {
         }
 
         List<InjectBinding> startNodes() {
-            List<InjectBinding> sources = edges.stream().map(Edge::source).toList();
-            return sources.stream()
+            return nodes.stream()
                     .filter(r -> edgesTo(r).isEmpty())
                     .toList();
         }
@@ -103,14 +104,5 @@ public class ComponentGenerator {
         void removeEdge(Edge edge) {
             edges.remove(edge);
         }
-    }
-
-    private Graph createGraph(Set<Edge> edges) {
-        Set<InjectBinding> nodes = new LinkedHashSet<>();
-        for (Edge edge : edges) {
-            nodes.add(edge.source());
-            nodes.add(edge.destination());
-        }
-        return new Graph(new LinkedHashSet<>(edges), nodes);
     }
 }

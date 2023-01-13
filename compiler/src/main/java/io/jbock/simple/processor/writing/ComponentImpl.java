@@ -3,18 +3,25 @@ package io.jbock.simple.processor.writing;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.FieldSpec;
 import io.jbock.javapoet.MethodSpec;
+import io.jbock.javapoet.TypeName;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.util.ComponentElement;
+import io.jbock.simple.processor.util.FactoryElement;
+import io.jbock.simple.processor.util.ValidationFailure;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.util.ElementFilter;
+import java.util.List;
 import java.util.Map;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PROTECTED;
 import static javax.lang.model.element.Modifier.PUBLIC;
+import static javax.lang.model.element.Modifier.STATIC;
 
 public class ComponentImpl {
 
@@ -40,15 +47,41 @@ public class ComponentImpl {
             method.addStatement("return $L", sorted.get(r.key()).name());
             method.returns(r.key().typeName());
             method.addAnnotation(Override.class);
-            if (r.requestElement().getModifiers().contains(PUBLIC)) {
-                method.addModifiers(PUBLIC);
-            }
-            if (r.requestElement().getModifiers().contains(PROTECTED)) {
-                method.addModifiers(PROTECTED);
-            }
+            method.addModifiers(r.requestElement().getModifiers().stream()
+                    .filter(m -> m == PUBLIC || m == PROTECTED).toList());
             spec.addMethod(method.build());
         }
+        component.factoryElement().ifPresent(factory -> {
+            spec.addMethod(MethodSpec.methodBuilder("factory")
+                    .returns(TypeName.get(factory.element().asType()))
+                    .addStatement("return new $T()", factory.generatedClass())
+                    .build());
+            spec.addType(createFactory(component, factory));
+        });
         return spec.addMethod(constructor.build())
                 .addOriginatingElement(component.element()).build();
+    }
+
+    private static TypeSpec createFactory(
+            ComponentElement component,
+            FactoryElement factory) {
+        TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
+        spec.addSuperinterface(factory.element().asType());
+        List<ExecutableElement> methods = ElementFilter.methodsIn(factory.element().getEnclosedElements());
+        if (methods.size() != 1) {
+            throw new ValidationFailure("Only one method allowed", factory.element());
+        }
+        ExecutableElement method = methods.get(0);
+        if (method.getModifiers().contains(STATIC)) {
+            throw new ValidationFailure("The method may not be static", method);
+        }
+        spec.addMethod(MethodSpec.methodBuilder(method.getSimpleName().toString())
+                .addAnnotation(Override.class)
+                .addModifiers(method.getModifiers().stream()
+                        .filter(m -> m == PUBLIC || m == PROTECTED).toList())
+                .returns(TypeName.get(component.element().asType()))
+                .addStatement("return new $T()", component.generatedClass())
+                .build());
+        return spec.build();
     }
 }

@@ -28,10 +28,12 @@ final class ProcessorComponent {
     private final ComponentGenerator generator;
     private final ComponentStep componentStep;
     private final InjectStep injectStep;
+    private final SafeTypes types;
+    private final SafeElements elements;
 
     ProcessorComponent(ProcessingEnvironment processingEnvironment) {
-        SafeTypes types = new SafeTypes(processingEnvironment.getTypeUtils());
-        SafeElements elements = new SafeElements(processingEnvironment.getElementUtils());
+        this.types = new SafeTypes(processingEnvironment.getTypeUtils());
+        this.elements = new SafeElements(processingEnvironment.getElementUtils());
         Filer filer = processingEnvironment.getFiler();
         this.componentRegistry = new ComponentRegistry();
         this.tool = new TypeTool(elements, types);
@@ -65,7 +67,19 @@ final class ProcessorComponent {
         return generator;
     }
 
-    public Messager messager() {
+    Messager messager() {
         return messager;
+    }
+
+    SafeTypes types() {
+        return types;
+    }
+
+    SafeElements elements() {
+        return elements;
+    }
+
+    TypeTool tool() {
+        return tool;
     }
 }
