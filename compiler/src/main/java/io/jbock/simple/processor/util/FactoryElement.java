@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.util;
 
 import io.jbock.javapoet.ClassName;
+import io.jbock.simple.processor.binding.ParameterBinding;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -9,6 +10,7 @@ import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static io.jbock.simple.processor.util.Suppliers.memoize;
 import static javax.lang.model.element.Modifier.STATIC;
 
 public class FactoryElement {
@@ -16,7 +18,7 @@ public class FactoryElement {
     private final TypeElement element;
     private final ClassName parentClass;
 
-    private final Supplier<ExecutableElement> singleAbstractMethod = Suppliers.memoize(() -> {
+    private final Supplier<ExecutableElement> singleAbstractMethod = memoize(() -> {
         List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
         if (methods.isEmpty()) {
             throw new ValidationFailure("Factory method not found", element());
@@ -34,6 +36,9 @@ public class FactoryElement {
         return method;
     });
 
+    private final Supplier<List<ParameterBinding>> parameterBindings = memoize(() -> 
+            singleAbstractMethod().getParameters().stream().map(ParameterBinding::create).toList());
+
     FactoryElement(TypeElement element, ClassName parentClass) {
         this.element = element;
         this.parentClass = parentClass;
@@ -49,5 +54,9 @@ public class FactoryElement {
 
     public ExecutableElement singleAbstractMethod() {
         return singleAbstractMethod.get();
+    }
+
+    public List<ParameterBinding> parameterBindings() {
+        return parameterBindings.get();
     }
 }

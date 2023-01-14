@@ -15,8 +15,14 @@ import static io.jbock.simple.processor.util.Suppliers.memoize;
 public final class InjectBinding extends Binding {
 
     private final ExecutableElement bindingElement;
-    
+
     private final Function<CodeBlock, CodeBlock> invokeExpression;
+
+    private final Supplier<String> suggestedVariableName = memoize(() -> {
+        String[] tokens = key().typeName().toString().split("[.]");
+        String simpleName = tokens[tokens.length - 1];
+        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
+    });
 
     private final Supplier<List<DependencyRequest>> dependencies = memoize(() -> {
         List<DependencyRequest> result = new ArrayList<>();
@@ -28,21 +34,26 @@ public final class InjectBinding extends Binding {
 
     public InjectBinding(
             Key key,
-            ExecutableElement bindingElement, 
+            ExecutableElement bindingElement,
             Function<CodeBlock, CodeBlock> invokeExpression) {
         super(key);
         this.bindingElement = bindingElement;
         this.invokeExpression = invokeExpression;
     }
 
+    public String suggestedVariableName() {
+        return suggestedVariableName.get();
+    }
+
     public ExecutableElement bindingElement() {
         return bindingElement;
     }
 
+    @Override
     public List<DependencyRequest> dependencies() {
         return dependencies.get();
     }
-    
+
     public CodeBlock invokeExpression(CodeBlock params) {
         return invokeExpression.apply(params);
     }

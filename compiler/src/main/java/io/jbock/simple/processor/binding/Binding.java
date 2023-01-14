@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.binding;
 
+import java.util.List;
 import java.util.Objects;
 
 public abstract sealed class Binding permits InjectBinding, ParameterBinding {
@@ -26,4 +27,6 @@ public abstract sealed class Binding permits InjectBinding, ParameterBinding {
     public final Key key() {
         return key;
     }
+
+    public abstract List<DependencyRequest> dependencies();
 }

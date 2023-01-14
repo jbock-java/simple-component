@@ -9,8 +9,8 @@ import io.jbock.simple.processor.util.SafeTypes;
 import io.jbock.simple.processor.util.SourceFileGenerator;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.Util;
-import io.jbock.simple.processor.writing.ComponentGenerator;
 import io.jbock.simple.processor.writing.ComponentImpl;
+import io.jbock.simple.processor.writing.Generator;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -25,7 +25,7 @@ final class ProcessorComponent {
     private final InjectBindingRegistry injectBindingRegistry;
     private final ComponentRegistry componentRegistry;
     private final ComponentImpl componentImpl;
-    private final ComponentGenerator generator;
+    private final Generator.Factory generatorFactory;
     private final ComponentStep componentStep;
     private final InjectStep injectStep;
     private final SafeTypes types;
@@ -42,7 +42,7 @@ final class ProcessorComponent {
         this.sourceFileGenerator = new SourceFileGenerator(filer, messager);
         this.injectBindingRegistry = new InjectBindingRegistry();
         this.componentImpl = new ComponentImpl();
-        this.generator = new ComponentGenerator(injectBindingRegistry, componentImpl);
+        this.generatorFactory = component -> new Generator(injectBindingRegistry.createBindingRegistry(component), componentImpl, component);
         this.componentStep = new ComponentStep(componentRegistry, messager, tool);
         this.injectStep = new InjectStep(injectBindingRegistry);
     }
@@ -63,8 +63,8 @@ final class ProcessorComponent {
         return sourceFileGenerator;
     }
 
-    ComponentGenerator componentGenerator() {
-        return generator;
+    Generator.Factory generatorFactory() {
+        return generatorFactory;
     }
 
     Messager messager() {

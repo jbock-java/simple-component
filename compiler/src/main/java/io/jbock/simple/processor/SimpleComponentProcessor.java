@@ -3,7 +3,6 @@ package io.jbock.simple.processor;
 import io.jbock.auto.common.BasicAnnotationProcessor;
 import io.jbock.javapoet.JavaFile;
 import io.jbock.javapoet.TypeSpec;
-import io.jbock.simple.processor.binding.ParameterBinding;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -28,12 +27,8 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
         boolean lastRound = roundEnv.getRootElements().isEmpty();
         if (lastRound && roundEnv.processingOver()) {
             for (ComponentElement componentElement : component.componentRegistry().components()) {
-                List<ParameterBinding> parameterBindings = componentElement.factoryElement()
-                        .map(factory -> factory.singleAbstractMethod().getParameters())
-                        .map(parameters -> parameters.stream().map(ParameterBinding::create).toList())
-                        .orElse(List.of());
                 try {
-                    TypeSpec typeSpec = component.componentGenerator().generate(componentElement);
+                    TypeSpec typeSpec = component.generatorFactory().create(componentElement).generate();
                     writeSpec(componentElement, typeSpec);
                 } catch (ValidationFailure f) {
                     f.writeTo(component.messager());
