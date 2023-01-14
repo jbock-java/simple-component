@@ -3,6 +3,7 @@ package io.jbock.simple.processor.binding;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.TypeName;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.ArrayList;
@@ -17,6 +18,13 @@ public final class InjectBinding extends Binding {
     private final ExecutableElement bindingElement;
 
     private final Function<CodeBlock, CodeBlock> invokeExpression;
+
+    private final Supplier<String> signature = memoize(() -> CodeBlock.of(
+            "$T($L)",
+            key().typeName(),
+            dependencies().stream()
+                    .map(d -> CodeBlock.of("$L", d.requestElement().getSimpleName().toString()))
+                    .collect(CodeBlock.joining(", "))).toString());
 
     private final Supplier<String> suggestedVariableName = memoize(() -> {
         String[] tokens = key().typeName().toString().split("[.]");
@@ -50,12 +58,21 @@ public final class InjectBinding extends Binding {
     }
 
     @Override
+    public Element element() {
+        return bindingElement;
+    }
+
+    @Override
     public List<DependencyRequest> dependencies() {
         return dependencies.get();
     }
 
     public CodeBlock invokeExpression(CodeBlock params) {
         return invokeExpression.apply(params);
+    }
+
+    public String signature() {
+        return signature.get();
     }
 
     @Override

@@ -2,7 +2,9 @@ package io.jbock.simple.processor.util;
 
 import io.jbock.simple.processor.binding.Binding;
 
-// An Injection: The source binding gets injected into destination binding.
+/**
+ * Edge(source, destination) :== source "IS INJECTED AT" destination 
+ */
 public record Edge(
         Binding source,
         Binding destination) {

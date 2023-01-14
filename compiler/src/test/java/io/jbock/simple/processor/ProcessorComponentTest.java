@@ -12,7 +12,7 @@ import static io.jbock.testing.compile.JavaFileObjects.forSourceLines;
 class ProcessorComponentTest {
 
     @Test
-    void simpleComponent() {
+    void staticMethodBindings() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",
                 "",
@@ -68,7 +68,7 @@ class ProcessorComponentTest {
     }
 
     @Test
-    void simpleDiamond() {
+    void dependencyDiamond() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",
                 "",
@@ -120,6 +120,37 @@ class ProcessorComponentTest {
                         "  @Override",
                         "  public TestClass.A getA() {",
                         "    return a;",
+                        "  }",
+                        "}");
+    }
+
+    @Test
+    void noRequest() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "",
+                "import io.jbock.simple.Component;",
+                "import jakarta.inject.Inject;",
+                "",
+                "final class TestClass {",
+                "",
+                "  @Component",
+                "  interface AComponent {",
+                "  }",
+                "}");
+
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
+        assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
+                .containsLines(
+                        "package test;",
+                        "",
+                        "class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "  private TestClass_AComponent_Impl() {",
+                        "  }",
+                        "",
+                        "  static TestClass.AComponent create() {",
+                        "    return new TestClass_AComponent_Impl();",
                         "  }",
                         "}");
     }

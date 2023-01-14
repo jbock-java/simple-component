@@ -11,7 +11,6 @@ import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.Edge;
 import io.jbock.simple.processor.util.FactoryElement;
 import io.jbock.simple.processor.util.UniqueNameSet;
-import io.jbock.simple.processor.util.ValidationFailure;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -60,8 +59,8 @@ public class Generator {
                 }
             }
         }
-        if (!graph.isEdgeless()) {
-            throw new ValidationFailure("cycle detected", component.element());
+        if (!graph.edges().isEmpty()) {
+            throw new CyclePrinter(graph).fail();
         }
         return result;
     }

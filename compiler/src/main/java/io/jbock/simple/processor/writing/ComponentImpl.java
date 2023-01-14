@@ -44,7 +44,7 @@ public class ComponentImpl {
             spec.addField(field);
             if (namedBinding.binding() instanceof InjectBinding b) {
                 constructor.addStatement("this.$N = $L", field,
-                        b.invokeExpression(namedBinding.binding().dependencies().stream()
+                        b.invokeExpression(b.dependencies().stream()
                                 .map(d -> CodeBlock.of("$L", sorted.get(d.key()).name()))
                                 .collect(CodeBlock.joining(", "))));
             } else if (namedBinding.binding() instanceof ParameterBinding b) {

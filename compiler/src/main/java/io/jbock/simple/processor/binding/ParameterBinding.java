@@ -4,6 +4,7 @@ import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.util.Suppliers;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import java.util.List;
 import java.util.function.Supplier;
@@ -39,6 +40,11 @@ public final class ParameterBinding extends Binding {
     @Override
     public String toString() {
         return "ParameterBinding[" + "" + key() + ']';
+    }
+
+    @Override
+    public Element element() {
+        return parameter;
     }
 
     @Override

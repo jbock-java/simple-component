@@ -35,8 +35,4 @@ public record Graph(Set<Edge> edges, Set<Binding> nodes) {
     void removeEdge(Edge edge) {
         edges.remove(edge);
     }
-
-    boolean isEdgeless() {
-        return edges.isEmpty();
-    }
 }

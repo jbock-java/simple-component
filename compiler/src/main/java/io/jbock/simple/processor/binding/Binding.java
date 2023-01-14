@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.binding;
 
+import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +28,8 @@ public abstract sealed class Binding permits InjectBinding, ParameterBinding {
     public final Key key() {
         return key;
     }
+
+    public abstract Element element();
 
     public abstract List<DependencyRequest> dependencies();
 }
