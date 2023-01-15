@@ -1,6 +1,6 @@
 module io.jbock.simple {
 
-    requires transitive java.compiler;
+    requires transitive jakarta.inject;
 
     exports io.jbock.simple;
 }
