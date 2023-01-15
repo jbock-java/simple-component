@@ -7,6 +7,7 @@ import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
 import io.jbock.simple.processor.writing.Graph;
 
+import javax.lang.model.element.VariableElement;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,12 +34,13 @@ public class BindingRegistry {
                 .orElse(List.of());
         Map<Key, ParameterBinding> parameterBindings = new HashMap<>();
         for (ParameterBinding b : pBindings) {
-            if (parameterBindings.put(b.key(), b) != null) {
-                throw new ValidationFailure("Duplicate binding, consider adding a qualifier annotation", b.parameter());
+            ParameterBinding previousBinding = parameterBindings.put(b.key(), b);
+            if (previousBinding != null) {
+                VariableElement p = previousBinding.parameter();
+                throw new ValidationFailure("The binding is in conflict with another parameter: " +
+                        p.asType() + ' ' + p.getSimpleName(), b.parameter());
             }
-            if (bindingsByKey.containsKey(b.key())) {
-                throw new ValidationFailure("Duplicate binding, consider adding a qualifier annotation", b.parameter());
-            }
+            DuplicateBinding.check(b, bindingsByKey.get(b.key()));
         }
         return new BindingRegistry(bindingsByKey, parameterBindings);
     }

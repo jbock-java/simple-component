@@ -27,7 +27,8 @@ public final class InjectBinding extends Binding {
         if (element().getKind() == ElementKind.CONSTRUCTOR) {
             return CodeBlock.of("$T($L)", key().typeName(), deps).toString();
         }
-        return CodeBlock.of("$T.$L($L)", key().typeName(), element().getSimpleName(), deps).toString();
+        return CodeBlock.of("$T.$L($L)", 
+                element().getEnclosingElement().asType(), element().getSimpleName(), deps).toString();
     });
 
     private final Supplier<String> suggestedVariableName = memoize(() -> {
