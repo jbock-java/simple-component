@@ -96,7 +96,7 @@ publishing {
     publications {
         shadow(MavenPublication) { publication ->
             project.shadow.component(publication)
-            artifactId = 'simple-compoent-compiler'
+            artifactId = 'simple-component-compiler'
 
             artifact sourcesJar
             artifact javadocJar
@@ -104,8 +104,8 @@ publishing {
             pom {
                 name = 'simple-component-compiler'
                 packaging = 'jar'
-                description = 'simple-component annotation processor'
-                url = 'https://github.com/jbock-java/simpe-component'
+                description = 'simple-component'
+                url = 'https://github.com/jbock-java/simple-component'
 
                 licenses {
                     license {
