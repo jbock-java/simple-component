@@ -31,22 +31,24 @@ public class BindingRegistry {
         List<ParameterBinding> pBindings = componentElement.factoryElement()
                 .map(FactoryElement::parameterBindings)
                 .orElse(List.of());
-        Map<Key, ParameterBinding> m = new HashMap<>();
+        Map<Key, ParameterBinding> parameterBindings = new HashMap<>();
         for (ParameterBinding b : pBindings) {
-            m.put(b.key(), b);
+            if (parameterBindings.put(b.key(), b) != null) {
+                throw new ValidationFailure("Duplicate binding, consider adding a qualifier annotation", b.parameter());
+            }
             if (bindingsByKey.containsKey(b.key())) {
-                throw new ValidationFailure("Duplicate binding", b.parameter());
+                throw new ValidationFailure("Duplicate binding, consider adding a qualifier annotation", b.parameter());
             }
         }
-        return new BindingRegistry(bindingsByKey, m);
+        return new BindingRegistry(bindingsByKey, parameterBindings);
     }
-    
+
     public Binding getBinding(DependencyRequest request) {
         InjectBinding injectBinding = bindingsByKey.get(request.key());
         if (injectBinding == null) {
             ParameterBinding parameterBinding = parameterBindings.get(request.key());
             if (parameterBinding == null) {
-                throw new ValidationFailure("Binding not found", request.requestElement());
+                throw new ValidationFailure("Binding not found", request.requestingElement());
             }
             return parameterBinding;
         }
@@ -70,7 +72,9 @@ public class BindingRegistry {
             Edge edge = new Edge(dependency, node);
             edges.add(edge);
             if (!nodes.add(dependency)) {
-                return; // probably cyclic dependency
+                // probably cyclic dependency,
+                // will be properly handled later on
+                return;
             }
             addDependencies(nodes, edges, dependency);
         }

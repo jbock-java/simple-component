@@ -17,6 +17,7 @@ public class FactoryElement {
 
     private final TypeElement element;
     private final ClassName parentClass;
+    private final Qualifiers qualifiers;
 
     private final Supplier<ExecutableElement> singleAbstractMethod = memoize(() -> {
         List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
@@ -36,12 +37,16 @@ public class FactoryElement {
         return method;
     });
 
-    private final Supplier<List<ParameterBinding>> parameterBindings = memoize(() -> 
-            singleAbstractMethod().getParameters().stream().map(ParameterBinding::create).toList());
+    private final Supplier<List<ParameterBinding>> parameterBindings = memoize(() ->
+            singleAbstractMethod().getParameters().stream().map(p -> ParameterBinding.create(p, qualifiers())).toList());
 
-    FactoryElement(TypeElement element, ClassName parentClass) {
+    FactoryElement(
+            TypeElement element,
+            ClassName parentClass,
+            Qualifiers qualifiers) {
         this.element = element;
         this.parentClass = parentClass;
+        this.qualifiers = qualifiers;
     }
 
     public TypeElement element() {
@@ -58,5 +63,9 @@ public class FactoryElement {
 
     public List<ParameterBinding> parameterBindings() {
         return parameterBindings.get();
+    }
+
+    private Qualifiers qualifiers() {
+        return qualifiers;
     }
 }

@@ -2,6 +2,7 @@ package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.TypeName;
+import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.Suppliers;
 
 import javax.lang.model.element.Element;
@@ -12,10 +13,10 @@ import java.util.function.Supplier;
 public final class ParameterBinding extends Binding {
 
     private final VariableElement parameter;
-    
-    private final Supplier<ParameterSpec> parameterSpec = Suppliers.memoize(() -> 
+
+    private final Supplier<ParameterSpec> parameterSpec = Suppliers.memoize(() ->
             ParameterSpec.builder(
-                    TypeName.get(parameter().asType()), 
+                    TypeName.get(parameter().asType()),
                     parameter().getSimpleName().toString()).build());
 
     private ParameterBinding(
@@ -25,8 +26,8 @@ public final class ParameterBinding extends Binding {
         this.parameter = parameter;
     }
 
-    public static ParameterBinding create(VariableElement parameter) {
-        return new ParameterBinding(new Key(TypeName.get(parameter.asType())), parameter);
+    public static ParameterBinding create(VariableElement parameter, Qualifiers qualifiers) {
+        return new ParameterBinding(new Key(TypeName.get(parameter.asType()), qualifiers.getQualifier(parameter)), parameter);
     }
 
     public VariableElement parameter() {

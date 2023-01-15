@@ -4,6 +4,7 @@ import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.simple.Component;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.ComponentRegistry;
+import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -21,14 +22,17 @@ public class ComponentStep implements Step {
     private final ComponentRegistry registry;
     private final Messager messager;
     private final TypeTool tool;
+    private final Qualifiers qualifiers;
 
     public ComponentStep(
             ComponentRegistry registry,
             Messager messager,
-            TypeTool tool) {
+            TypeTool tool,
+            Qualifiers qualifiers) {
         this.registry = registry;
         this.messager = messager;
         this.tool = tool;
+        this.qualifiers = qualifiers;
     }
 
     @Override
@@ -42,7 +46,7 @@ public class ComponentStep implements Step {
             List<Element> elements = elementsByAnnotation.values().stream().flatMap(Set::stream).toList();
             List<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement typeElement : typeElements) {
-                ComponentElement component = ComponentElement.create(typeElement, tool);
+                ComponentElement component = ComponentElement.create(typeElement, tool, qualifiers);
                 component.factoryElement().ifPresent(factory -> {
                     ExecutableElement method = factory.singleAbstractMethod();
                     if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {

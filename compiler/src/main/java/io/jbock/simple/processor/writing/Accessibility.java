@@ -12,25 +12,15 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.SimpleElementVisitor14;
+
+import static io.jbock.simple.processor.util.Visitors.PACKAGE_VISITOR;
+import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
 class Accessibility {
 
     private final Graph graph;
     private final PackageElement componentPackage;
     private final ComponentElement component;
-    private static final SimpleElementVisitor14<PackageElement, Void> PACKAGE_VISITOR = new SimpleElementVisitor14<>() {
-        @Override
-        public PackageElement visitPackage(PackageElement e, Void unused) {
-            return e;
-        }
-    };
-    private static final SimpleElementVisitor14<TypeElement, Void> TYPE_ELEMENT_VISITOR = new SimpleElementVisitor14<>() {
-        @Override
-        public TypeElement visitType(TypeElement e, Void unused) {
-            return e;
-        }
-    };
 
     private Accessibility(
             PackageElement componentPackage,
@@ -106,7 +96,7 @@ class Accessibility {
             return;
         }
         if (t.getNestingKind() == NestingKind.MEMBER && !t.getModifiers().contains(Modifier.STATIC)) {
-            throw new ValidationFailure("Enclosing nested class must be static", t);
+            throw new ValidationFailure("Non-static inner class is not allowed here", t);
         }
     }
 }

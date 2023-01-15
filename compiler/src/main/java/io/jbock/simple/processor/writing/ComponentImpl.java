@@ -55,11 +55,11 @@ public class ComponentImpl {
                 .map(FactoryElement::parameterBindings)
                 .orElse(List.of());
         for (DependencyRequest r : component.getRequests()) {
-            MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestElement().getSimpleName().toString());
+            MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestingElement().getSimpleName().toString());
             method.addStatement("return $L", sorted.get(r.key()).name());
             method.returns(r.key().typeName());
             method.addAnnotation(Override.class);
-            method.addModifiers(r.requestElement().getModifiers().stream()
+            method.addModifiers(r.requestingElement().getModifiers().stream()
                     .filter(m -> m == PUBLIC || m == PROTECTED).toList());
             spec.addMethod(method.build());
         }

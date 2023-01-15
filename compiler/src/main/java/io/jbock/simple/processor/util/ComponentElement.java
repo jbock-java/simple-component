@@ -25,6 +25,7 @@ public final class ComponentElement {
 
     private final TypeElement element;
     private final TypeTool tool;
+    private final Qualifiers qualifiers;
 
     private final Supplier<ClassName> generatedClass = memoize(() -> {
         ClassName className = ClassName.get(element());
@@ -40,7 +41,7 @@ public final class ComponentElement {
             if (hasFactoryAnnotation && el.getKind() != ElementKind.INTERFACE) {
                 throw new ValidationFailure("Factory must be an interface", el);
             }
-            return TypeTool.AS_TYPE_ELEMENT.visit(el).map(typeElement -> new FactoryElement(typeElement, generatedClass()));
+            return TypeTool.AS_TYPE_ELEMENT.visit(el).map(typeElement -> new FactoryElement(typeElement, generatedClass(), qualifiers()));
         }
         return Optional.empty();
     });
@@ -52,27 +53,32 @@ public final class ComponentElement {
             if (!method.getParameters().isEmpty()) {
                 throw new ValidationFailure("The method may not have any parameters", method);
             }
+            if (method.getModifiers().contains(Modifier.DEFAULT)) {
+                throw new ValidationFailure("Default method not allowed here", method);
+            }
             if (method.getModifiers().contains(Modifier.STATIC)) {
                 throw new ValidationFailure("The method may not be static", method);
             }
             if (method.getReturnType().getKind() == TypeKind.VOID) {
                 throw new ValidationFailure("The method may not return void", method);
             }
-            result.add(new DependencyRequest(new Key(TypeName.get(method.getReturnType())), method));
+            Key key = new Key(TypeName.get(method.getReturnType()), qualifiers().getQualifier(method));
+            result.add(new DependencyRequest(key, method));
         }
         return result;
     });
 
-    private ComponentElement(TypeElement element, TypeTool tool) {
+    private ComponentElement(TypeElement element, TypeTool tool, Qualifiers qualifiers) {
         this.element = element;
         this.tool = tool;
+        this.qualifiers = qualifiers;
     }
 
-    public static ComponentElement create(TypeElement element, TypeTool tool) {
+    public static ComponentElement create(TypeElement element, TypeTool tool, Qualifiers qualifiers) {
         if (element.getKind() != ElementKind.INTERFACE) {
             throw new ValidationFailure("The component must be an interface", element);
         }
-        return new ComponentElement(element, tool);
+        return new ComponentElement(element, tool, qualifiers);
     }
 
     public TypeElement element() {
@@ -106,5 +112,9 @@ public final class ComponentElement {
     @Override
     public int hashCode() {
         return Objects.hash(element);
+    }
+
+    private Qualifiers qualifiers() {
+        return qualifiers;
     }
 }

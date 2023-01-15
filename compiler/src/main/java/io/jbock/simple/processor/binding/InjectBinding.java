@@ -2,6 +2,7 @@ package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.TypeName;
+import io.jbock.simple.processor.util.Qualifiers;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -21,7 +22,7 @@ public final class InjectBinding extends Binding {
 
     private final Supplier<String> signature = memoize(() -> {
         CodeBlock deps = dependencies().stream()
-                .map(d -> CodeBlock.of("$L", d.requestElement().getSimpleName().toString()))
+                .map(d -> CodeBlock.of("$L", d.requestingElement().getSimpleName().toString()))
                 .collect(CodeBlock.joining(", "));
         if (element().getKind() == ElementKind.CONSTRUCTOR) {
             return CodeBlock.of("$T($L)", key().typeName(), deps).toString();
@@ -35,21 +36,30 @@ public final class InjectBinding extends Binding {
         return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
     });
 
-    private final Supplier<List<DependencyRequest>> dependencies = memoize(() -> {
-        List<DependencyRequest> result = new ArrayList<>();
-        for (VariableElement parameter : element().getParameters()) {
-            result.add(new DependencyRequest(new Key(TypeName.get(parameter.asType())), parameter));
-        }
-        return result;
-    });
+    private final List<DependencyRequest> dependencies;
 
     public InjectBinding(
             Key key,
             ExecutableElement bindingElement,
-            Function<CodeBlock, CodeBlock> invokeExpression) {
+            Function<CodeBlock, CodeBlock> invokeExpression,
+            List<DependencyRequest> dependencies) {
         super(key);
         this.bindingElement = bindingElement;
         this.invokeExpression = invokeExpression;
+        this.dependencies = dependencies;
+    }
+
+    public static InjectBinding create(
+            Key key,
+            ExecutableElement bindingElement,
+            Function<CodeBlock, CodeBlock> invokeExpression,
+            Qualifiers qualifiers) {
+        List<DependencyRequest> dependencies = new ArrayList<>();
+        for (VariableElement parameter : bindingElement.getParameters()) {
+            dependencies.add(new DependencyRequest(new Key(TypeName.get(parameter.asType()),
+                    qualifiers.getQualifier(parameter)), parameter));
+        }
+        return new InjectBinding(key, bindingElement, invokeExpression, dependencies);
     }
 
     public String suggestedVariableName() {
@@ -63,7 +73,7 @@ public final class InjectBinding extends Binding {
 
     @Override
     public List<DependencyRequest> dependencies() {
-        return dependencies.get();
+        return dependencies;
     }
 
     public CodeBlock invokeExpression(CodeBlock params) {

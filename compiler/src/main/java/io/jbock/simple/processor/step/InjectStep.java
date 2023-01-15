@@ -2,8 +2,10 @@ package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.simple.processor.util.InjectBindingRegistry;
+import io.jbock.simple.processor.util.ValidationFailure;
 import jakarta.inject.Inject;
 
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.ElementFilter;
@@ -14,9 +16,13 @@ import java.util.Set;
 public class InjectStep implements Step {
 
     private final InjectBindingRegistry registry;
+    private final Messager messager;
 
-    public InjectStep(InjectBindingRegistry registry) {
+    public InjectStep(
+            InjectBindingRegistry registry,
+            Messager messager) {
         this.registry = registry;
+        this.messager = messager;
     }
 
     @Override
@@ -26,14 +32,18 @@ public class InjectStep implements Step {
 
     @Override
     public Set<? extends Element> process(Map<String, Set<Element>> elementsByAnnotation) {
-        List<Element> elements = elementsByAnnotation.values().stream().flatMap(Set::stream).toList();
-        List<ExecutableElement> constructors = ElementFilter.constructorsIn(elements);
-        List<ExecutableElement> methods = ElementFilter.methodsIn(elements);
-        for (ExecutableElement constructor : constructors) {
-            registry.registerConstructor(constructor);
-        }
-        for (ExecutableElement method : methods) {
-            registry.registerFactoryMethod(method);
+        try {
+            List<Element> elements = elementsByAnnotation.values().stream().flatMap(Set::stream).toList();
+            List<ExecutableElement> constructors = ElementFilter.constructorsIn(elements);
+            List<ExecutableElement> methods = ElementFilter.methodsIn(elements);
+            for (ExecutableElement constructor : constructors) {
+                registry.registerConstructor(constructor);
+            }
+            for (ExecutableElement method : methods) {
+                registry.registerFactoryMethod(method);
+            }
+        } catch (ValidationFailure f) {
+            f.writeTo(messager);
         }
         return Set.of();
     }
