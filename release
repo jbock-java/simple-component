@@ -1,0 +1,36 @@
+#!/bin/bash
+
+die () {
+    echo "$*"
+    exit 1
+}
+
+if [[ $(git status --porcelain) ]]; then
+  die "dirty workspace"
+fi
+
+VERSION="$1"
+
+if [[ -z "$VERSION" ]]; then
+  die "Usage: release <version>"
+fi
+
+if ! git pull origin $(git rev-parse --abbrev-ref HEAD); then
+  die "pull failed"
+fi
+
+if ! ./gradlew clean -Pversion=${VERSION} simple-component:publish; then
+  die "build failed"
+fi
+
+
+if ! ./gradlew clean -Pversion=${VERSION} compiler:publish; then
+  die "build failed"
+fi
+
+read -e -p "Upload successful. Also tag? [y/N]"
+if [[ "$REPLY" == [Yy]* ]]; then
+  git tag "${VERSION}"
+  git push origin --tags
+fi
+
