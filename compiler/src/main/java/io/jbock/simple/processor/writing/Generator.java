@@ -41,6 +41,7 @@ public class Generator {
             Binding binding = bindingRegistry.getBinding(request);
             graph.addAll((bindingRegistry.getDependencies(binding)));
         }
+        Accessibility.check(component, graph);
         return sortNodes(graph);
     }
 

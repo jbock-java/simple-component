@@ -30,7 +30,7 @@ class CycleTest {
                 "  }",
                 "",
                 "  static class C {",
-                "    @Inject C(D d) {}",
+                "    @Inject static C createC(D d) { return null; }",
                 "  }",
                 "",
                 "  static class D {",
@@ -50,7 +50,7 @@ class CycleTest {
                 "    test.TestClass.B is injected at",
                 "        test.TestClass.D(b)",
                 "    test.TestClass.D is injected at",
-                "        test.TestClass.C(d)",
+                "        test.TestClass.C.createC(d)",
                 "    test.TestClass.C is injected at",
                 "        test.TestClass.B(c)"));
     }

@@ -43,11 +43,13 @@ class CyclePrinter {
         List<String> message = new ArrayList<>();
         message.add("Found a dependency cycle:");
         for (Edge edge : cycle) {
-            message.add(INDENT + edge.source().key().typeName() + " is injected at");
             Binding destination = edge.destination();
             if (destination instanceof InjectBinding b) {
+                message.add(INDENT + edge.source().key().typeName() + " is injected at");
                 message.add(DOUBLE_INDENT + b.signature());
-            }
+            } else {
+                throw new AssertionError("we should never get here");
+            } 
         }
         return String.join("\n", message);
     }

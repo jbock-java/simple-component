@@ -3,7 +3,7 @@ package io.jbock.simple.processor.binding;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.TypeName;
 
-import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.ArrayList;
@@ -19,12 +19,15 @@ public final class InjectBinding extends Binding {
 
     private final Function<CodeBlock, CodeBlock> invokeExpression;
 
-    private final Supplier<String> signature = memoize(() -> CodeBlock.of(
-            "$T($L)",
-            key().typeName(),
-            dependencies().stream()
-                    .map(d -> CodeBlock.of("$L", d.requestElement().getSimpleName().toString()))
-                    .collect(CodeBlock.joining(", "))).toString());
+    private final Supplier<String> signature = memoize(() -> {
+        CodeBlock deps = dependencies().stream()
+                .map(d -> CodeBlock.of("$L", d.requestElement().getSimpleName().toString()))
+                .collect(CodeBlock.joining(", "));
+        if (element().getKind() == ElementKind.CONSTRUCTOR) {
+            return CodeBlock.of("$T($L)", key().typeName(), deps).toString();
+        }
+        return CodeBlock.of("$T.$L($L)", key().typeName(), element().getSimpleName(), deps).toString();
+    });
 
     private final Supplier<String> suggestedVariableName = memoize(() -> {
         String[] tokens = key().typeName().toString().split("[.]");
@@ -34,7 +37,7 @@ public final class InjectBinding extends Binding {
 
     private final Supplier<List<DependencyRequest>> dependencies = memoize(() -> {
         List<DependencyRequest> result = new ArrayList<>();
-        for (VariableElement parameter : bindingElement().getParameters()) {
+        for (VariableElement parameter : element().getParameters()) {
             result.add(new DependencyRequest(new Key(TypeName.get(parameter.asType())), parameter));
         }
         return result;
@@ -53,12 +56,8 @@ public final class InjectBinding extends Binding {
         return suggestedVariableName.get();
     }
 
-    public ExecutableElement bindingElement() {
-        return bindingElement;
-    }
-
     @Override
-    public Element element() {
+    public ExecutableElement element() {
         return bindingElement;
     }
 
