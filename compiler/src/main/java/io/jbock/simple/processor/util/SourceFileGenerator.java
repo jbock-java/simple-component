@@ -23,6 +23,8 @@ public final class SourceFileGenerator {
 
     public void write(Element element, JavaFile javaFile) {
         try {
+            // TODO filer.createResource(...); to avoid warnings?
+            // https://stackoverflow.com/questions/10094346/warning-file-for-type-insert-class-here-created-in-the-last-round-will-not
             javaFile.writeTo(filer);
         } catch (IOException e) {
             StringWriter sw = new StringWriter();

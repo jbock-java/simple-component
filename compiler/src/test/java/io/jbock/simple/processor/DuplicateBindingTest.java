@@ -56,6 +56,6 @@ class DuplicateBindingTest {
                 "}");
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("There is a conflicting binding: test.TestClass.createString2()");
+        assertThat(compilation).hadErrorContaining("There is a conflicting binding: test.TestClass.createString");
     }
 }

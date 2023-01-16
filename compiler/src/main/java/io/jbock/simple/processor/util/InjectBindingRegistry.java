@@ -8,14 +8,15 @@ import io.jbock.simple.processor.binding.Key;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class InjectBindingRegistry {
 
     private final Qualifiers qualifiers;
 
-    private final Map<Key, InjectBinding> bindingsByKey = new HashMap<>();
+    private final Map<Key, InjectBinding> bindingsByKey = new LinkedHashMap<>();
 
     public InjectBindingRegistry(Qualifiers qualifiers) {
         this.qualifiers = qualifiers;
@@ -41,5 +42,9 @@ public class InjectBindingRegistry {
 
     public BindingRegistry createBindingRegistry(ComponentElement componentElement) {
         return BindingRegistry.create(bindingsByKey, componentElement);
+    }
+
+    public Collection<InjectBinding> allBindings() {
+        return bindingsByKey.values();
     }
 }

@@ -62,6 +62,10 @@ final class ProcessorComponent {
         return componentRegistry;
     }
 
+    InjectBindingRegistry injectRegistry() {
+        return injectBindingRegistry;
+    }
+
     SourceFileGenerator sourceFileGenerator() {
         return sourceFileGenerator;
     }

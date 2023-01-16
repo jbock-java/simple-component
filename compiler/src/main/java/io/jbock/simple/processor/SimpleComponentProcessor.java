@@ -1,8 +1,11 @@
 package io.jbock.simple.processor;
 
 import io.jbock.auto.common.BasicAnnotationProcessor;
+import io.jbock.javapoet.ClassName;
 import io.jbock.javapoet.JavaFile;
 import io.jbock.javapoet.TypeSpec;
+import io.jbock.simple.processor.access.AccessGroup;
+import io.jbock.simple.processor.access.AccessGroups;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -29,23 +32,26 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
             for (ComponentElement componentElement : component.componentRegistry().components()) {
                 try {
                     TypeSpec typeSpec = component.generatorFactory().create(componentElement).generate();
-                    writeSpec(componentElement, typeSpec);
+                    writeSpec(componentElement.generatedClass(), typeSpec);
                 } catch (ValidationFailure f) {
                     f.writeTo(component.messager());
                 }
             }
+            for (AccessGroup group : AccessGroups.create(component.injectRegistry().allBindings()).groups()) {
+                writeSpec(group.generatedClass(), group.generate());
+            }
         }
     }
 
-    private void writeSpec(ComponentElement componentElement, TypeSpec typeSpec) {
+    private void writeSpec(ClassName generatedClass, TypeSpec typeSpec) {
         if (typeSpec.originatingElements.size() != 1) {
             throw new AssertionError();
         }
-        String packageName = componentElement.generatedClass().packageName();
+        String packageName = generatedClass.packageName();
         JavaFile javaFile = JavaFile.builder(packageName, typeSpec)
                 .skipJavaLangImports(true)
                 .build();
-        component.sourceFileGenerator().write(componentElement.element(), javaFile);
+        component.sourceFileGenerator().write(typeSpec.originatingElements.get(0), javaFile);
     }
 
     @Override

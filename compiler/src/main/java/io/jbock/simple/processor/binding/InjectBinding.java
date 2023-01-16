@@ -1,9 +1,12 @@
 package io.jbock.simple.processor.binding;
 
+import io.jbock.javapoet.ClassName;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.util.Qualifiers;
+import io.jbock.simple.processor.util.Visitors;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
@@ -20,6 +23,20 @@ public final class InjectBinding extends Binding {
 
     private final Function<CodeBlock, CodeBlock> invokeExpression;
 
+    private final Supplier<String> accessMethodName = memoize(() -> {
+        if (element().getKind() == ElementKind.CONSTRUCTOR) {
+            return "create";
+        }
+        return element().getSimpleName().toString();
+    });
+
+    private final Supplier<ClassName> accessClassName = memoize(() -> {
+        Element enclosing = element().getEnclosingElement();
+        ClassName className = ClassName.get(Visitors.TYPE_ELEMENT_VISITOR.visit(enclosing));
+        return className.topLevelClassName()
+                .peerClass(String.join("_", className.simpleNames()) + "_Access");
+    });
+
     private final Supplier<String> signature = memoize(() -> {
         CodeBlock deps = dependencies().stream()
                 .map(d -> CodeBlock.of("$L", d.requestingElement().getSimpleName().toString()))
@@ -27,7 +44,7 @@ public final class InjectBinding extends Binding {
         if (element().getKind() == ElementKind.CONSTRUCTOR) {
             return CodeBlock.of("$T($L)", key().typeName(), deps).toString();
         }
-        return CodeBlock.of("$T.$L($L)", 
+        return CodeBlock.of("$T.$L($L)",
                 element().getEnclosingElement().asType(), element().getSimpleName(), deps).toString();
     });
 
@@ -79,6 +96,14 @@ public final class InjectBinding extends Binding {
 
     public CodeBlock invokeExpression(CodeBlock params) {
         return invokeExpression.apply(params);
+    }
+
+    public ClassName accessClassName() {
+        return accessClassName.get();
+    }
+
+    public String accessMethodName() {
+        return accessMethodName.get();
     }
 
     public String signature() {
