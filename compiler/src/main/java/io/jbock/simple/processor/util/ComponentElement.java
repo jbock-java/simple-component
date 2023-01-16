@@ -1,7 +1,6 @@
 package io.jbock.simple.processor.util;
 
 import io.jbock.javapoet.ClassName;
-import io.jbock.javapoet.TypeName;
 import io.jbock.simple.Component;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.Key;
@@ -62,8 +61,8 @@ public final class ComponentElement {
             if (method.getReturnType().getKind() == TypeKind.VOID) {
                 throw new ValidationFailure("The method may not return void", method);
             }
-            Key key = new Key(TypeName.get(method.getReturnType()), qualifiers().getQualifier(method));
-            result.add(new DependencyRequest(key, method, tool()));
+            Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
+            result.add(new DependencyRequest(key, method, qualifiers(), tool()));
         }
         return result;
     });

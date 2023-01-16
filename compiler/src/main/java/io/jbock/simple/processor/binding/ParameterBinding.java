@@ -27,7 +27,8 @@ public final class ParameterBinding extends Binding {
     }
 
     public static ParameterBinding create(VariableElement parameter, Qualifiers qualifiers) {
-        return new ParameterBinding(new Key(TypeName.get(parameter.asType()), qualifiers.getQualifier(parameter)), parameter);
+        Key key = Key.create(parameter.asType(), qualifiers.getQualifier(parameter));
+        return new ParameterBinding(key, parameter);
     }
 
     public VariableElement parameter() {

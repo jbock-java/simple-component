@@ -2,7 +2,6 @@ package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.ClassName;
 import io.jbock.javapoet.CodeBlock;
-import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.Visitors;
@@ -11,6 +10,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -76,10 +76,32 @@ public final class InjectBinding extends Binding {
             TypeTool tool) {
         List<DependencyRequest> dependencies = new ArrayList<>();
         for (VariableElement parameter : bindingElement.getParameters()) {
-            dependencies.add(new DependencyRequest(new Key(TypeName.get(parameter.asType()),
-                    qualifiers.getQualifier(parameter)), parameter, tool));
+            dependencies.add(new DependencyRequest(Key.create(parameter.asType(),
+                    qualifiers.getQualifier(parameter)), parameter, qualifiers, tool));
         }
         return new InjectBinding(key, bindingElement, invokeExpression, dependencies);
+    }
+
+    public static InjectBinding createConstructor(
+            Qualifiers qualifiers,
+            TypeTool tool,
+            ExecutableElement element) {
+        Element typeElement = element.getEnclosingElement();
+        Key key = Key.create(typeElement.asType(), qualifiers.getQualifier(element));
+        return create(key, element,
+                params -> CodeBlock.of("new $T($L)", typeElement.asType(), params),
+                qualifiers, tool);
+    }
+
+    public static InjectBinding createMethod(
+            Qualifiers qualifiers,
+            TypeTool tool,
+            ExecutableElement element) {
+        TypeMirror returnType = element.getReturnType();
+        Key key = Key.create(returnType, qualifiers.getQualifier(element));
+        return InjectBinding.create(key, element,
+                params -> CodeBlock.of("$T.$L($L)", element.getEnclosingElement().asType(), element.getSimpleName().toString(), params),
+                qualifiers, tool);
     }
 
     public String suggestedVariableName() {

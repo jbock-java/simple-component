@@ -4,6 +4,7 @@ import io.jbock.simple.processor.step.ComponentStep;
 import io.jbock.simple.processor.step.InjectStep;
 import io.jbock.simple.processor.util.ComponentRegistry;
 import io.jbock.simple.processor.util.InjectBindingRegistry;
+import io.jbock.simple.processor.util.InjectBindingValidator;
 import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.SafeElements;
 import io.jbock.simple.processor.util.SafeTypes;
@@ -30,6 +31,7 @@ final class ProcessorComponent {
     private final Qualifiers qualifiers;
     private final ComponentStep componentStep;
     private final InjectStep injectStep;
+    private final InjectBindingValidator injectBindingValidator;
     private final SafeTypes types;
     private final SafeElements elements;
 
@@ -45,9 +47,10 @@ final class ProcessorComponent {
         this.sourceFileGenerator = new SourceFileGenerator(filer, messager);
         this.injectBindingRegistry = new InjectBindingRegistry(qualifiers, tool);
         this.componentImpl = new ComponentImpl();
+        this.injectBindingValidator = new InjectBindingValidator(tool);
         this.generatorFactory = component -> new Generator(injectBindingRegistry.createBindingRegistry(component), componentImpl, component);
         this.componentStep = new ComponentStep(componentRegistry, messager, tool, qualifiers);
-        this.injectStep = new InjectStep(injectBindingRegistry, messager);
+        this.injectStep = new InjectStep(injectBindingRegistry, injectBindingValidator, messager);
     }
 
     ComponentStep componentStep() {
@@ -55,7 +58,7 @@ final class ProcessorComponent {
     }
 
     InjectStep injectStep() {
-        return new InjectStep(injectBindingRegistry, messager);
+        return injectStep;
     }
 
     ComponentRegistry componentRegistry() {

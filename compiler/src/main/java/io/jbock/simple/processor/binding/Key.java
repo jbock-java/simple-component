@@ -3,18 +3,28 @@ package io.jbock.simple.processor.binding;
 import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.util.SimpleAnnotation;
 
+import javax.lang.model.type.TypeMirror;
 import java.util.Objects;
 import java.util.Optional;
 
 public final class Key {
 
+    private final TypeMirror type;
     private final TypeName typeName;
     private final Optional<SimpleAnnotation> qualifier;
 
-    public Key(TypeName typeName,
-               Optional<SimpleAnnotation> qualifier) {
+    private Key(
+            TypeMirror type,
+            TypeName typeName,
+            Optional<SimpleAnnotation> qualifier) {
+        this.type = type;
         this.typeName = typeName;
         this.qualifier = qualifier;
+    }
+
+    public static Key create(TypeMirror mirror, Optional<SimpleAnnotation> qualifier) {
+        TypeName typeName = TypeName.get(mirror);
+        return new Key(mirror, typeName, qualifier);
     }
 
     @Override
@@ -27,6 +37,10 @@ public final class Key {
 
     public TypeName typeName() {
         return typeName;
+    }
+
+    public TypeMirror type() {
+        return type;
     }
 
     @Override

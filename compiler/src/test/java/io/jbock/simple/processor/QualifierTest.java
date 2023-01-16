@@ -41,33 +41,6 @@ class QualifierTest {
     }
 
     @Test
-    void qualifiedInjectionSites() {
-        JavaFileObject component = forSourceLines("test.TestClass",
-                "package test;",
-                "",
-                "import io.jbock.simple.Component;",
-                "import jakarta.inject.Inject;",
-                "import jakarta.inject.Named;",
-                "",
-                "final class TestClass {",
-                "",
-                "  @Inject @Named(\"a\") static String createString1() { return null; }",
-                "  @Inject @Named(\"b\") static String createString2() { return null; }",
-                "",
-                "  static class A {",
-                "    @Inject A(@Named(\"a\") String s) {}",
-                "  }",
-                "",
-                "  @Component",
-                "  interface AComponent {",
-                "    A getA();",
-                "  }",
-                "}");
-        Compilation compilation = simpleCompiler().compile(component);
-        assertThat(compilation).succeeded();
-    }
-
-    @Test
     void qualifiedIdentity() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",

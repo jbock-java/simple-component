@@ -1,13 +1,9 @@
 package io.jbock.simple.processor.util;
 
-import io.jbock.javapoet.CodeBlock;
-import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.type.TypeMirror;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,21 +21,13 @@ public class InjectBindingRegistry {
     }
 
     public void registerConstructor(ExecutableElement element) {
-        Element typeElement = element.getEnclosingElement();
-        Key key = new Key(TypeName.get(typeElement.asType()), qualifiers.getQualifier(element));
-        InjectBinding b = InjectBinding.create(key, element,
-                params -> CodeBlock.of("new $T($L)", typeElement.asType(), params),
-                qualifiers, tool);
-        DuplicateBinding.check(b, bindingsByKey.put(key, b));
+        InjectBinding b = InjectBinding.createConstructor(qualifiers, tool, element);
+        DuplicateBinding.check(b, bindingsByKey.put(b.key(), b));
     }
 
     public void registerFactoryMethod(ExecutableElement element) {
-        TypeMirror returnType = element.getReturnType();
-        Key key = new Key(TypeName.get(returnType), qualifiers.getQualifier(element));
-        InjectBinding b = InjectBinding.create(key, element,
-                params -> CodeBlock.of("$T.$L($L)", element.getEnclosingElement().asType(), element.getSimpleName().toString(), params),
-                qualifiers, tool);
-        DuplicateBinding.check(b, bindingsByKey.put(key, b));
+        InjectBinding b = InjectBinding.createMethod(qualifiers, tool, element);
+        DuplicateBinding.check(b, bindingsByKey.put(b.key(), b));
     }
 
     public BindingRegistry createBindingRegistry(ComponentElement componentElement) {

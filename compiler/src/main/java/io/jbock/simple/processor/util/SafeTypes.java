@@ -1,7 +1,6 @@
 package io.jbock.simple.processor.util;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -21,14 +20,6 @@ public final class SafeTypes {
 
     public Optional<Element> asElement(TypeMirror t) {
         return Optional.ofNullable(types.asElement(t));
-    }
-
-    public PrimitiveType getPrimitiveType(TypeKind kind) {
-        return types.getPrimitiveType(kind);
-    }
-
-    public TypeElement boxedClass(PrimitiveType p) {
-        return types.boxedClass(p);
     }
 
     public boolean isSameType(TypeMirror t1, TypeMirror t2) {
