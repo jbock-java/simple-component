@@ -4,6 +4,7 @@ import io.jbock.javapoet.ClassName;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.util.Qualifiers;
+import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.Visitors;
 
 import javax.lang.model.element.Element;
@@ -71,11 +72,12 @@ public final class InjectBinding extends Binding {
             Key key,
             ExecutableElement bindingElement,
             Function<CodeBlock, CodeBlock> invokeExpression,
-            Qualifiers qualifiers) {
+            Qualifiers qualifiers,
+            TypeTool tool) {
         List<DependencyRequest> dependencies = new ArrayList<>();
         for (VariableElement parameter : bindingElement.getParameters()) {
             dependencies.add(new DependencyRequest(new Key(TypeName.get(parameter.asType()),
-                    qualifiers.getQualifier(parameter)), parameter));
+                    qualifiers.getQualifier(parameter)), parameter, tool));
         }
         return new InjectBinding(key, bindingElement, invokeExpression, dependencies);
     }

@@ -15,11 +15,13 @@ import java.util.Map;
 public class InjectBindingRegistry {
 
     private final Qualifiers qualifiers;
+    private final TypeTool tool;
 
     private final Map<Key, InjectBinding> bindingsByKey = new LinkedHashMap<>();
 
-    public InjectBindingRegistry(Qualifiers qualifiers) {
+    public InjectBindingRegistry(Qualifiers qualifiers, TypeTool tool) {
         this.qualifiers = qualifiers;
+        this.tool = tool;
     }
 
     public void registerConstructor(ExecutableElement element) {
@@ -27,7 +29,7 @@ public class InjectBindingRegistry {
         Key key = new Key(TypeName.get(typeElement.asType()), qualifiers.getQualifier(element));
         InjectBinding b = InjectBinding.create(key, element,
                 params -> CodeBlock.of("new $T($L)", typeElement.asType(), params),
-                qualifiers);
+                qualifiers, tool);
         DuplicateBinding.check(b, bindingsByKey.put(key, b));
     }
 
@@ -36,7 +38,7 @@ public class InjectBindingRegistry {
         Key key = new Key(TypeName.get(returnType), qualifiers.getQualifier(element));
         InjectBinding b = InjectBinding.create(key, element,
                 params -> CodeBlock.of("$T.$L($L)", element.getEnclosingElement().asType(), element.getSimpleName().toString(), params),
-                qualifiers);
+                qualifiers, tool);
         DuplicateBinding.check(b, bindingsByKey.put(key, b));
     }
 

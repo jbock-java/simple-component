@@ -43,7 +43,7 @@ final class ProcessorComponent {
         this.util = new Util(types, tool);
         this.messager = processingEnvironment.getMessager();
         this.sourceFileGenerator = new SourceFileGenerator(filer, messager);
-        this.injectBindingRegistry = new InjectBindingRegistry(qualifiers);
+        this.injectBindingRegistry = new InjectBindingRegistry(qualifiers, tool);
         this.componentImpl = new ComponentImpl();
         this.generatorFactory = component -> new Generator(injectBindingRegistry.createBindingRegistry(component), componentImpl, component);
         this.componentStep = new ComponentStep(componentRegistry, messager, tool, qualifiers);

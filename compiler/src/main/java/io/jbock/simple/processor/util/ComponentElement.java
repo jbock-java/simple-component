@@ -63,7 +63,7 @@ public final class ComponentElement {
                 throw new ValidationFailure("The method may not return void", method);
             }
             Key key = new Key(TypeName.get(method.getReturnType()), qualifiers().getQualifier(method));
-            result.add(new DependencyRequest(key, method));
+            result.add(new DependencyRequest(key, method, tool()));
         }
         return result;
     });
