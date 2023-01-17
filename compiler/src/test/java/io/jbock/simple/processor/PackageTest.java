@@ -19,7 +19,7 @@ class PackageTest {
                 "import jakarta.inject.Inject;",
                 "",
                 "public class DD {",
-                "  @Inject static DD createDD() {}",
+                "  @Inject static DD createDD() { return null; }",
                 "}");
         JavaFileObject dep = forSourceLines("test.b.Dep",
                 "package test.b;",

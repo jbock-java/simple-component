@@ -48,9 +48,8 @@ class Accessibility {
         if (getPackage(e).equals(componentPackage)) {
             return;
         }
-        if (!e.getModifiers().contains(Modifier.PUBLIC)) {
-            throw new ValidationFailure(b.signature() + " is not accessible from "
-                    + component.element().getQualifiedName(), e);
+        if (e.getModifiers().contains(Modifier.PRIVATE)) {
+            throw new ValidationFailure(b.signature() + "The binding may not be private", e);
         }
         TypeElement nonPublic = findNonPublicEnclosing(e.getEnclosingElement());
         if (nonPublic == null) {

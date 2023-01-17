@@ -43,6 +43,6 @@ class BindingValidationTest {
                 "}");
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("Static method binding must return the enclosing type");
+        assertThat(compilation).hadErrorContaining("The factory method must return the type of its enclosing class");
     }
 }

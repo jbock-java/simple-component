@@ -4,7 +4,9 @@ import jakarta.inject.Inject;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
 
@@ -30,6 +32,9 @@ public final class InjectBindingValidator {
 
     private void validate(ExecutableElement element) {
         TypeElement typeElement = Visitors.TYPE_ELEMENT_VISITOR.visit(element.getEnclosingElement());
+        if (!typeElement.getTypeParameters().isEmpty()) {
+            throw new ValidationFailure("Type parameters are not allowed on element", typeElement);
+        }
         List<? extends Element> allMembers = tool.elements().getAllMembers(typeElement);
         List<ExecutableElement> constructors = ElementFilter.constructorsIn(allMembers).stream()
                 .filter(c -> c.getAnnotationMirrors().stream().anyMatch(m -> tool.isSameType(m.getAnnotationType(), Inject.class)))
@@ -49,6 +54,18 @@ public final class InjectBindingValidator {
             throw new ValidationFailure(
                     "Static method bindings are not allowed in a class with a constructor binding",
                     element);
+        }
+        if (!methods.isEmpty()) {
+            ExecutableElement m = methods.get(0);
+            if (!m.getModifiers().contains(Modifier.STATIC)) {
+                throw new ValidationFailure("The factory method must be static", m);
+            }
+            if (m.getReturnType().getKind() == TypeKind.VOID) {
+                throw new ValidationFailure("The factory method may not return void", m);
+            }
+            if (!tool.types().isSameType(m.getReturnType(), typeElement.asType())) {
+                throw new ValidationFailure("The factory method must return the type of its enclosing class", m);
+            }
         }
     }
 }
