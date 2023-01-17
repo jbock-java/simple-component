@@ -1,13 +1,16 @@
 package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
+import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Component;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.ComponentElementValidator;
 import io.jbock.simple.processor.util.ComponentRegistry;
 import io.jbock.simple.processor.util.Qualifiers;
+import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.writing.Generator;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -25,18 +28,24 @@ public class ComponentStep implements Step {
     private final TypeTool tool;
     private final Qualifiers qualifiers;
     private final ComponentElementValidator validator;
+    private final Generator.Factory generatorFactory;
+    private final SpecWriter specWriter;
 
     public ComponentStep(
             ComponentRegistry registry,
             Messager messager,
             TypeTool tool,
             Qualifiers qualifiers,
-            ComponentElementValidator validator) {
+            ComponentElementValidator validator,
+            Generator.Factory generatorFactory,
+            SpecWriter specWriter) {
         this.registry = registry;
         this.messager = messager;
         this.tool = tool;
         this.qualifiers = qualifiers;
         this.validator = validator;
+        this.generatorFactory = generatorFactory;
+        this.specWriter = specWriter;
     }
 
     @Override
@@ -58,6 +67,8 @@ public class ComponentStep implements Step {
                         throw new ValidationFailure("Factory method must return the component type", method);
                     }
                 });
+                TypeSpec typeSpec = generatorFactory.create(component).generate();
+                specWriter.write(component.generatedClass(), typeSpec);
                 registry.registerComponent(component);
             }
         } catch (ValidationFailure f) {

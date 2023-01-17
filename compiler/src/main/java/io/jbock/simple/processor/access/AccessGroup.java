@@ -8,67 +8,41 @@ import io.jbock.javapoet.TypeName;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
-import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.List;
-import java.util.Optional;
 
 public final class AccessGroup {
 
     private final ClassName generatedClass;
     private final TypeElement typeElement;
-    private final List<InjectBinding> bindings;
+    private final InjectBinding b;
 
     private AccessGroup(
             ClassName generatedClass,
             TypeElement typeElement,
-            List<InjectBinding> bindings) {
+            InjectBinding b) {
         this.generatedClass = generatedClass;
         this.typeElement = typeElement;
-        this.bindings = bindings;
+        this.b = b;
     }
 
-    static AccessGroup create(
-            TypeElement typeElement,
-            List<InjectBinding> bindings) {
-        return new AccessGroup(bindings.get(0).accessClassName(), typeElement, bindings);
+    public static AccessGroup create(
+            InjectBinding binding) {
+        return new AccessGroup(binding.accessClassName(), binding.enclosingElement(), binding);
     }
 
     public TypeSpec generate() {
-        Optional<InjectBinding> constructorBinding = bindings.stream().filter(b -> b.element().getKind() == ElementKind.CONSTRUCTOR).findAny();
-        if (constructorBinding.isPresent()) {
-            InjectBinding cb = constructorBinding.orElseThrow();
-            if (bindings.size() >= 2) {
-                bindings.stream()
-                        .filter(b -> b.element().getKind() == ElementKind.METHOD)
-                        .findFirst()
-                        .ifPresentOrElse(
-                                mb -> {
-                                    throw new ValidationFailure(
-                                            "Static method bindings are not allowed in a class with a constructor binding",
-                                            mb.element());
-                                },
-                                () -> {
-                                    throw new ValidationFailure(
-                                            "Only one constructor binding per class allowed",
-                                            cb.element());
-                                });
-            }
-        }
         TypeSpec.Builder spec = TypeSpec.classBuilder(generatedClass);
         spec.addOriginatingElement(typeElement);
         spec.addModifiers(Modifier.PUBLIC);
-        for (InjectBinding b : bindings) {
-            spec.addMethod(accessMethod(b));
-        }
+        spec.addMethod(accessMethod());
         return spec.build();
     }
 
-    private MethodSpec accessMethod(InjectBinding b) {
+    private MethodSpec accessMethod() {
         MethodSpec.Builder spec = MethodSpec.methodBuilder(b.accessMethodName());
         spec.addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         if (b.element().getKind() == ElementKind.CONSTRUCTOR) {

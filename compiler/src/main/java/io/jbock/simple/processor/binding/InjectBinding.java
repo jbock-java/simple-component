@@ -9,6 +9,7 @@ import io.jbock.simple.processor.util.Visitors;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
@@ -17,12 +18,18 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
+import static java.util.Objects.requireNonNull;
 
 public final class InjectBinding extends Binding {
 
     private final ExecutableElement bindingElement;
 
     private final Function<CodeBlock, CodeBlock> invokeExpression;
+
+    private final Supplier<TypeElement> enclosingElement = memoize(() -> {
+        Element el = element().getEnclosingElement();
+        return requireNonNull(Visitors.TYPE_ELEMENT_VISITOR.visit(el));
+    });
 
     private final Supplier<String> accessMethodName = memoize(() -> {
         if (element().getKind() == ElementKind.CONSTRUCTOR) {
@@ -128,6 +135,10 @@ public final class InjectBinding extends Binding {
 
     public String accessMethodName() {
         return accessMethodName.get();
+    }
+
+    public TypeElement enclosingElement() {
+        return enclosingElement.get();
     }
 
     public String signature() {
