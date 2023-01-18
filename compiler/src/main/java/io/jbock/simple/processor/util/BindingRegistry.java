@@ -12,23 +12,19 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class BindingRegistry {
 
-    private final Map<Key, InjectBinding> bindingsByKey;
     private final Map<Key, ParameterBinding> parameterBindings;
 
     private BindingRegistry(
-            Map<Key, InjectBinding> bindingsByKey,
             Map<Key, ParameterBinding> parameterBindings) {
-        this.bindingsByKey = bindingsByKey;
         this.parameterBindings = parameterBindings;
     }
 
-    static BindingRegistry create(
-            Map<Key, InjectBinding> bindingsByKey,
-            ComponentElement componentElement) {
+    public static BindingRegistry create(ComponentElement componentElement) {
         List<ParameterBinding> pBindings = componentElement.factoryElement()
                 .map(FactoryElement::parameterBindings)
                 .orElse(List.of());
@@ -40,21 +36,22 @@ public class BindingRegistry {
                 throw new ValidationFailure("The binding is in conflict with another parameter: " +
                         p.asType() + ' ' + p.getSimpleName(), b.parameter());
             }
-            DuplicateBinding.check(b, bindingsByKey.get(b.key()));
         }
-        return new BindingRegistry(bindingsByKey, parameterBindings);
+        return new BindingRegistry(parameterBindings);
     }
 
     public Binding getBinding(DependencyRequest request) {
-        InjectBinding injectBinding = bindingsByKey.get(request.key());
-        if (injectBinding == null) {
+        Optional<InjectBinding> injectBinding = request.binding();
+        if (injectBinding.isEmpty()) {
             ParameterBinding parameterBinding = parameterBindings.get(request.key());
             if (parameterBinding == null) {
                 throw new ValidationFailure("Binding not found", request.requestingElement());
             }
             return parameterBinding;
         }
-        return injectBinding;
+        InjectBinding b = injectBinding.orElseThrow();
+        DuplicateBinding.check(parameterBindings.get(request.key()), b);
+        return b;
     }
 
     public Graph getDependencies(Binding startNode) {

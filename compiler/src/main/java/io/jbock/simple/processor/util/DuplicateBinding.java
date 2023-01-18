@@ -9,6 +9,9 @@ public final class DuplicateBinding {
         if (other == null) {
             return;
         }
+        if (b == null) {
+            return;
+        }
         throw new ValidationFailure("There is a conflicting binding: " + other.signature(), b.element());
     }
 

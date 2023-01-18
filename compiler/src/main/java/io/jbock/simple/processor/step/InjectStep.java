@@ -1,11 +1,7 @@
 package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
-import io.jbock.simple.processor.access.AccessGroup;
-import io.jbock.simple.processor.binding.InjectBinding;
-import io.jbock.simple.processor.util.InjectBindingRegistry;
 import io.jbock.simple.processor.util.InjectBindingValidator;
-import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.ValidationFailure;
 import jakarta.inject.Inject;
 
@@ -19,20 +15,14 @@ import java.util.Set;
 
 public class InjectStep implements Step {
 
-    private final InjectBindingRegistry registry;
     private final InjectBindingValidator validator;
     private final Messager messager;
-    private final SpecWriter specWriter;
 
     public InjectStep(
-            InjectBindingRegistry registry,
             InjectBindingValidator validator,
-            Messager messager,
-            SpecWriter specWriter) {
-        this.registry = registry;
+            Messager messager) {
         this.validator = validator;
         this.messager = messager;
-        this.specWriter = specWriter;
     }
 
     @Override
@@ -47,16 +37,10 @@ public class InjectStep implements Step {
             List<ExecutableElement> constructors = ElementFilter.constructorsIn(elements);
             List<ExecutableElement> methods = ElementFilter.methodsIn(elements);
             for (ExecutableElement constructor : constructors) {
-                InjectBinding b = registry.registerConstructor(constructor);
                 validator.validateConstructor(constructor);
-                AccessGroup accessGroup = AccessGroup.create(b);
-                specWriter.write(accessGroup.generatedClass(), accessGroup.generate());
             }
             for (ExecutableElement method : methods) {
-                InjectBinding b = registry.registerFactoryMethod(method);
                 validator.validateStaticMethod(method);
-                AccessGroup accessGroup = AccessGroup.create(b);
-                specWriter.write(accessGroup.generatedClass(), accessGroup.generate());
             }
         } catch (ValidationFailure f) {
             f.writeTo(messager);
