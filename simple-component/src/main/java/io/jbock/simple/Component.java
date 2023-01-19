@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Retention(SOURCE)
 public @interface Component {
 
-    Class<?>[] modules() default {};
+    Class<?>[] rebindChain() default {};
 
     @Retention(SOURCE)
     @Target(TYPE)
