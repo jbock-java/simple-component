@@ -7,9 +7,9 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation goes on a concrete class.
- * Each method must have no parameters and return one of the alias types.
+ * Each non-private method must have no parameters and return one of the type alias types.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
-public @interface AliasOverrides {
+public @interface TypeAliasOverrides {
 }
