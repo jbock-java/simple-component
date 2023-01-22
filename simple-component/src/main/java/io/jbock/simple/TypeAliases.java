@@ -8,10 +8,11 @@ import java.lang.annotation.Target;
 /**
  * This annotation goes on an interface.
  *
- * <p>Each interface method must have a single parameter of a bound type.
- * The parameter type must be assignable to the return type.
+ * <p>Each interface method must have a single parameter.
+ * The parameter type must resolve to an {@code Inject}-annotated method or constructor,
+ * and it must be assignable to the method's return type.
  *
- * <p>Note: In dagger terms, a type alias method is an abstract module method
+ * <p>Note: In dagger terms, a type alias method corresponds to a module method
  * that has a "{@code @Binds}" annotation.
  */
 @Retention(RetentionPolicy.SOURCE)
