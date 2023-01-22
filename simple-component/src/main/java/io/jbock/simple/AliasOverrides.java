@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation goes on an interface which is like a dagger module but
- * it can only do {@code @Binds}.
+ * This annotation goes on a concrete class.
+ * Each method must have no parameters and return one of the alias types.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
-public @interface Rebind {
+public @interface AliasOverrides {
 }

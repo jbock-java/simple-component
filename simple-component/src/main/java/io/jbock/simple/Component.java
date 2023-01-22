@@ -11,7 +11,9 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Retention(SOURCE)
 public @interface Component {
 
-    Class<?>[] rebindChain() default {};
+    Class<?> aliases() default Object.class;
+
+    Class<?> aliasOverrides() default Object.class;
 
     @Retention(SOURCE)
     @Target(TYPE)
