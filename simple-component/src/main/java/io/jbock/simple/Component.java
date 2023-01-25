@@ -11,13 +11,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Retention(SOURCE)
 public @interface Component {
 
-    Class<?> typeAliases() default Object.class;
-
-    /**
-     *  <p>If this is different from {@code Object.class},
-     *  exactly of the factory parameters must be an instance of this class.
-     */
-    Class<?> typeAliasOverrides() default Object.class;
+    Class<?> module() default Object.class;
 
     /**
      * This annotation goes on an interface.
