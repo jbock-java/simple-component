@@ -25,14 +25,24 @@ public class Generator {
     private final BindingRegistry bindingRegistry;
     private final ComponentImpl componentImpl;
     private final ComponentElement component;
+    private final AccessibilityValidator validator;
 
-    public Generator(
+    private Generator(
             BindingRegistry bindingRegistry,
             ComponentImpl componentImpl,
-            ComponentElement component) {
+            ComponentElement component,
+            AccessibilityValidator validator) {
         this.bindingRegistry = bindingRegistry;
         this.componentImpl = componentImpl;
         this.component = component;
+        this.validator = validator;
+    }
+
+    public static Generator create(
+            BindingRegistry bindingRegistry,
+            ComponentImpl componentImpl,
+            ComponentElement component) {
+        return new Generator(bindingRegistry, componentImpl, component, AccessibilityValidator.create(component));
     }
 
     Set<Binding> analyze() {
@@ -41,7 +51,11 @@ public class Generator {
             Binding binding = bindingRegistry.getBinding(request);
             graph.addAll((bindingRegistry.getDependencies(binding)));
         }
-        Accessibility.check(component, graph);
+        for (Binding binding : graph.nodes()) {
+            if (binding instanceof InjectBinding b) {
+                validator.checkBinding(b.element());
+            }
+        }
         return sortNodes(graph);
     }
 
@@ -89,9 +103,5 @@ public class Generator {
             }
         }
         return result;
-    }
-
-    public interface Factory {
-        Generator create(ComponentElement component);
     }
 }

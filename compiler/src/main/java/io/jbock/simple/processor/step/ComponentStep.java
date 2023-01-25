@@ -4,10 +4,10 @@ import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Component;
 import io.jbock.simple.processor.util.ComponentElement;
-import io.jbock.simple.processor.util.ComponentElementValidator;
 import io.jbock.simple.processor.util.ComponentRegistry;
 import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.SpecWriter;
+import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.writing.Generator;
@@ -20,6 +20,7 @@ import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 public class ComponentStep implements Step {
 
@@ -27,8 +28,8 @@ public class ComponentStep implements Step {
     private final Messager messager;
     private final TypeTool tool;
     private final Qualifiers qualifiers;
-    private final ComponentElementValidator validator;
-    private final Generator.Factory generatorFactory;
+    private final TypeElementValidator validator;
+    private final Function<ComponentElement, Generator> generatorFactory;
     private final SpecWriter specWriter;
 
     public ComponentStep(
@@ -36,8 +37,8 @@ public class ComponentStep implements Step {
             Messager messager,
             TypeTool tool,
             Qualifiers qualifiers,
-            ComponentElementValidator validator,
-            Generator.Factory generatorFactory,
+            TypeElementValidator validator,
+            Function<ComponentElement, Generator> generatorFactory,
             SpecWriter specWriter) {
         this.registry = registry;
         this.messager = messager;
@@ -67,7 +68,7 @@ public class ComponentStep implements Step {
                         throw new ValidationFailure("Factory method must return the component type", method);
                     }
                 });
-                TypeSpec typeSpec = generatorFactory.create(component).generate();
+                TypeSpec typeSpec = generatorFactory.apply(component).generate();
                 specWriter.write(component.generatedClass(), typeSpec);
                 registry.registerComponent(component);
             }

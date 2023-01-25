@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
+import io.jbock.simple.processor.util.ExecutableElementValidator;
 import io.jbock.simple.processor.util.InjectBindingValidator;
 import io.jbock.simple.processor.util.ValidationFailure;
 import jakarta.inject.Inject;
@@ -16,12 +17,15 @@ import java.util.Set;
 public class InjectStep implements Step {
 
     private final InjectBindingValidator validator;
+    private final ExecutableElementValidator executableElementValidator;
     private final Messager messager;
 
     public InjectStep(
             InjectBindingValidator validator,
+            ExecutableElementValidator executableElementValidator,
             Messager messager) {
         this.validator = validator;
+        this.executableElementValidator = executableElementValidator;
         this.messager = messager;
     }
 
@@ -37,9 +41,11 @@ public class InjectStep implements Step {
             List<ExecutableElement> constructors = ElementFilter.constructorsIn(elements);
             List<ExecutableElement> methods = ElementFilter.methodsIn(elements);
             for (ExecutableElement constructor : constructors) {
+                executableElementValidator.validate(constructor);
                 validator.validateConstructor(constructor);
             }
             for (ExecutableElement method : methods) {
+                executableElementValidator.validate(method);
                 validator.validateStaticMethod(method);
             }
         } catch (ValidationFailure f) {

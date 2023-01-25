@@ -1,8 +1,6 @@
 package io.jbock.simple.processor.writing;
 
 import io.jbock.javapoet.TypeName;
-import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -12,44 +10,33 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import java.util.Locale;
 
 import static io.jbock.simple.processor.util.Visitors.PACKAGE_VISITOR;
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
-class Accessibility {
+class AccessibilityValidator {
 
-    private final Graph graph;
     private final PackageElement componentPackage;
     private final ComponentElement component;
 
-    private Accessibility(
+    private AccessibilityValidator(
             PackageElement componentPackage,
-            Graph graph,
             ComponentElement component) {
-        this.graph = graph;
         this.componentPackage = componentPackage;
         this.component = component;
     }
 
-    static void check(ComponentElement component, Graph graph) {
-        new Accessibility(getPackage(component.element()), graph, component).check();
+    static AccessibilityValidator create(ComponentElement component) {
+        return new AccessibilityValidator(getPackage(component.element()), component);
     }
 
-    private void check() {
-        for (Binding binding : graph.nodes()) {
-            if (binding instanceof InjectBinding b) {
-                checkBinding(b);
-            }
-        }
-    }
-
-    private void checkBinding(InjectBinding b) {
-        ExecutableElement e = b.element();
+    void checkBinding(ExecutableElement e) {
         if (getPackage(e).equals(componentPackage)) {
             return;
         }
         if (!e.getModifiers().contains(Modifier.PUBLIC)) {
-            throw new ValidationFailure(b.signature() + " is not accessible from "
+            throw new ValidationFailure(e.getKind().name().toLowerCase(Locale.ROOT) + " is not accessible from "
                     + component.element().getQualifiedName(), e);
         }
         TypeElement nonPublic = findNonPublicEnclosing(e.getEnclosingElement());

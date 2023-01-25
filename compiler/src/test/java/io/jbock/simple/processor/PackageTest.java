@@ -42,7 +42,7 @@ class PackageTest {
 
         Compilation compilation = simpleCompiler().compile(dd, dep, component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("test.b.DD.createDD() is not accessible from test.a.AComponent");
+        assertThat(compilation).hadErrorContaining("method is not accessible from test.a.AComponent");
     }
 
     @Test
@@ -76,7 +76,7 @@ class PackageTest {
 
         Compilation compilation = simpleCompiler().compile(dd, dep, component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("test.b.DD() is not accessible from test.a.AComponent");
+        assertThat(compilation).hadErrorContaining("constructor is not accessible from test.a.AComponent");
     }
 
 

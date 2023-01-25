@@ -30,7 +30,7 @@ public final class DependencyRequest {
             return Optional.empty();
         }
         List<? extends Element> allMembers = tool().elements().getAllMembers(typeElement).stream()
-                .filter(m -> m.getAnnotationMirrors().stream().anyMatch(mirror -> tool().isSameType(mirror.getAnnotationType(), Inject.class)))
+                .filter(m -> m.getAnnotation(Inject.class) != null)
                 .toList();
         if (allMembers.isEmpty()) {
             return Optional.empty();

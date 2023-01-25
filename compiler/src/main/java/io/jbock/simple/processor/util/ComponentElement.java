@@ -6,7 +6,6 @@ import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.Key;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -37,10 +36,14 @@ public final class ComponentElement {
         for (Element el : element().getEnclosedElements()) {
             boolean hasFactoryAnnotation = el.getAnnotationMirrors().stream()
                     .anyMatch(m -> tool().isSameType(m.getAnnotationType(), Component.Factory.class));
-            if (hasFactoryAnnotation && el.getKind() != ElementKind.INTERFACE) {
-                throw new ValidationFailure("Factory must be an interface", el);
+            if (!hasFactoryAnnotation) {
+                return Optional.empty();
             }
-            return TypeTool.AS_TYPE_ELEMENT.visit(el).map(typeElement -> new FactoryElement(typeElement, generatedClass(), qualifiers()));
+            TypeElement tel = Visitors.TYPE_ELEMENT_VISITOR.visit(el);
+            if (tel == null) {
+                return Optional.empty();
+            }
+            return Optional.of(new FactoryElement(tel, generatedClass(), qualifiers()));
         }
         return Optional.empty();
     });
@@ -74,9 +77,6 @@ public final class ComponentElement {
     }
 
     public static ComponentElement create(TypeElement element, TypeTool tool, Qualifiers qualifiers) {
-        if (element.getKind() != ElementKind.INTERFACE) {
-            throw new ValidationFailure("The component must be an interface", element);
-        }
         return new ComponentElement(element, tool, qualifiers);
     }
 

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 public class BindingRegistry {
 
@@ -24,7 +25,11 @@ public class BindingRegistry {
         this.parameterBindings = parameterBindings;
     }
 
-    public static BindingRegistry create(ComponentElement componentElement) {
+    public static Function<ComponentElement, BindingRegistry> factory() {
+        return BindingRegistry::create;
+    }
+
+    private static BindingRegistry create(ComponentElement componentElement) {
         List<ParameterBinding> pBindings = componentElement.factoryElement()
                 .map(FactoryElement::parameterBindings)
                 .orElse(List.of());
