@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Retention(SOURCE)
 public @interface Component {
 
-    Class<?> module() default Object.class;
+    Class<?>[] modules() default {};
 
     /**
      * This annotation goes on an interface.
