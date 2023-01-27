@@ -37,8 +37,15 @@ public class ComponentFactoryStep implements Step {
             List<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement typeElement : typeElements) {
                 validator.validate(typeElement);
-                if (typeElement.getEnclosingElement().getAnnotation(Component.class) == null) {
+                Element enclosing = typeElement.getEnclosingElement();
+                if (enclosing.getAnnotation(Component.class) == null) {
                     throw new ValidationFailure("The @Factory class must be nested inside its @Component", typeElement);
+                }
+                if (enclosing.getEnclosedElements().stream()
+                        .filter(enclosed -> enclosed.getKind().isInterface())
+                        .filter(enclosed -> enclosed.getAnnotation(Component.Factory.class) != null)
+                        .count() >= 2) {
+                    throw new ValidationFailure("Found more than one @Factory", enclosing);
                 }
             }
         } catch (ValidationFailure f) {

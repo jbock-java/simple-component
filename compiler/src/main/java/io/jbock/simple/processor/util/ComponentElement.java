@@ -34,8 +34,7 @@ public final class ComponentElement {
 
     private final Supplier<Optional<FactoryElement>> factoryElement = memoize(() -> {
         for (Element el : element().getEnclosedElements()) {
-            boolean hasFactoryAnnotation = el.getAnnotationMirrors().stream()
-                    .anyMatch(m -> tool().isSameType(m.getAnnotationType(), Component.Factory.class));
+            boolean hasFactoryAnnotation = el.getAnnotation(Component.Factory.class) != null;
             if (!hasFactoryAnnotation) {
                 return Optional.empty();
             }
@@ -47,6 +46,13 @@ public final class ComponentElement {
         }
         return Optional.empty();
     });
+
+    private final Supplier<List<ModuleElement>> modules = memoize(() -> element().getEnclosingElement().getEnclosedElements().stream()
+            .filter(enclosed -> enclosed.getAnnotation(Component.Factory.class) != null)
+            .map(Visitors.TYPE_ELEMENT_VISITOR::visit)
+            .filter(Objects::nonNull)
+            .map(el -> ModuleElement.create(el, tool()))
+            .toList());
 
     private final Supplier<List<DependencyRequest>> requests = memoize(() -> {
         List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
@@ -94,6 +100,10 @@ public final class ComponentElement {
 
     public ClassName generatedClass() {
         return generatedClass.get();
+    }
+
+    public List<ModuleElement> modules() {
+        return modules.get();
     }
 
     private TypeTool tool() {
