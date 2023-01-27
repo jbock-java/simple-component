@@ -2,6 +2,6 @@
 
 A simple dagger-style injector which
 
-* uses jakarta's `@Inject` annotation
+* uses its own `@Inject` annotation for max flexibility
 * allows injection into static "factory" methods
 * doesn't generate casts
