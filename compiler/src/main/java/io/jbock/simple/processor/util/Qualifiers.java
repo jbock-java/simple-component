@@ -2,7 +2,7 @@ package io.jbock.simple.processor.util;
 
 import io.jbock.auto.common.MoreElements;
 import io.jbock.javapoet.ClassName;
-import jakarta.inject.Qualifier;
+import io.jbock.simple.Qualifier;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;

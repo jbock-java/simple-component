@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.util;
 
-import jakarta.inject.Inject;
+import io.jbock.simple.Inject;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

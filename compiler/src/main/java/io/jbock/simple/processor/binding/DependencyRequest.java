@@ -1,8 +1,8 @@
 package io.jbock.simple.processor.binding;
 
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.TypeTool;
-import jakarta.inject.Inject;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;

@@ -18,7 +18,7 @@ class CycleTest {
                 "package test;",
                 "",
                 "import io.jbock.simple.Component;",
-                "import jakarta.inject.Inject;",
+                "import io.jbock.simple.Inject;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
