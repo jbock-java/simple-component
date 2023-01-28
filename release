@@ -24,7 +24,7 @@ if ! ./gradlew clean -Pversion=${VERSION} simple-component:publish; then
 fi
 
 
-if ! ./gradlew clean -Pversion=${VERSION} compiler:publish; then
+if ! ./gradlew clean -Pversion=${VERSION} compiler:test compiler:publish; then
   die "build failed"
 fi
 

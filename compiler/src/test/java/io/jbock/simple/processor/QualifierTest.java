@@ -67,7 +67,7 @@ class QualifierTest {
                 .containsLines(
                         "package test;",
                         "",
-                        "class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
                         "  private final String a;",
                         "  private final String b;",
                         "",
@@ -85,7 +85,7 @@ class QualifierTest {
                         "    return new Factory_Impl();",
                         "  }",
                         "",
-                        "  private static class Factory_Impl implements TestClass.AComponent.Factory {",
+                        "  private static final class Factory_Impl implements TestClass.AComponent.Factory {",
                         "    @Override",
                         "    public TestClass.AComponent create(String a, String b) {",
                         "      return new TestClass_AComponent_Impl(a, b);",

@@ -48,7 +48,7 @@ class ProcessorComponentTest {
                 .containsLines(
                         "package test;",
                         "",
-                        "class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
                         "  private final TestClass.C c;",
                         "  private final TestClass.B b;",
                         "  private final TestClass.A a;",
@@ -103,7 +103,7 @@ class ProcessorComponentTest {
                 .containsLines(
                         "package test;",
                         "",
-                        "class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
                         "  private final TestClass.E e;",
                         "  private final TestClass.C c;",
                         "  private final TestClass.B b;",
@@ -148,7 +148,7 @@ class ProcessorComponentTest {
                 .containsLines(
                         "package test;",
                         "",
-                        "class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
                         "  private TestClass_AComponent_Impl() {",
                         "  }",
                         "",
