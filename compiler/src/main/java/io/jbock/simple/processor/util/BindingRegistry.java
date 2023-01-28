@@ -42,7 +42,6 @@ public class BindingRegistry {
                         p.asType() + ' ' + p.getSimpleName(), b.parameter());
             }
         }
-        // TODO componentElement.modules()...
         return new BindingRegistry(parameterBindings);
     }
 

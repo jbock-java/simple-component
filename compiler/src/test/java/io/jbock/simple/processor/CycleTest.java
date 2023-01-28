@@ -29,7 +29,7 @@ class CycleTest {
                 "    @Inject B(C c) {}",
                 "  }",
                 "",
-                "  static class C {",
+                "  interface C {",
                 "    @Inject static C createC(D d) { return null; }",
                 "  }",
                 "",

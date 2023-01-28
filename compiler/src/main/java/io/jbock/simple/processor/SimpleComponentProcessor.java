@@ -13,9 +13,7 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
         return List.of(
                 component.injectStep(),
                 component.componentStep(),
-                component.componentFactoryStep(),
-                component.bindsStep(),
-                component.simpleModuleStep());
+                component.componentFactoryStep());
     }
 
     @Override

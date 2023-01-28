@@ -11,8 +11,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Retention(SOURCE)
 public @interface Component {
 
-    Class<?>[] modules() default {};
-
     /**
      * This annotation goes on an interface.
      * The interface definition must be nested inside the component interface.

@@ -1,10 +1,8 @@
 package io.jbock.simple.processor;
 
-import io.jbock.simple.processor.step.BindsStep;
 import io.jbock.simple.processor.step.ComponentFactoryStep;
 import io.jbock.simple.processor.step.ComponentStep;
 import io.jbock.simple.processor.step.InjectStep;
-import io.jbock.simple.processor.step.SimpleModuleStep;
 import io.jbock.simple.processor.util.BindingRegistry;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.ComponentRegistry;
@@ -43,8 +41,6 @@ final class ProcessorComponent {
     private final ExecutableElementValidator executableElementValidator;
     private final SafeTypes types;
     private final SafeElements elements;
-    private final BindsStep bindsStep;
-    private final SimpleModuleStep simpleModuleStep;
     private final ComponentFactoryStep componentFactoryStep;
 
     ProcessorComponent(ProcessingEnvironment processingEnvironment) {
@@ -65,8 +61,6 @@ final class ProcessorComponent {
         this.specWriter = new SpecWriter(sourceFileGenerator, messager);
         this.componentStep = new ComponentStep(componentRegistry, messager, tool, qualifiers, typeElementValidator, generatorFactory, specWriter);
         this.injectStep = new InjectStep(injectBindingValidator, executableElementValidator, messager);
-        this.bindsStep = new BindsStep(messager, executableElementValidator);
-        this.simpleModuleStep = new SimpleModuleStep(typeElementValidator, messager);
         this.componentFactoryStep = new ComponentFactoryStep(messager, typeElementValidator);
     }
 
@@ -76,14 +70,6 @@ final class ProcessorComponent {
 
     InjectStep injectStep() {
         return injectStep;
-    }
-
-    BindsStep bindsStep() {
-        return bindsStep;
-    }
-
-    SimpleModuleStep simpleModuleStep() {
-        return simpleModuleStep;
     }
 
     ComponentFactoryStep componentFactoryStep() {
