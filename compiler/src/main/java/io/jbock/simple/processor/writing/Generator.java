@@ -49,7 +49,7 @@ public class Generator {
         Graph graph = Graph.newGraph();
         for (DependencyRequest request : component.getRequests()) {
             Binding binding = bindingRegistry.getBinding(request);
-            graph.addAll((bindingRegistry.getDependencies(binding)));
+            graph.addAll(bindingRegistry.getDependencies(binding));
         }
         for (Binding binding : graph.nodes()) {
             if (binding instanceof InjectBinding) {

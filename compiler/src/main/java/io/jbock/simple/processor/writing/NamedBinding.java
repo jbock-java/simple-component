@@ -19,4 +19,9 @@ public final class NamedBinding {
     public String name() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return binding.toString();
+    }
 }

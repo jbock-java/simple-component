@@ -153,4 +153,43 @@ class ProcessorComponentTest {
                         "  }",
                         "}");
     }
+
+    @Test
+    void thoroughTest() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "",
+                "import io.jbock.simple.Component;",
+                "import io.jbock.simple.Inject;",
+                "",
+                "class TestClass {",
+                "",
+                "  @Component interface AComponent {",
+                "    A a();",
+                "    @Component.Factory interface Factory {",
+                "      AComponent create(P p);",
+                "    }",
+                "  }",
+                "",
+                "  static class A {",
+                "    @Inject A(B b, P p) {}",
+                "  }",
+                "",
+                "  static class B {",
+                "    @Inject B(P p, C c) {}",
+                "  }",
+                "",
+                "  static class C {",
+                "    @Inject C(P p, D d) {}",
+                "  }",
+                "",
+                "  static class D {",
+                "    @Inject D(P p) {}",
+                "  }",
+                "",
+                "  static class P {}",
+                "}");
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
+    }
 }
