@@ -1,10 +1,12 @@
 package io.jbock.simple.processor.writing;
 
+import io.jbock.javapoet.AnnotationSpec;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.FieldSpec;
 import io.jbock.javapoet.MethodSpec;
 import io.jbock.javapoet.TypeName;
 import io.jbock.javapoet.TypeSpec;
+import io.jbock.simple.processor.SimpleComponentProcessor;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
@@ -12,6 +14,7 @@ import io.jbock.simple.processor.binding.ParameterBinding;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.FactoryElement;
 
+import javax.annotation.processing.Generated;
 import javax.lang.model.element.ExecutableElement;
 import java.util.List;
 import java.util.Map;
@@ -78,8 +81,14 @@ public class ComponentImpl {
         for (ParameterBinding b : parameterBindings) {
             constructor.addParameter(b.parameterSpec());
         }
-        return spec.addMethod(constructor.build())
-                .addOriginatingElement(component.element()).build();
+        spec.addAnnotation(AnnotationSpec.builder(Generated.class)
+                .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
+                .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
+                .build());
+        spec.addModifiers(FINAL);
+        spec.addMethod(constructor.build());
+        spec.addOriginatingElement(component.element());
+        return spec.build();
     }
 
     private static TypeSpec createFactory(
@@ -87,7 +96,7 @@ public class ComponentImpl {
             ComponentElement component,
             FactoryElement factory) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
-        spec.addModifiers(PRIVATE, STATIC);
+        spec.addModifiers(PRIVATE, STATIC, FINAL);
         spec.addSuperinterface(factory.element().asType());
         ExecutableElement abstractMethod = factory.singleAbstractMethod();
         MethodSpec.Builder method = MethodSpec.methodBuilder(abstractMethod.getSimpleName().toString());
