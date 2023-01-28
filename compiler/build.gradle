@@ -46,8 +46,8 @@ tasks.withType(GenerateModuleMetadata) {
 shadowJar {
     minimize()
     archiveClassifier.set('')
-    relocate('io.jbock.auto.common', 'io.jbock.jbock.auto.common')
-    relocate('io.jbock.javapoet', 'io.jbock.jbock.javapoet')
+    relocate('io.jbock.auto.common', 'io.jbock.simple.auto.common')
+    relocate('io.jbock.javapoet', 'io.jbock.simple.javapoet')
 }
 
 dependencies {
