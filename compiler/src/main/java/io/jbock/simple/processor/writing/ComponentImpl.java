@@ -69,6 +69,7 @@ public class ComponentImpl {
         }
         component.factoryElement().ifPresent(factory -> {
             spec.addMethod(MethodSpec.methodBuilder("factory")
+                    .addModifiers(STATIC)
                     .returns(TypeName.get(factory.element().asType()))
                     .addStatement("return new $T()", factory.generatedClass())
                     .build());
@@ -86,6 +87,7 @@ public class ComponentImpl {
             ComponentElement component,
             FactoryElement factory) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
+        spec.addModifiers(PRIVATE, STATIC);
         spec.addSuperinterface(factory.element().asType());
         ExecutableElement abstractMethod = factory.singleAbstractMethod();
         MethodSpec.Builder method = MethodSpec.methodBuilder(abstractMethod.getSimpleName().toString());
