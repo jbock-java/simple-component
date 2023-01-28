@@ -51,14 +51,14 @@ public final class ComponentElement {
         List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
         List<DependencyRequest> result = new ArrayList<>();
         for (ExecutableElement method : methods) {
+            if (method.getModifiers().contains(Modifier.STATIC)) {
+                continue; // ignore
+            }
             if (!method.getParameters().isEmpty()) {
                 throw new ValidationFailure("The method may not have any parameters", method);
             }
             if (method.getModifiers().contains(Modifier.DEFAULT)) {
                 throw new ValidationFailure("Default method not allowed here", method);
-            }
-            if (method.getModifiers().contains(Modifier.STATIC)) {
-                throw new ValidationFailure("The method may not be static", method);
             }
             if (method.getReturnType().getKind() == TypeKind.VOID) {
                 throw new ValidationFailure("The method may not return void", method);

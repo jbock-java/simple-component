@@ -42,7 +42,7 @@ public class ComponentFactoryStep implements Step {
                 validator.validate(typeElement);
                 Element enclosing = typeElement.getEnclosingElement();
                 if (enclosing.getAnnotation(Component.class) == null) {
-                    throw new ValidationFailure("The @Factory class must be nested inside its @Component", typeElement);
+                    throw new ValidationFailure("The @Factory must be nested inside a @Component", typeElement);
                 }
                 if (enclosing.getEnclosedElements().stream()
                         .filter(enclosed -> enclosed.getKind().isInterface())

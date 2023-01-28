@@ -21,7 +21,9 @@ public class FactoryElement {
     private final Qualifiers qualifiers;
 
     private final Supplier<ExecutableElement> singleAbstractMethod = memoize(() -> {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
+        List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements())
+                .stream().filter(m -> !m.getModifiers().contains(STATIC))
+                .collect(Collectors.toList());
         if (methods.isEmpty()) {
             throw new ValidationFailure("Factory method not found", element());
         }
@@ -29,9 +31,6 @@ public class FactoryElement {
             throw new ValidationFailure("Only one method allowed", element());
         }
         ExecutableElement method = methods.get(0);
-        if (method.getModifiers().contains(STATIC)) {
-            throw new ValidationFailure("The method may not be static", method);
-        }
         if (method.getReturnType().getKind() == TypeKind.VOID) {
             throw new ValidationFailure("The method may not return void", method);
         }
