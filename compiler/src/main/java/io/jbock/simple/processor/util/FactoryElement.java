@@ -9,6 +9,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 import static javax.lang.model.element.Modifier.STATIC;
@@ -38,7 +39,9 @@ public class FactoryElement {
     });
 
     private final Supplier<List<ParameterBinding>> parameterBindings = memoize(() ->
-            singleAbstractMethod().getParameters().stream().map(p -> ParameterBinding.create(p, qualifiers())).toList());
+            singleAbstractMethod().getParameters().stream()
+                    .map(p -> ParameterBinding.create(p, qualifiers()))
+                    .collect(Collectors.toList()));
 
     FactoryElement(
             TypeElement element,

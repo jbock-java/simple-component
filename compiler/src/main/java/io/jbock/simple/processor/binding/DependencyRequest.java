@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 import static io.jbock.simple.processor.util.Visitors.EXECUTABLE_ELEMENT_VISITOR;
@@ -31,7 +32,7 @@ public final class DependencyRequest {
         }
         List<? extends Element> allMembers = tool().elements().getAllMembers(typeElement).stream()
                 .filter(m -> m.getAnnotation(Inject.class) != null)
-                .toList();
+                .collect(Collectors.toList());
         if (allMembers.isEmpty()) {
             return Optional.empty();
         }

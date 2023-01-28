@@ -9,6 +9,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class InjectBindingValidator {
 
@@ -38,10 +39,10 @@ public final class InjectBindingValidator {
         List<? extends Element> allMembers = tool.elements().getAllMembers(typeElement);
         List<ExecutableElement> constructors = ElementFilter.constructorsIn(allMembers).stream()
                 .filter(c -> c.getAnnotationMirrors().stream().anyMatch(m -> tool.isSameType(m.getAnnotationType(), Inject.class)))
-                .toList();
+                .collect(Collectors.toList());
         List<ExecutableElement> methods = ElementFilter.methodsIn(allMembers).stream()
                 .filter(c -> c.getAnnotationMirrors().stream().anyMatch(m -> tool.isSameType(m.getAnnotationType(), Inject.class)))
-                .toList();
+                .collect(Collectors.toList());
         if (constructors.size() >= 2) {
             throw new ValidationFailure("Only one constructor binding per class allowed",
                     element);

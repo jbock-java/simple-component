@@ -10,6 +10,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Qualifiers {
 
@@ -23,7 +24,7 @@ public class Qualifiers {
         List<SimpleAnnotation> qualifiers = element.getAnnotationMirrors().stream()
                 .filter(Qualifiers::hasQualifierAnnotation)
                 .map(mirror -> SimpleAnnotation.create(mirror, elements))
-                .toList();
+                .collect(Collectors.toList());
         if (qualifiers.isEmpty()) {
             return Optional.empty();
         }

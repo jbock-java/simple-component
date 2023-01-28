@@ -15,6 +15,7 @@ import io.jbock.simple.processor.util.FactoryElement;
 import javax.lang.model.element.ExecutableElement;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
@@ -42,12 +43,14 @@ public class ComponentImpl {
             String name = namedBinding.name();
             FieldSpec field = FieldSpec.builder(key.typeName(), name, PRIVATE, FINAL).build();
             spec.addField(field);
-            if (namedBinding.binding() instanceof InjectBinding b) {
+            if (namedBinding.binding() instanceof InjectBinding) {
+                InjectBinding b = (InjectBinding) namedBinding.binding();
                 constructor.addStatement("this.$N = $L", field,
                         b.invokeExpression(b.dependencies().stream()
                                 .map(d -> CodeBlock.of("$L", sorted.get(d.key()).name()))
                                 .collect(CodeBlock.joining(", "))));
-            } else if (namedBinding.binding() instanceof ParameterBinding b) {
+            } else if (namedBinding.binding() instanceof ParameterBinding) {
+                ParameterBinding b = (ParameterBinding) namedBinding.binding();
                 constructor.addStatement("this.$N = $N", field, b.parameterSpec());
             }
         }
@@ -60,7 +63,8 @@ public class ComponentImpl {
             method.returns(r.key().typeName());
             method.addAnnotation(Override.class);
             method.addModifiers(r.requestingElement().getModifiers().stream()
-                    .filter(m -> m == PUBLIC || m == PROTECTED).toList());
+                    .filter(m -> m == PUBLIC || m == PROTECTED)
+                    .collect(Collectors.toList()));
             spec.addMethod(method.build());
         }
         component.factoryElement().ifPresent(factory -> {
@@ -87,7 +91,7 @@ public class ComponentImpl {
         MethodSpec.Builder method = MethodSpec.methodBuilder(abstractMethod.getSimpleName().toString());
         method.addAnnotation(Override.class);
         method.addModifiers(abstractMethod.getModifiers().stream()
-                .filter(m -> m == PUBLIC || m == PROTECTED).toList());
+                .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
         method.returns(TypeName.get(component.element().asType()));
         method.addStatement("return new $T($L)", component.generatedClass(), parameterBindings.stream()
                 .map(b -> CodeBlock.of("$N", b.parameterSpec()))

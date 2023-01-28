@@ -52,7 +52,8 @@ public class Generator {
             graph.addAll((bindingRegistry.getDependencies(binding)));
         }
         for (Binding binding : graph.nodes()) {
-            if (binding instanceof InjectBinding b) {
+            if (binding instanceof InjectBinding) {
+                InjectBinding b = (InjectBinding) binding;
                 validator.checkBinding(b.element());
             }
         }
@@ -97,7 +98,8 @@ public class Generator {
             uniqueNameSet.claim(name);
         }
         for (Binding binding : sorted) {
-            if (binding instanceof InjectBinding b) {
+            if (binding instanceof InjectBinding) {
+                InjectBinding b = (InjectBinding) binding;
                 String name = uniqueNameSet.getUniqueName(b.suggestedVariableName());
                 result.put(b.key(), new NamedBinding(b, name));
             }

@@ -13,6 +13,7 @@ import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class InjectStep implements Step {
 
@@ -37,7 +38,9 @@ public class InjectStep implements Step {
     @Override
     public Set<? extends Element> process(Map<String, Set<Element>> elementsByAnnotation) {
         try {
-            List<Element> elements = elementsByAnnotation.values().stream().flatMap(Set::stream).toList();
+            List<Element> elements = elementsByAnnotation.values().stream()
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toList());
             List<ExecutableElement> constructors = ElementFilter.constructorsIn(elements);
             List<ExecutableElement> methods = ElementFilter.methodsIn(elements);
             for (ExecutableElement constructor : constructors) {

@@ -26,7 +26,14 @@ class CyclePrinter {
         return new ValidationFailure(report.message, report.binding.element());
     }
 
-    private record Report(String message, Binding binding) {
+    private static final class Report {
+        final String message;
+        final Binding binding;
+
+        Report(String message, Binding binding) {
+            this.message = message;
+            this.binding = binding;
+        }
     }
 
     Report cycleMessage() {
@@ -44,12 +51,13 @@ class CyclePrinter {
         message.add("Found a dependency cycle:");
         for (Edge edge : cycle) {
             Binding destination = edge.destination();
-            if (destination instanceof InjectBinding b) {
+            if (destination instanceof InjectBinding) {
+                InjectBinding b = (InjectBinding) destination;
                 message.add(INDENT + edge.source().key().typeName() + " is injected at");
                 message.add(DOUBLE_INDENT + b.signature());
             } else {
                 throw new AssertionError("we should never get here");
-            } 
+            }
         }
         return String.join("\n", message);
     }

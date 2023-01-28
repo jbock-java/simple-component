@@ -4,7 +4,6 @@ import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Component;
 import io.jbock.simple.processor.util.ComponentElement;
-import io.jbock.simple.processor.util.ComponentRegistry;
 import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeElementValidator;
@@ -21,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ComponentStep implements Step {
 
-    private final ComponentRegistry registry;
     private final Messager messager;
     private final TypeTool tool;
     private final Qualifiers qualifiers;
@@ -33,14 +32,12 @@ public class ComponentStep implements Step {
     private final SpecWriter specWriter;
 
     public ComponentStep(
-            ComponentRegistry registry,
             Messager messager,
             TypeTool tool,
             Qualifiers qualifiers,
             TypeElementValidator validator,
             Function<ComponentElement, Generator> generatorFactory,
             SpecWriter specWriter) {
-        this.registry = registry;
         this.messager = messager;
         this.tool = tool;
         this.qualifiers = qualifiers;
@@ -57,7 +54,7 @@ public class ComponentStep implements Step {
     @Override
     public Set<? extends Element> process(Map<String, Set<Element>> elementsByAnnotation) {
         try {
-            List<Element> elements = elementsByAnnotation.values().stream().flatMap(Set::stream).toList();
+            List<Element> elements = elementsByAnnotation.values().stream().flatMap(Set::stream).collect(Collectors.toList());
             List<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement typeElement : typeElements) {
                 validator.validate(typeElement);
@@ -70,7 +67,6 @@ public class ComponentStep implements Step {
                 });
                 TypeSpec typeSpec = generatorFactory.apply(component).generate();
                 specWriter.write(component.generatedClass(), typeSpec);
-                registry.registerComponent(component);
             }
         } catch (ValidationFailure f) {
             f.writeTo(messager);

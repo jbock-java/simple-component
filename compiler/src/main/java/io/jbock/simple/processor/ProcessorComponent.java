@@ -5,7 +5,6 @@ import io.jbock.simple.processor.step.ComponentStep;
 import io.jbock.simple.processor.step.InjectStep;
 import io.jbock.simple.processor.util.BindingRegistry;
 import io.jbock.simple.processor.util.ComponentElement;
-import io.jbock.simple.processor.util.ComponentRegistry;
 import io.jbock.simple.processor.util.ExecutableElementValidator;
 import io.jbock.simple.processor.util.InjectBindingValidator;
 import io.jbock.simple.processor.util.Qualifiers;
@@ -28,7 +27,6 @@ final class ProcessorComponent {
     private final TypeTool tool;
     private final Messager messager;
     private final SourceFileGenerator sourceFileGenerator;
-    private final ComponentRegistry componentRegistry;
     private final ComponentImpl componentImpl;
     private final Function<ComponentElement, Generator> generatorFactory;
     private final Function<ComponentElement, BindingRegistry> bindingRegistryFactory;
@@ -48,7 +46,6 @@ final class ProcessorComponent {
         this.elements = new SafeElements(processingEnvironment.getElementUtils());
         qualifiers = new Qualifiers(elements);
         Filer filer = processingEnvironment.getFiler();
-        this.componentRegistry = new ComponentRegistry();
         this.tool = new TypeTool(elements, types);
         this.messager = processingEnvironment.getMessager();
         this.sourceFileGenerator = new SourceFileGenerator(filer, messager);
@@ -59,7 +56,7 @@ final class ProcessorComponent {
         this.bindingRegistryFactory = BindingRegistry.factory();
         this.generatorFactory = component -> Generator.create(bindingRegistryFactory.apply(component), componentImpl, component);
         this.specWriter = new SpecWriter(sourceFileGenerator, messager);
-        this.componentStep = new ComponentStep(componentRegistry, messager, tool, qualifiers, typeElementValidator, generatorFactory, specWriter);
+        this.componentStep = new ComponentStep(messager, tool, qualifiers, typeElementValidator, generatorFactory, specWriter);
         this.injectStep = new InjectStep(injectBindingValidator, executableElementValidator, messager);
         this.componentFactoryStep = new ComponentFactoryStep(messager, typeElementValidator);
     }

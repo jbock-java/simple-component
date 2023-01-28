@@ -4,7 +4,7 @@ import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Objects;
 
-public abstract sealed class Binding permits InjectBinding, ParameterBinding {
+public abstract class Binding { // permits InjectBinding, ParameterBinding
 
     private final Key key;
 
