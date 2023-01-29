@@ -5,7 +5,8 @@
 
 A simple dependency injector. 
 
-* Batteries included: comes with its own `@Inject` annotation so you don't have to choose between `javax.inject` and `jakarta.inject`.
+* Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
+* Also includes its own `@Inject` annotation, for those cases where neither `javax.inject` nor `jakarta.inject` is available.
 * Allows static "factory" methods as injection sites.
 * No typecasts in generated code.
 * Field injection is not supported.
