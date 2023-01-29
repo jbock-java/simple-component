@@ -46,17 +46,15 @@ public class BindingRegistry {
     }
 
     public Binding getBinding(DependencyRequest request) {
+        ParameterBinding parameterBinding = parameterBindings.get(request.key());
+        if (parameterBinding != null) {
+            return parameterBinding; // takes precedence
+        }
         Optional<InjectBinding> injectBinding = request.binding();
         if (injectBinding.isEmpty()) {
-            ParameterBinding parameterBinding = parameterBindings.get(request.key());
-            if (parameterBinding == null) {
-                throw new ValidationFailure("Binding not found", request.requestingElement());
-            }
-            return parameterBinding;
+            throw new ValidationFailure("Binding not found", request.requestingElement());
         }
-        InjectBinding b = injectBinding.orElseThrow();
-        DuplicateBinding.check(parameterBindings.get(request.key()), b);
-        return b;
+        return injectBinding.orElseThrow();
     }
 
     public Graph getDependencies(Binding startNode) {

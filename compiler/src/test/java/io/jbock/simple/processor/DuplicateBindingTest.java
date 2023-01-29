@@ -37,7 +37,7 @@ class DuplicateBindingTest {
     }
 
     @Test
-    void parameterBindingConflict() {
+    void parameterBindingTakesPrecedence() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",
                 "",
@@ -61,7 +61,22 @@ class DuplicateBindingTest {
                 "  }",
                 "}");
         Compilation compilation = simpleCompiler().compile(component);
-        assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("There is a conflicting binding: test.TestClass.A()");
+        assertThat(compilation).succeeded();
+        assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
+                .containsLines(
+                        "package test;",
+                        "",
+                        "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "  private final TestClass.A a;",
+                        "",
+                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
+                        "    this.a = a;",
+                        "  }",
+                        "",
+                        "  @Override",
+                        "  public TestClass.A getA() {",
+                        "    return a;",
+                        "  }",
+                        "}");
     }
 }
