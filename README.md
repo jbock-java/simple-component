@@ -11,7 +11,7 @@ A simple dependency injector.
 * No typecasts in generated code.
 * Field injection is not supported.
 * Generates only a single class per `@Component`.
-* No scoping: For every "key" (typename + optional qualifier), there is only a single instance per component instance.
+* No scoping: For every "key" (typename + optional qualifier), there is always at most one instance per component instance.
 
 ### Samples
 
