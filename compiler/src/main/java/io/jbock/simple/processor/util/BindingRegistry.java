@@ -74,10 +74,9 @@ public class BindingRegistry {
         for (DependencyRequest d : node.dependencies()) {
             Binding dependency = getBinding(d);
             Edge edge = new Edge(dependency, node);
-            nodes.add(dependency);
-            if (!edges.add(edge)) {
-                // cycle detected
-                return;
+            edges.add(edge);
+            if (!nodes.add(dependency)) {
+                continue; // prevent stack overflow in invalid (cyclic) graph
             }
             addDependencies(nodes, edges, dependency);
         }
