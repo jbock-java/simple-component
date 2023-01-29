@@ -8,7 +8,7 @@ A simple dependency injector.
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
 * Also includes its own `@Inject` annotation, for those cases where neither `javax.inject` nor `jakarta.inject` is available.
 * Allows static methods as injection sites.
-* No typecasts in generated code.
+* No typecasts in generated code. Dagger will always generate a typecast when a bound type is not `public`.
 * Field injection is not supported.
 * Generates only a single class per `@Component`.
 * No scoping: For every "key" (typename + optional qualifier), there is always at most one instance per component instance.
