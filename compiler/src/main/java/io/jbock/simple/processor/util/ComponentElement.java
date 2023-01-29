@@ -2,6 +2,7 @@ package io.jbock.simple.processor.util;
 
 import io.jbock.javapoet.ClassName;
 import io.jbock.simple.Component;
+import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.Key;
 
@@ -11,9 +12,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -47,9 +48,9 @@ public final class ComponentElement {
         return Optional.empty();
     });
 
-    private final Supplier<List<DependencyRequest>> requests = memoize(() -> {
+    private final Supplier<Map<Key, DependencyRequest>> requests = memoize(() -> {
         List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
-        List<DependencyRequest> result = new ArrayList<>();
+        Map<Key, DependencyRequest> result = new LinkedHashMap<>();
         for (ExecutableElement method : methods) {
             if (method.getModifiers().contains(Modifier.STATIC)) {
                 continue; // ignore
@@ -64,7 +65,7 @@ public final class ComponentElement {
                 throw new ValidationFailure("The method may not return void", method);
             }
             Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
-            result.add(new DependencyRequest(key, method, qualifiers(), tool()));
+            result.put(key, new DependencyRequest(key, method, qualifiers(), tool()));
         }
         return result;
     });
@@ -87,8 +88,12 @@ public final class ComponentElement {
         return factoryElement.get();
     }
 
+    public boolean isComponentRequest(Binding binding) {
+        return requests.get().containsKey(binding.key());        
+    }
+
     public List<DependencyRequest> getRequests() {
-        return requests.get();
+        return List.copyOf(requests.get().values());
     }
 
     public ClassName generatedClass() {
@@ -97,19 +102,6 @@ public final class ComponentElement {
 
     private TypeTool tool() {
         return tool;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ComponentElement that = (ComponentElement) o;
-        return element.equals(that.element);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(element);
     }
 
     private Qualifiers qualifiers() {

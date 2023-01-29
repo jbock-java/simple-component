@@ -94,14 +94,14 @@ public class Generator {
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
         for (ParameterBinding b : parameterBindings) {
             String name = b.parameter().getSimpleName().toString();
-            result.put(b.key(), new NamedBinding(b, name));
+            result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
             uniqueNameSet.claim(name);
         }
         for (Binding binding : sorted) {
             if (binding instanceof InjectBinding) {
                 InjectBinding b = (InjectBinding) binding;
                 String name = uniqueNameSet.getUniqueName(b.suggestedVariableName());
-                result.put(b.key(), new NamedBinding(b, name));
+                result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
             }
         }
         return result;

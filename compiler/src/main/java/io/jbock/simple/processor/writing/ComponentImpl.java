@@ -4,6 +4,7 @@ import io.jbock.javapoet.AnnotationSpec;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.FieldSpec;
 import io.jbock.javapoet.MethodSpec;
+import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.TypeName;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.processor.SimpleComponentProcessor;
@@ -44,18 +45,29 @@ public class ComponentImpl {
             NamedBinding namedBinding = e.getValue();
             Key key = namedBinding.binding().key();
             String name = namedBinding.name();
-            FieldSpec field = FieldSpec.builder(key.typeName(), name, PRIVATE, FINAL).build();
-            spec.addField(field);
-            if (namedBinding.binding() instanceof InjectBinding) {
-                InjectBinding b = (InjectBinding) namedBinding.binding();
-                constructor.addStatement("this.$N = $L", field,
-                        b.invokeExpression(b.dependencies().stream()
-                                .map(d -> CodeBlock.of("$L", sorted.get(d.key()).name()))
-                                .collect(CodeBlock.joining(", "))));
-            } else if (namedBinding.binding() instanceof ParameterBinding) {
-                ParameterBinding b = (ParameterBinding) namedBinding.binding();
-                constructor.addStatement("this.$N = $N", field, b.parameterSpec());
-            }
+            if (namedBinding.isComponentRequest()) {
+                FieldSpec field = FieldSpec.builder(key.typeName(), name, PRIVATE, FINAL).build();
+                spec.addField(field);
+                if (namedBinding.binding() instanceof InjectBinding) {
+                    InjectBinding b = (InjectBinding) namedBinding.binding();
+                    constructor.addStatement("this.$N = $L", field,
+                            b.invokeExpression(b.dependencies().stream()
+                                    .map(d -> CodeBlock.of("$L", sorted.get(d.key()).name()))
+                                    .collect(CodeBlock.joining(", "))));
+                } else if (namedBinding.binding() instanceof ParameterBinding) {
+                    ParameterBinding b = (ParameterBinding) namedBinding.binding();
+                    constructor.addStatement("this.$N = $N", field, b.parameterSpec());
+                }
+            } else {
+                ParameterSpec param = ParameterSpec.builder(key.typeName(), name).build();
+                if (namedBinding.binding() instanceof InjectBinding) {
+                    InjectBinding b = (InjectBinding) namedBinding.binding();
+                    constructor.addStatement("$T $N = $L", b.key().typeName(), param,
+                            b.invokeExpression(b.dependencies().stream()
+                                    .map(d -> CodeBlock.of("$L", sorted.get(d.key()).name()))
+                                    .collect(CodeBlock.joining(", "))));
+                }
+            } 
         }
         List<ParameterBinding> parameterBindings = component.factoryElement()
                 .map(FactoryElement::parameterBindings)
