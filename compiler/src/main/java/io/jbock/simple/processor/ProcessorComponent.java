@@ -44,9 +44,9 @@ final class ProcessorComponent {
     ProcessorComponent(ProcessingEnvironment processingEnvironment) {
         this.types = new SafeTypes(processingEnvironment.getTypeUtils());
         this.elements = new SafeElements(processingEnvironment.getElementUtils());
-        qualifiers = new Qualifiers(elements);
         Filer filer = processingEnvironment.getFiler();
         this.tool = new TypeTool(elements, types);
+        this.qualifiers = new Qualifiers(tool);
         this.messager = processingEnvironment.getMessager();
         this.sourceFileGenerator = new SourceFileGenerator(filer, messager);
         this.injectBindingValidator = new InjectBindingValidator(tool);

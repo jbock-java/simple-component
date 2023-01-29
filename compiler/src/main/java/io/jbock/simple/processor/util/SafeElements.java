@@ -6,6 +6,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,12 +18,20 @@ public class SafeElements {
 
     private final Elements elements;
 
+    private final Map<String, Optional<TypeElement>> typeElementCache = new HashMap<>();
+
     public SafeElements(Elements elements) {
         this.elements = elements;
     }
 
     public Optional<TypeElement> getTypeElement(String name) {
-        return Optional.ofNullable(elements.getTypeElement(name));
+        Optional<TypeElement> fromCache = typeElementCache.get(name);
+        if (fromCache != null) {
+            return fromCache;
+        }
+        Optional<TypeElement> result = Optional.ofNullable(elements.getTypeElement(name));
+        typeElementCache.put(name, result);
+        return result;
     }
 
     public List<? extends Element> getAllMembers(TypeElement element) {
