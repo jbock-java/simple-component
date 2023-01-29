@@ -1,15 +1,19 @@
 package io.jbock.simple.processor.util;
 
-import io.jbock.simple.Inject;
-
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
-import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static io.jbock.simple.processor.util.TypeNames.JAKARTA_INJECT;
+import static io.jbock.simple.processor.util.TypeNames.JAVAX_INJECT;
+import static io.jbock.simple.processor.util.TypeNames.SIMPLE_INJECT;
+import static javax.lang.model.util.ElementFilter.constructorsIn;
+import static javax.lang.model.util.ElementFilter.methodsIn;
 
 public final class InjectBindingValidator {
 
@@ -37,11 +41,11 @@ public final class InjectBindingValidator {
             throw new ValidationFailure("Type parameters are not allowed on element", typeElement);
         }
         List<? extends Element> allMembers = tool.elements().getAllMembers(typeElement);
-        List<ExecutableElement> constructors = ElementFilter.constructorsIn(allMembers).stream()
-                .filter(c -> c.getAnnotationMirrors().stream().anyMatch(m -> tool.isSameType(m.getAnnotationType(), Inject.class)))
+        List<ExecutableElement> constructors = constructorsIn(allMembers).stream()
+                .filter(tool::hasInjectAnnotation)
                 .collect(Collectors.toList());
-        List<ExecutableElement> methods = ElementFilter.methodsIn(allMembers).stream()
-                .filter(c -> c.getAnnotationMirrors().stream().anyMatch(m -> tool.isSameType(m.getAnnotationType(), Inject.class)))
+        List<ExecutableElement> methods = methodsIn(allMembers).stream()
+                .filter(tool::hasInjectAnnotation)
                 .collect(Collectors.toList());
         if (constructors.size() >= 2) {
             throw new ValidationFailure("Only one constructor binding per class allowed",
@@ -56,8 +60,9 @@ public final class InjectBindingValidator {
                     "Static method bindings are not allowed in a class with a constructor binding",
                     element);
         }
+        ExecutableElement m;
         if (!methods.isEmpty()) {
-            ExecutableElement m = methods.get(0);
+            m = methods.get(0);
             if (!m.getModifiers().contains(Modifier.STATIC)) {
                 throw new ValidationFailure("The factory method must be static", m);
             }
@@ -67,6 +72,16 @@ public final class InjectBindingValidator {
             if (!tool.types().isSameType(m.getReturnType(), typeElement.asType())) {
                 throw new ValidationFailure("The factory method must return the type of its enclosing class", m);
             }
+        } else {
+            m = constructors.get(0);
+        }
+        if (m.getAnnotationMirrors().stream().filter(mirror -> {
+            DeclaredType annotationType = mirror.getAnnotationType();
+            return tool.isSameType(annotationType, JAVAX_INJECT)
+                    || tool.isSameType(annotationType, JAKARTA_INJECT)
+                    || tool.isSameType(annotationType, SIMPLE_INJECT);
+        }).count() >= 2) {
+            throw new ValidationFailure("Duplicate inject annotation", m);
         }
     }
 }

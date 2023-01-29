@@ -1,6 +1,5 @@
 package io.jbock.simple.processor.binding;
 
-import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.TypeTool;
 
@@ -31,7 +30,7 @@ public final class DependencyRequest {
             return Optional.empty();
         }
         List<? extends Element> allMembers = tool().elements().getAllMembers(typeElement).stream()
-                .filter(m -> m.getAnnotation(Inject.class) != null)
+                .filter(tool()::hasInjectAnnotation)
                 .collect(Collectors.toList());
         if (allMembers.isEmpty()) {
             return Optional.empty();
