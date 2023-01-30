@@ -26,7 +26,7 @@ class BindingValidationTest {
                 "}");
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("Only one static method binding per class allowed");
+        assertThat(compilation).hadErrorContaining("consider a (different) qualifier");
     }
 
     @Test

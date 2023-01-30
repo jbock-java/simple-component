@@ -49,7 +49,7 @@ final class ProcessorComponent {
         this.qualifiers = new Qualifiers(tool);
         this.messager = processingEnvironment.getMessager();
         this.sourceFileGenerator = new SourceFileGenerator(filer, messager);
-        this.injectBindingValidator = new InjectBindingValidator(tool);
+        this.injectBindingValidator = new InjectBindingValidator(qualifiers);
         this.typeElementValidator = new TypeElementValidator();
         this.executableElementValidator = new ExecutableElementValidator(tool, typeElementValidator);
         this.componentImpl = new ComponentImpl();

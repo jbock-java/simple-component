@@ -4,17 +4,13 @@ import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.TypeTool;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
-import static io.jbock.simple.processor.util.Visitors.EXECUTABLE_ELEMENT_VISITOR;
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
 public final class DependencyRequest {
@@ -29,20 +25,8 @@ public final class DependencyRequest {
         if (typeElement == null) {
             return Optional.empty();
         }
-        List<? extends Element> allMembers = tool().elements().getAllMembers(typeElement).stream()
-                .filter(tool()::hasInjectAnnotation)
-                .collect(Collectors.toList());
-        if (allMembers.isEmpty()) {
-            return Optional.empty();
-        }
-        ExecutableElement m = EXECUTABLE_ELEMENT_VISITOR.visit(allMembers.get(0)); // There should only be one, see InjectBindingValidator
-        if (m == null) {
-            return Optional.empty();
-        }
-        if (m.getKind() == ElementKind.CONSTRUCTOR) {
-            return Optional.of(InjectBinding.createConstructor(qualifiers(), tool(), m));
-        }
-        return Optional.of(InjectBinding.createMethod(qualifiers(), tool(), m));
+        Map<Key, InjectBinding> m = qualifiers().injectBindings(typeElement);
+        return Optional.ofNullable(m.get(key()));
     }));
 
     public DependencyRequest(

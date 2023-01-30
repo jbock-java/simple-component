@@ -43,6 +43,10 @@ public final class Key {
         return type;
     }
 
+    public Optional<SimpleAnnotation> qualifier() {
+        return qualifier;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
