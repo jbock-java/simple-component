@@ -27,7 +27,8 @@ This means you may have to do some manual "init wiring" before you create your c
 * No typecasts in generated code.
 * Generates only a single class per `@Component` annotation, so this *should* be faster than dagger and doesn't bloat your jar as much.
 
-The new feature, "injection into static method" is only allowed if the method's return value matches the type of the enclosing class. For example:
+The new feature, "injection into static method" is only allowed if the method's return value matches the type of the enclosing class.
+For example, this is allowed because the method returns `Heater`:
 
 ```java
 public interface Heater {
@@ -35,9 +36,11 @@ public interface Heater {
     static Heater getInstance() {
         return new ElectricHeater();
     }
+
     //...
 }
 ```
+
 You can have more than one "static injection site" if you add a qualifier:
 
 ```java
@@ -48,7 +51,7 @@ public interface Heater {
     static Heater createElectricHeater() {
         return ElectricHeater.getInstance();
     }
-    
+
     @Named("diesel")
     @Inject
     static Heater createDieselHeater() {
