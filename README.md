@@ -3,19 +3,27 @@
 
 ### simple-component
 
-A simple dependency injector. 
+A minimal dependency injector. Basically the idea is that you can do (almost) everything dagger does with only three annotations:
+
+1. `@Inject`
+2. `@Qualifier` along with `@Named`
+3. `@Component` along with `@Component.Factory`
+
+Due warning, some dagger features are just not there, in particular `@Scope`.
+Instead, you have a guarantee that everything gets created at most once per component instance.
+So if you really, *really* need to have multiple distinct "copies" of a particular "bean" in your component, then this might not be for you.
+Also subcomponents and component dependencies are not there, but these are not essential features imho, just a glorified convenience to copy
+things from one component to the other.
+
+### Do more with less
 
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
-* Also includes its own `@Inject` annotation, for those cases where neither `javax.inject` nor `jakarta.inject` is available.
+* It also includes its own `@Inject` annotation, so you don't *have* to depend on one of these.
 * Allows static methods as injection sites.
-* No typecasts in generated code. Dagger will always generate a typecast when a bound type is not `public`.
-* Field injection is not supported.
-* Generates only a single class per `@Component`.
-* No scoping: For every "key" (typename + optional qualifier), there is always at most one instance per component instance.
-* No modules (yet), but you can use `@Component.Factory` to pass parameters to the component.
-* No `@Binds` (yet), but you can use injection into static method as described below, to bind a concrete type to an interface. 
+* No typecasts in generated code.
+* Generates only a single class per `@Component` annotation, so should be faster and doesn't bloat your jar.
 
-Injection into static methods is only allowed if the method's return value matches the type of the enclosing class. For example:
+The new feature, "injection into static method" is only allowed if the method's return value matches the type of the enclosing class. For example:
 
 ```java
 public interface Heater {
@@ -23,15 +31,34 @@ public interface Heater {
     static Heater getInstance() {
         return new ElectricHeater();
     }
+    //...
+}
+```
+You can have more than one "static injection site" if you add a qualifier:
+
+```java
+public interface Heater {
+
+    @Named("electric")
+    @Inject
+    static Heater createElectricHeater() {
+        return ElectricHeater.getInstance();
+    }
+    
+    @Named("diesel")
+    @Inject
+    static Heater createDieselHeater() {
+        return DieselHeater.getInstance();
+    }
+
+    //...
 }
 ```
 
-It is possible to cache an instance of `ElectricHeater` across different component instances,
-something that cannot be done with dagger.
-
 ### Samples
 
-* https://github.com/jbock-java/modular-thermosiphon
+* [coffee example from dagger](https://github.com/jbock-java/modular-thermosiphon)
+* [jbock](https://github.com/jbock-java/jbock) uses it
 
 ### Alternatives
 
