@@ -24,7 +24,7 @@ This means you may have to do some manual "init wiring" before you create your c
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
 * It also includes its own `@Inject` annotation, so you don't *have* to depend on one of these.
 * Allows static methods as injection sites.
-* No typecasts in generated code.
+* No typecasts in generated code, duh.
 * Generates only a single class per `@Component` annotation, so this *should* be faster than dagger and doesn't bloat your jar as much.
 
 The new feature, "injection into static method" is only allowed if the method's return value matches the type of the enclosing class.
