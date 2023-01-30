@@ -3,7 +3,7 @@
 
 ### simple-component
 
-A minimal dependency injector. Basically the idea is that you can do (almost) everything dagger does with only three annotations:
+A minimal dependency injector. Basically the idea is that you can do (almost) everything dagger does with only three++ annotations:
 
 1. `@Inject`
 2. `@Qualifier` along with `@Named`
