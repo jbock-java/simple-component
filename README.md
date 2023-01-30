@@ -17,7 +17,7 @@ Also subcomponents and "component dependencies" (?) are not there. These are not
 things from one component to the other.
 
 Finally to be honest there's no `@Module` (yet).
-This means you may have to do some manual "init wiring" before you create your component, and pass the results via `@Component.Factory`.
+This means you may have to do some manual "init wiring" before you create your component, and pass the results to your component factory.
 
 ### Do more with less
 
