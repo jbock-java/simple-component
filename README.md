@@ -12,8 +12,12 @@ A minimal dependency injector. Basically the idea is that you can do (almost) ev
 Due warning, some dagger features are just not there, in particular `@Scope`.
 Instead, you have a guarantee that everything gets created at most once per component instance.
 So if you really, *really* need to have multiple distinct "copies" of a particular "bean" in your component, then this might not be for you.
+
 Also subcomponents and component dependencies are not there, but these are not essential features imho, just a glorified convenience to copy
 things from one component to the other.
+
+Finally to be honest there's no `@Module` (yet).
+This means you may have to do some manual "init wiring" before you create your component, and pass the results via `@Component.Factory`.
 
 ### Do more with less
 
