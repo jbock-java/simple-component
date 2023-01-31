@@ -2,13 +2,13 @@ package io.jbock.simple.processor.writing;
 
 import io.jbock.simple.processor.binding.Binding;
 
-public final class NamedBinding {
+final class NamedBinding {
 
     private final Binding binding;
     private final String name;
     private final boolean componentRequest;
 
-    public NamedBinding(
+    NamedBinding(
             Binding binding,
             String name,
             boolean componentRequest) {
@@ -17,15 +17,15 @@ public final class NamedBinding {
         this.componentRequest = componentRequest;
     }
 
-    public Binding binding() {
+    Binding binding() {
         return binding;
     }
 
-    public String name() {
+    String name() {
         return name;
     }
 
-    public boolean isComponentRequest() {
+    boolean isComponentRequest() {
         return componentRequest;
     }
 

@@ -1,29 +1,27 @@
-package io.jbock.simple.processor.util;
+package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.processor.binding.Binding;
 
 import java.util.Objects;
 
 /**
- * Edge(source, destination) :== source "IS INJECTED AT" destination 
+ * Edge(FROM: source, TO: destination) :== source "IS INJECTED AT" destination 
  */
-public final class Edge {
+final class Edge {
 
     private final Binding source;
     private final Binding destination;
 
-    Edge(
-            Binding source,
-            Binding destination) {
+    Edge(Binding source, Binding destination) {
         this.source = source;
         this.destination = destination;
     }
 
-    public Binding source() {
+    Binding source() {
         return source;
     }
 
-    public Binding destination() {
+    Binding destination() {
         return destination;
     }
 

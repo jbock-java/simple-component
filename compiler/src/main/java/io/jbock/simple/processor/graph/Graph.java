@@ -1,19 +1,18 @@
-package io.jbock.simple.processor.writing;
+package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.util.Edge;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class Graph {
+final class Graph {
 
     private final Set<Edge> edges;
     private final Set<Binding> nodes;
 
-    public Graph(Set<Edge> edges, Set<Binding> nodes) {
+    Graph(Set<Edge> edges, Set<Binding> nodes) {
         this.edges = edges;
         this.nodes = nodes;
     }

@@ -1,8 +1,7 @@
-package io.jbock.simple.processor.writing;
+package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.InjectBinding;
-import io.jbock.simple.processor.util.Edge;
 import io.jbock.simple.processor.util.ValidationFailure;
 
 import java.util.ArrayList;

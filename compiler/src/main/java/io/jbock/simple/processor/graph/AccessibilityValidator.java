@@ -1,4 +1,4 @@
-package io.jbock.simple.processor.writing;
+package io.jbock.simple.processor.graph;
 
 import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.util.ComponentElement;

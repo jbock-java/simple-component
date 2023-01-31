@@ -3,6 +3,8 @@ package io.jbock.simple.processor.step;
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Component;
+import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.SpecWriter;
@@ -29,6 +31,7 @@ public class ComponentStep implements Step {
     private final Qualifiers qualifiers;
     private final TypeElementValidator validator;
     private final Function<ComponentElement, Generator> generatorFactory;
+    private final TopologicalSorter topologicalSorter;
     private final SpecWriter specWriter;
 
     public ComponentStep(
@@ -37,12 +40,14 @@ public class ComponentStep implements Step {
             Qualifiers qualifiers,
             TypeElementValidator validator,
             Function<ComponentElement, Generator> generatorFactory,
+            TopologicalSorter topologicalSorter, 
             SpecWriter specWriter) {
         this.messager = messager;
         this.tool = tool;
         this.qualifiers = qualifiers;
         this.validator = validator;
         this.generatorFactory = generatorFactory;
+        this.topologicalSorter = topologicalSorter;
         this.specWriter = specWriter;
     }
 
@@ -65,7 +70,9 @@ public class ComponentStep implements Step {
                         throw new ValidationFailure("Factory method must return the component type", method);
                     }
                 });
-                TypeSpec typeSpec = generatorFactory.apply(component).generate();
+                Generator generator = generatorFactory.apply(component);
+                Set<Binding> sorted = topologicalSorter.analyze(component);
+                TypeSpec typeSpec = generator.generate(sorted);
                 specWriter.write(component.generatedClass(), typeSpec);
             }
         } catch (ValidationFailure f) {
