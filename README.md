@@ -18,9 +18,8 @@ It can also be worked around by injecting a "factory".
 Subcomponents and "component dependencies" are not there and I don't plan to add them,
 these are just conveniences to copy things from one component to the other.
 
-There is no `@Module`.
-The `@Provides` methods must be static and live directly in the `@Component`.
-They are similar to a "static method binding" (see below), but can return anything.
+There is no `@Module`, but there is still `@Provides`.
+The provides methods must be static and live directly in the component.
 
 ### Do more with less
 
