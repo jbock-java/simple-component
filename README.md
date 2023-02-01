@@ -8,16 +8,19 @@ A minimal dependency injector. Basically the idea is that you can do (almost) ev
 1. `@Inject`
 2. `@Qualifier` along with `@Named`
 3. `@Component` along with `@Component.Factory`
+4. `@Provides`
 
 There is no `@Scope`. Instead, you have a guarantee that everything gets created at most once per component instance.
 If you need multiple distinct "copies" of a particular "bean" in your component, then only dagger can help you.
 In my experience this is a rare case and should not be the default behaviour, like it is in dagger.
-Also if you really need it, it can be worked around by injecting a "factory".
+It can also be worked around by injecting a "factory".
 
 Subcomponents and "component dependencies" are not there and I don't plan to add them,
 these are just conveniences to copy things from one component to the other.
 
-We will add `@Provides` soon.
+There is no `@Module`.
+The `@Provides` methods must be static and live directly in the `@Component`.
+They are similar to a "static method binding" (see below), but can return anything.
 
 ### Do more with less
 
