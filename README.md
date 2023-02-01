@@ -8,7 +8,7 @@ A minimal dependency injector. Basically the idea is that you can do (almost) ev
 1. `@Inject`
 2. `@Qualifier` along with `@Named`
 3. `@Component` along with `@Component.Factory`
-4. `@Provides`
+4. `@Provides`, the little brother of `@Inject`
 
 There is no `@Scope`. Instead, you have a guarantee that every "bean" gets created at most once per component instance.
 If you need multiple distinct "copies" of a particular "bean" in your component, then only dagger can help you.
