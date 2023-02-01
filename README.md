@@ -17,7 +17,7 @@ It can also be worked around by injecting a hand-rolled "BeanFactory" instead.
 
 Subcomponents and "component dependencies" are not there and I don't plan to add them, unless you convince me otherwise.
 At the moment I assume these are just a rather complicated "second way" to copy things from one component to the other,
-if you even have more than one component. The "first way" is to pass stuff via a `@Component.Factory`, of course.
+if you even have more than one component. Needless to say, the "first way" is to pass stuff via a `@Component.Factory`.
 
 There is no `@Module`, but there is still `@Provides`.
 The provides methods must be static and live directly in the component.
