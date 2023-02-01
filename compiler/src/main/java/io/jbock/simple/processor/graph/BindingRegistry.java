@@ -20,10 +20,13 @@ import java.util.Set;
 public class BindingRegistry {
 
     private final Map<Key, ParameterBinding> parameterBindings;
+    private final Map<Key, InjectBinding> providers;
 
     private BindingRegistry(
-            Map<Key, ParameterBinding> parameterBindings) {
+            Map<Key, ParameterBinding> parameterBindings,
+            Map<Key, InjectBinding> providers) {
         this.parameterBindings = parameterBindings;
+        this.providers = providers;
     }
 
     public static BindingRegistry create(ComponentElement componentElement) {
@@ -39,15 +42,17 @@ public class BindingRegistry {
                         p.asType() + ' ' + p.getSimpleName(), b.parameter());
             }
         }
-        return new BindingRegistry(parameterBindings);
+        return new BindingRegistry(parameterBindings, componentElement.providers());
     }
 
     Binding getBinding(DependencyRequest request) {
-        ParameterBinding parameterBinding = parameterBindings.get(request.key());
+        Key key = request.key();
+        ParameterBinding parameterBinding = parameterBindings.get(key);
         if (parameterBinding != null) {
             return parameterBinding; // takes precedence
         }
-        Optional<InjectBinding> injectBinding = request.binding();
+        Optional<InjectBinding> injectBinding = request.binding()
+                .or(() -> Optional.ofNullable(providers.get(key)));
         if (injectBinding.isEmpty()) {
             throw new ValidationFailure("Binding not found", request.requestingElement());
         }

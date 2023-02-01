@@ -2,8 +2,10 @@ package io.jbock.simple.processor.util;
 
 import io.jbock.javapoet.ClassName;
 import io.jbock.simple.Component;
+import io.jbock.simple.Provides;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.DependencyRequest;
+import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
 
 import javax.lang.model.element.Element;
@@ -59,13 +61,27 @@ public final class ComponentElement {
                 throw new ValidationFailure("The method may not have any parameters", method);
             }
             if (method.getModifiers().contains(Modifier.DEFAULT)) {
-                throw new ValidationFailure("Default method not allowed here", method);
+                throw new ValidationFailure("Default method is not allowed here", method);
             }
             if (method.getReturnType().getKind() == TypeKind.VOID) {
                 throw new ValidationFailure("The method may not return void", method);
             }
             Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
             result.put(key, new DependencyRequest(key, method, qualifiers(), tool()));
+        }
+        return result;
+    });
+
+    private final Supplier<Map<Key, InjectBinding>> providers = memoize(() -> {
+        List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
+        Map<Key, InjectBinding> result = new LinkedHashMap<>();
+        for (ExecutableElement method : methods) {
+            if (method.getAnnotation(Provides.class) == null) {
+                continue; // ignore
+            }
+            Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
+            InjectBinding b = InjectBinding.createMethod(qualifiers(), tool(), method);
+            result.put(key, b);
         }
         return result;
     });
@@ -89,11 +105,15 @@ public final class ComponentElement {
     }
 
     public boolean isComponentRequest(Binding binding) {
-        return requests.get().containsKey(binding.key());        
+        return requests.get().containsKey(binding.key());
     }
 
-    public List<DependencyRequest> getRequests() {
+    public List<DependencyRequest> requests() {
         return List.copyOf(requests.get().values());
+    }
+
+    public Map<Key, InjectBinding> providers() {
+        return providers.get();
     }
 
     public ClassName generatedClass() {

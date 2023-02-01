@@ -72,7 +72,7 @@ public class ComponentImpl {
         List<ParameterBinding> parameterBindings = component.factoryElement()
                 .map(FactoryElement::parameterBindings)
                 .orElse(List.of());
-        for (DependencyRequest r : component.getRequests()) {
+        for (DependencyRequest r : component.requests()) {
             MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestingElement().getSimpleName().toString());
             method.addStatement("return $L", sorted.get(r.key()).name());
             method.returns(r.key().typeName());

@@ -23,7 +23,7 @@ public final class TopologicalSorter {
         BindingRegistry bindingRegistry = bindingRegistryFactory.apply(component);
         AccessibilityValidator validator = AccessibilityValidator.create(component);
         Graph graph = Graph.newGraph();
-        for (DependencyRequest request : component.getRequests()) {
+        for (DependencyRequest request : component.requests()) {
             Binding binding = bindingRegistry.getBinding(request);
             graph.addAll(bindingRegistry.getDependencies(binding));
         }

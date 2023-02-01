@@ -9,6 +9,7 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,10 @@ public class ProvidesStep implements Step {
             List<ExecutableElement> methods = ElementFilter.methodsIn(elements);
             for (ExecutableElement m : methods) {
                 if (!m.getModifiers().contains(Modifier.STATIC)) {
-                    throw new ValidationFailure("The @Provides method must be static", m);
+                    throw new ValidationFailure("The method must be static", m);
+                }
+                if (m.getReturnType().getKind() == TypeKind.VOID) {
+                    throw new ValidationFailure("The method may not return void", m);
                 }
                 Element enclosing = m.getEnclosingElement();
                 if (enclosing.getAnnotation(Component.class) == null) {
