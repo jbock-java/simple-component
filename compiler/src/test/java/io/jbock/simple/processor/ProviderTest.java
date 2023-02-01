@@ -58,4 +58,53 @@ class ProviderTest {
                         "  }",
                         "}");
     }
+
+    @Test
+    void providedList() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "",
+                "import io.jbock.simple.Component;",
+                "import io.jbock.simple.Inject;",
+                "import io.jbock.simple.Provides;",
+                "import java.util.List;",
+                "",
+                "final class TestClass {",
+                "  static class A {",
+                "    @Inject A(List<B> b) {}",
+                "  }",
+                "",
+                "  static class B {",
+                "    @Inject B() {}",
+                "  }",
+                "",
+                "  @Component",
+                "  interface AComponent {",
+                "    A getA();",
+                "",
+                "    @Provides static List<B> getList(B b) { return null; }",
+                "  }",
+                "}");
+
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
+        assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
+                .containsLines(
+                        "package test;",
+                        "",
+                        "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "  private final TestClass.A a;",
+                        "",
+                        "  private TestClass_AComponent_Impl() {",
+                        "    TestClass.B b = new TestClass.B();",
+                        "    List<TestClass.B> list = TestClass.AComponent.getList(b);",
+                        "    this.a = new TestClass.A(list);",
+                        "  }",
+                        "",
+                        "  @Override",
+                        "  public TestClass.A getA() {",
+                        "    return a;",
+                        "  }",
+                        "}");
+    }
 }

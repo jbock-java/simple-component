@@ -16,7 +16,6 @@ import io.jbock.simple.processor.util.SourceFileGenerator;
 import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.TypeTool;
-import io.jbock.simple.processor.validation.ComponentValidator;
 import io.jbock.simple.processor.writing.ComponentImpl;
 import io.jbock.simple.processor.writing.Generator;
 
@@ -45,7 +44,6 @@ final class ProcessorComponent {
     private final SafeElements elements;
     private final ComponentFactoryStep componentFactoryStep;
     private final TopologicalSorter topologicalSorter;
-    private final ComponentValidator componentValidator;
 
     ProcessorComponent(ProcessingEnvironment processingEnvironment) {
         this.types = new SafeTypes(processingEnvironment.getTypeUtils());
@@ -63,8 +61,7 @@ final class ProcessorComponent {
         this.generatorFactory = component -> new Generator(componentImpl, component);
         this.specWriter = new SpecWriter(sourceFileGenerator, messager);
         this.topologicalSorter = new TopologicalSorter(bindingRegistryFactory);
-        this.componentValidator = new ComponentValidator(messager);
-        this.componentStep = new ComponentStep(messager, tool, qualifiers, typeElementValidator, componentValidator, generatorFactory, topologicalSorter, specWriter);
+        this.componentStep = new ComponentStep(messager, tool, qualifiers, typeElementValidator, generatorFactory, topologicalSorter, specWriter);
         this.injectStep = new InjectStep(injectBindingValidator, executableElementValidator, messager);
         this.providesStep = new ProvidesStep(messager);
         this.componentFactoryStep = new ComponentFactoryStep(messager, typeElementValidator);

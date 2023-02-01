@@ -11,7 +11,6 @@ import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
-import io.jbock.simple.processor.validation.ComponentValidator;
 import io.jbock.simple.processor.writing.Generator;
 
 import javax.annotation.processing.Messager;
@@ -31,7 +30,6 @@ public class ComponentStep implements Step {
     private final TypeTool tool;
     private final Qualifiers qualifiers;
     private final TypeElementValidator typeElementValidator;
-    private final ComponentValidator componentValidator;
     private final Function<ComponentElement, Generator> generatorFactory;
     private final TopologicalSorter topologicalSorter;
     private final SpecWriter specWriter;
@@ -41,7 +39,6 @@ public class ComponentStep implements Step {
             TypeTool tool,
             Qualifiers qualifiers,
             TypeElementValidator typeElementValidator,
-            ComponentValidator componentValidator, 
             Function<ComponentElement, Generator> generatorFactory,
             TopologicalSorter topologicalSorter,
             SpecWriter specWriter) {
@@ -49,7 +46,6 @@ public class ComponentStep implements Step {
         this.tool = tool;
         this.qualifiers = qualifiers;
         this.typeElementValidator = typeElementValidator;
-        this.componentValidator = componentValidator;
         this.generatorFactory = generatorFactory;
         this.topologicalSorter = topologicalSorter;
         this.specWriter = specWriter;
@@ -67,7 +63,6 @@ public class ComponentStep implements Step {
             List<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement typeElement : typeElements) {
                 typeElementValidator.validate(typeElement);
-                componentValidator.validate(typeElement);
                 ComponentElement component = ComponentElement.create(typeElement, tool, qualifiers);
                 component.factoryElement().ifPresent(factory -> {
                     ExecutableElement method = factory.singleAbstractMethod();
