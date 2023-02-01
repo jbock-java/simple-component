@@ -11,6 +11,7 @@ import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.validation.ComponentValidator;
 import io.jbock.simple.processor.writing.Generator;
 
 import javax.annotation.processing.Messager;
@@ -29,7 +30,8 @@ public class ComponentStep implements Step {
     private final Messager messager;
     private final TypeTool tool;
     private final Qualifiers qualifiers;
-    private final TypeElementValidator validator;
+    private final TypeElementValidator typeElementValidator;
+    private final ComponentValidator componentValidator;
     private final Function<ComponentElement, Generator> generatorFactory;
     private final TopologicalSorter topologicalSorter;
     private final SpecWriter specWriter;
@@ -38,14 +40,16 @@ public class ComponentStep implements Step {
             Messager messager,
             TypeTool tool,
             Qualifiers qualifiers,
-            TypeElementValidator validator,
+            TypeElementValidator typeElementValidator,
+            ComponentValidator componentValidator, 
             Function<ComponentElement, Generator> generatorFactory,
-            TopologicalSorter topologicalSorter, 
+            TopologicalSorter topologicalSorter,
             SpecWriter specWriter) {
         this.messager = messager;
         this.tool = tool;
         this.qualifiers = qualifiers;
-        this.validator = validator;
+        this.typeElementValidator = typeElementValidator;
+        this.componentValidator = componentValidator;
         this.generatorFactory = generatorFactory;
         this.topologicalSorter = topologicalSorter;
         this.specWriter = specWriter;
@@ -62,7 +66,8 @@ public class ComponentStep implements Step {
             List<Element> elements = elementsByAnnotation.values().stream().flatMap(Set::stream).collect(Collectors.toList());
             List<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement typeElement : typeElements) {
-                validator.validate(typeElement);
+                typeElementValidator.validate(typeElement);
+                componentValidator.validate(typeElement);
                 ComponentElement component = ComponentElement.create(typeElement, tool, qualifiers);
                 component.factoryElement().ifPresent(factory -> {
                     ExecutableElement method = factory.singleAbstractMethod();

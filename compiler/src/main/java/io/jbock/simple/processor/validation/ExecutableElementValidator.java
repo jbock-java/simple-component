@@ -1,6 +1,10 @@
-package io.jbock.simple.processor.util;
+package io.jbock.simple.processor.validation;
 
 import io.jbock.javapoet.TypeName;
+import io.jbock.simple.processor.util.TypeElementValidator;
+import io.jbock.simple.processor.util.TypeTool;
+import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.util.Visitors;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;

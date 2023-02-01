@@ -11,6 +11,9 @@ import static javax.lang.model.element.Modifier.STATIC;
 
 public final class TypeElementValidator {
 
+    /**
+     * Assert that the given TypeElement is a regular interface.
+     */
     public void validate(TypeElement element) {
         if (element.getKind() != ElementKind.INTERFACE) {
             throw new ValidationFailure("The annotated class must be an interface", element);

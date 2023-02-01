@@ -1,7 +1,10 @@
-package io.jbock.simple.processor.util;
+package io.jbock.simple.processor.validation;
 
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.util.Qualifiers;
+import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.util.Visitors;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
