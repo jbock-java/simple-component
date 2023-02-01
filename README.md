@@ -13,11 +13,11 @@ A minimal dependency injector. Basically the idea is that you can do (almost) ev
 There is no `@Scope`. Instead, you have a guarantee that every "bean" gets created at most once per component instance.
 If you need multiple distinct "copies" of a particular "bean" in your component, then only dagger can help you.
 In my experience this is a rare case and should not be the default behaviour, like it is in dagger.
-It can also be worked around by injecting a hand-rolled "factory" instead.
+It can also be worked around by injecting a hand-rolled "BeanFactory" instead.
 
 Subcomponents and "component dependencies" are not there and I don't plan to add them, unless you convince me otherwise.
-At the moment I assume these are just a rather complicated way to copy things from one component to the other,
-if you even have more than one component.
+At the moment I assume these are just a rather complicated "second way" to copy things from one component to the other,
+if you even have more than one component. The "first way" is to pass stuff via a `@Component.Factory`, of course.
 
 There is no `@Module`, but there is still `@Provides`.
 The provides methods must be static and live directly in the component.
