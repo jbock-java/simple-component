@@ -15,8 +15,9 @@ If you need multiple distinct "copies" of a particular "bean" in your component,
 In my experience this is a rare case and should not be the default behaviour, like it is in dagger.
 It can also be worked around by injecting a hand-rolled "factory" instead.
 
-Subcomponents and "component dependencies" are not there and I don't plan to add them,
-these are just conveniences to copy things from one component to the other.
+Subcomponents and "component dependencies" are not there and I don't plan to add them, unless you convince me otherwise.
+At the moment I assume these are just a rather complicated way to copy things from one component to the other,
+if you even have more than one component.
 
 There is no `@Module`, but there is still `@Provides`.
 The provides methods must be static and live directly in the component.
