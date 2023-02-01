@@ -22,6 +22,10 @@ if you even have more than one component. Needless to say, the "first way" is to
 There is no `@Module`, but there is still `@Provides`.
 The provides methods must be static and live directly in the component.
 
+There is no `@Binds`, use a "static method binding" instead.
+
+There is no need for `@BindsInstance`, because any parameter of a `@Component.Factory` method is treated the same way.
+
 ### Do more with less
 
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
