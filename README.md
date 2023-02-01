@@ -9,15 +9,15 @@ A minimal dependency injector. Basically the idea is that you can do (almost) ev
 2. `@Qualifier` along with `@Named`
 3. `@Component` along with `@Component.Factory`
 
-There's no `@Scope`. Instead, you have a guarantee that everything gets created at most once per component instance.
+There is no `@Scope`. Instead, you have a guarantee that everything gets created at most once per component instance.
 If you need multiple distinct "copies" of a particular "bean" in your component, then only dagger can help you.
-In my experience this is a rare case which should not be the default behaviour, like it is in dagger.
+In my experience this is a rare case and should not be the default behaviour, like it is in dagger.
 Also if you really need it, it can be worked around by injecting a "factory".
 
 Subcomponents and "component dependencies" are not there and I don't plan to add them,
 these are just conveniences to copy things from one component to the other.
 
-We may add `@Module` in the future.
+We will add `@Provides` soon.
 
 ### Do more with less
 
