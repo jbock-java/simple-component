@@ -5,7 +5,7 @@
 
 A minimal dependency injector. Basically the idea is that you can do (almost) everything dagger does with only a handful annotations:
 
-1. `@Inject` to declare an injection site, `@Provides` to declare an injection site within the component
+1. `@Inject` declares an injection site, `@Provides` declares an injection site within the component
 2. `@Qualifier` along with `@Named`
 3. `@Component` along with `@Component.Factory`
 
