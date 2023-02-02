@@ -5,12 +5,12 @@
 
 A minimal dependency injector. Basically the idea is that you can do (almost) everything dagger does with only a handful annotations:
 
-1. `@Inject`
+1. `@Inject` to declare an injection site
 2. `@Qualifier` along with `@Named`
 3. `@Component` along with `@Component.Factory`
-4. `@Provides`, the little brother of `@Inject`
+4. `@Provides` to declare an injection site within the component
 
-There is no `@Scope`. Instead, you have a guarantee that every "bean" gets created at most once per component instance.
+There is no `@Scope`. Instead, you have a guarantee that every injection site gets called at most once per component instance.
 If you need multiple distinct "copies" of a particular "bean" in your component, then only dagger can help you.
 In my experience this is a rare case and should not be the default behaviour, like it is in dagger.
 It can also be worked around by injecting a hand-rolled "BeanFactory" instead.
