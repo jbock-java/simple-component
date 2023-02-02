@@ -24,7 +24,7 @@ The provides methods must be static and live directly in the component.
 
 There is no `@Binds`, use a "static method binding" instead.
 
-There is no need for `@BindsInstance`, because any parameter of a `@Component.Factory` method is treated the same way.
+There is no need for `@BindsInstance`. Each parameter of a `@Component.Factory` method is treated as if it had that annotation.
 
 ### Do more with less
 
