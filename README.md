@@ -69,7 +69,7 @@ public interface Heater {
 ### Samples
 
 * [coffee example from dagger](https://github.com/jbock-java/modular-thermosiphon)
-* [jbock](https://github.com/jbock-java/jbock) uses it
+* [jbock](https://github.com/jbock-java/jbock) uses it, see for example [ValidateComponent](https://github.com/jbock-java/jbock/blob/master/compiler/src/main/java/net/jbock/validate/ValidateComponent.java)
 
 ### Alternatives
 
