@@ -3,7 +3,7 @@
 
 ### simple-component
 
-A minimal dependency injector. Basically the idea is that you can do (almost) everything dagger does with only a handful annotations:
+A minimalistic approach to dependency injection. Basically the idea is that you can do (almost) everything dagger does with only a handful annotations:
 
 1. `@Inject` declares an injection site, `@Provides` declares an injection site within the component
 2. `@Qualifier` and `@Named`
