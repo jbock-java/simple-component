@@ -10,9 +10,10 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 3. `@Component` along with `@Component.Factory`
 
 There is no `@Scope`. Instead, you have a guarantee that every injection site gets called at most once per component instance.
+This is immediately obvious from the generated code.
+
 If you need multiple distinct "copies" of a particular "bean" in your component, then only dagger can help you.
 In my experience this is a rare case and should not be the default behaviour, like it is in dagger.
-It can also be worked around by injecting a hand-rolled "BeanFactory" instead.
 
 There are no subcomponents or "component dependencies".
 
