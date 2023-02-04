@@ -45,7 +45,7 @@ public interface Heater {
 }
 ```
 
-For instance, `setHeaterFactory` *could* be used to sneak in a mock `Heater` for testing purpose, before you create the component: 
+In the following example, the method `setHeaterFactory` *could* be used to sneak in a mock `Heater` for testing purpose, if invoked before the component is created: 
 
 ```java
 public interface Heater {
