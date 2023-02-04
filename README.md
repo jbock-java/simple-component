@@ -5,7 +5,7 @@
 
 A minimalistic approach to dependency injection. Basically the idea is that you can do (almost) everything dagger does with only a handful annotations:
 
-1. `@Inject` declares an injection site, `@Provides` declares an injection site within the component
+1. `@Inject` declares an injection point, similarly `@Provides` declares an injection point within the component
 2. `@Qualifier` and `@Named`
 3. `@Component` along with `@Component.Factory`
 
@@ -46,7 +46,31 @@ public interface Heater {
 }
 ```
 
-You can have more than one "static injection site" if you add a qualifier:
+For instance, this *could* be used to sneak in a mock `Heater` for testing:
+
+```java
+public interface Heater {
+
+    private static Supplier<Heater> heaterFactory;
+
+    @Inject
+    static Heater getInstance() {
+        if (heaterFactory == null) {
+            heaterFactory = ElectricHeater::new;
+        }
+        return heaterFactory.get();
+    }
+
+    // only for testing
+    static void setHeaterFactory(Supplier<Heater> mockHeaterFactory) {
+        heaterFactory = mockHeaterFactory;
+    }
+
+    //...
+}
+```
+
+You can have more than one static injection point in the same class, if you add a qualifier:
 
 ```java
 public interface Heater {
@@ -66,6 +90,8 @@ public interface Heater {
     //...
 }
 ```
+
+
 
 ### Samples
 
