@@ -9,8 +9,7 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 2. `@Qualifier` and `@Named`
 3. `@Component` along with `@Component.Factory`
 
-There is no `@Scope`. Instead, you have a guarantee that every injection site gets called at most once per component instance.
-This is immediately obvious from the generated code.
+There is no `@Scope`. Instead, you have a guarantee that every injection point gets invoked at most once per component instance.
 
 If you need multiple distinct "copies" of a particular "bean" in your component, then only dagger can help you.
 In my experience this is a rare case and should not be the default behaviour, like it is in dagger.
@@ -46,7 +45,7 @@ public interface Heater {
 }
 ```
 
-For instance, this *could* be used to sneak in a mock `Heater` for testing:
+For instance, `setHeaterFactory` *could* be used to sneak in a mock `Heater` for testing purpose, before you create the component: 
 
 ```java
 public interface Heater {
