@@ -10,14 +10,12 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 3. `@Component` along with `@Component.Factory`
 
 There is no `@Scope`. Instead, you have a guarantee that every injection point gets invoked at most once per component instance.
+So there is no "prototype scope", unlike in dagger, where it is the default.
 
-If you need multiple distinct "copies" of a particular "bean" in your component, then only dagger can help you.
-In my experience this is a rare case and should not be the default behaviour, like it is in dagger.
-
-There are no subcomponents or "component dependencies".
+There are no subcomponents or "component dependencies". You can still have more than one component though.
 
 There is no `@Module`, but there is still `@Provides`.
-The provides methods must be static and live directly in the component.
+A `@Provides` method must be static and live directly in the component.
 
 There is no `@Binds`, use a "static method binding" instead.
 
