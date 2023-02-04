@@ -17,7 +17,7 @@ There are no subcomponents or "component dependencies". You can still have more 
 There is no `@Module`, but there is still `@Provides`.
 A `@Provides` method must be static and live directly in the component.
 
-There is no `@Binds`, use a "static method binding" instead.
+There is no `@Binds`. It can be emulated with a `@Provides` method or. if you control the source code of the interface, a static injection point.
 
 There is no need for `@BindsInstance`. Each parameter of a `@Component.Factory` method is treated as if it had that annotation.
 
