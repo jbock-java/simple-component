@@ -18,7 +18,7 @@ There is no `@Module`, but there is still `@Provides`.
 A `@Provides` method must be static and live directly in the component.
 There is no restriction on the return type of a `@Provides` method, as long as it does not return `void`.
 
-There is no `@Binds`. It can be emulated with a `@Provides` method, or, if you control the source code of the interface, a static injection point.
+There is no `@Binds`. It can be emulated with a `@Provides` method, or, if you control the source code of the interface, a static `@Inject` method.
 
 There is no need for `@BindsInstance`. Each parameter of a `@Component.Factory` method is treated as if it had that annotation.
 
