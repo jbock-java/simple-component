@@ -8,7 +8,8 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 3. `@Component` along with `@Component.Factory`
 
 There is no `@Scope`. Instead, you have a guarantee that every injection point gets invoked at most once per component instance.
-This means there is no "prototype scope" (in spring terms). Note that in dagger, prototype scope is the default scope.
+Hence, the `@Singleton` annotation is unnecessary and is ignored.
+There is no "prototype scope", which is the default scope in dagger..
 
 There are no subcomponents or "component dependencies" (in dagger terms). You can still have more than one component though.
 
