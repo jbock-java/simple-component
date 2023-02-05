@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 public final class TopologicalSorter {
-    
+
     private final Function<ComponentElement, GraphFactory> bindingRegistryFactory;
 
     public TopologicalSorter(Function<ComponentElement, GraphFactory> bindingRegistryFactory) {

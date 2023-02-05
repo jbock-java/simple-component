@@ -13,7 +13,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
-import javax.lang.model.util.ElementFilter;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
+import static javax.lang.model.util.ElementFilter.methodsIn;
 
 public final class ComponentElement {
 
@@ -51,7 +52,7 @@ public final class ComponentElement {
     });
 
     private final Supplier<Map<Key, DependencyRequest>> requests = memoize(() -> {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
+        List<ExecutableElement> methods = methodsIn(element().getEnclosedElements());
         Map<Key, DependencyRequest> result = new LinkedHashMap<>();
         for (ExecutableElement method : methods) {
             if (method.getModifiers().contains(Modifier.STATIC)) {
@@ -68,20 +69,6 @@ public final class ComponentElement {
             }
             Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
             result.put(key, new DependencyRequest(key, method, qualifiers(), tool()));
-        }
-        return result;
-    });
-
-    private final Supplier<Map<Key, InjectBinding>> providers = memoize(() -> {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements());
-        Map<Key, InjectBinding> result = new LinkedHashMap<>();
-        for (ExecutableElement method : methods) {
-            if (method.getAnnotation(Provides.class) == null) {
-                continue; // ignore
-            }
-            Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
-            InjectBinding b = InjectBinding.createMethod(qualifiers(), tool(), method);
-            result.put(key, b);
         }
         return result;
     });
@@ -108,12 +95,22 @@ public final class ComponentElement {
         return requests.get().containsKey(binding.key());
     }
 
-    public List<DependencyRequest> requests() {
-        return List.copyOf(requests.get().values());
+    public Collection<DependencyRequest> requests() {
+        return requests.get().values();
     }
 
     public Map<Key, InjectBinding> providers() {
-        return providers.get();
+        List<ExecutableElement> methods = methodsIn(element.getEnclosedElements());
+        Map<Key, InjectBinding> result = new LinkedHashMap<>();
+        for (ExecutableElement method : methods) {
+            if (method.getAnnotation(Provides.class) == null) {
+                continue; // ignore
+            }
+            Key key = Key.create(method.getReturnType(), qualifiers.getQualifier(method));
+            InjectBinding b = InjectBinding.createMethod(qualifiers, tool, method);
+            result.put(key, b);
+        }
+        return result;
     }
 
     public ClassName generatedClass() {
