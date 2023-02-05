@@ -16,6 +16,7 @@ There are no subcomponents or "component dependencies". You can still have more 
 
 There is no `@Module`, but there is still `@Provides`.
 A `@Provides` method must be static and live directly in the component.
+There is no restriction on the return type of a `@Provides` method, as long as it does not return `void`.
 
 There is no `@Binds`. It can be emulated with a `@Provides` method, or, if you control the source code of the interface, a static injection point.
 
