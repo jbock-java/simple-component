@@ -10,13 +10,13 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 There is no `@Scope`. Instead, you have a guarantee that every injection point gets invoked at most once per component instance.
 This means there is no "prototype scope" (in spring terms). Note that in dagger, prototype scope is the default scope.
 
-There are no subcomponents or "component dependencies". You can still have more than one component though.
+There are no subcomponents or "component dependencies" (in dagger terms). You can still have more than one component though.
 
-There is no `@Module`, but there is still `@Provides`.
-A `@Provides` method must be static and live directly in the component.
+There is no `@Module` (in dagger terms); all `@Provides` methods must be static and live directly in the component.
 There is no restriction on the return type of a `@Provides` method, as long as it does not return `void`.
 
-There is no `@Binds`. It can be emulated with a `@Provides` method, or, if you control the source code of the interface, a static `@Inject` method.
+There is no `@Binds` which, in dagger, does binding of a bean to its interface type.
+It can be emulated with a simple `@Provides` method, or, if you control the source code of the interface, a static `@Inject` method.
 
 There is no need for `@BindsInstance`. Each parameter of a `@Component.Factory` method is treated as if it had that annotation.
 
