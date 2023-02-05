@@ -9,7 +9,7 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 
 There is no `@Scope`. Instead, you have a guarantee that every injection point gets invoked at most once per component instance.
 Hence, the `@Singleton` annotation is unnecessary and is ignored.
-There is no "prototype scope", which is the default scope in dagger..
+There is no "prototype scope", which is the default scope in dagger.
 
 There are no subcomponents or "component dependencies" (in dagger terms). You can still have more than one component though.
 
