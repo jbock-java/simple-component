@@ -100,3 +100,4 @@ public interface Heater {
 
 * https://github.com/google/dagger/
 * https://github.com/avaje/avaje-inject
+* https://github.com/michaelboyles/simple-di
