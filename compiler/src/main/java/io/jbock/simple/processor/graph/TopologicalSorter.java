@@ -13,19 +13,18 @@ import java.util.function.Function;
 
 public final class TopologicalSorter {
     
-    private final Function<ComponentElement, BindingRegistry> bindingRegistryFactory;
+    private final Function<ComponentElement, GraphFactory> bindingRegistryFactory;
 
-    public TopologicalSorter(Function<ComponentElement, BindingRegistry> bindingRegistryFactory) {
+    public TopologicalSorter(Function<ComponentElement, GraphFactory> bindingRegistryFactory) {
         this.bindingRegistryFactory = bindingRegistryFactory;
     }
 
     public Set<Binding> analyze(ComponentElement component) {
-        BindingRegistry bindingRegistry = bindingRegistryFactory.apply(component);
+        GraphFactory graphFactory = bindingRegistryFactory.apply(component);
         AccessibilityValidator validator = AccessibilityValidator.create(component);
         Graph graph = Graph.newGraph();
         for (DependencyRequest request : component.requests()) {
-            Binding binding = bindingRegistry.getBinding(request);
-            graph.addAll(bindingRegistry.getDependencies(binding));
+            graph.addAll(graphFactory.getGraph(request));
         }
         for (Binding binding : graph.nodes()) {
             if (binding instanceof InjectBinding) {

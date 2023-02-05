@@ -1,6 +1,6 @@
 package io.jbock.simple.processor;
 
-import io.jbock.simple.processor.graph.BindingRegistry;
+import io.jbock.simple.processor.graph.GraphFactory;
 import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.step.ComponentFactoryStep;
 import io.jbock.simple.processor.step.ComponentStep;
@@ -31,7 +31,7 @@ final class ProcessorComponent {
     private final SourceFileGenerator sourceFileGenerator;
     private final ComponentImpl componentImpl;
     private final Function<ComponentElement, Generator> generatorFactory;
-    private final Function<ComponentElement, BindingRegistry> bindingRegistryFactory;
+    private final Function<ComponentElement, GraphFactory> bindingRegistryFactory;
     private final Qualifiers qualifiers;
     private final SpecWriter specWriter;
     private final ComponentStep componentStep;
@@ -57,7 +57,7 @@ final class ProcessorComponent {
         this.typeElementValidator = new TypeElementValidator();
         this.executableElementValidator = new ExecutableElementValidator(tool, typeElementValidator);
         this.componentImpl = new ComponentImpl();
-        this.bindingRegistryFactory = BindingRegistry::create;
+        this.bindingRegistryFactory = GraphFactory::create;
         this.generatorFactory = component -> new Generator(componentImpl, component);
         this.specWriter = new SpecWriter(sourceFileGenerator, messager);
         this.topologicalSorter = new TopologicalSorter(bindingRegistryFactory);

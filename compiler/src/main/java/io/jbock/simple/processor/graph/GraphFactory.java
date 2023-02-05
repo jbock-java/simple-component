@@ -17,19 +17,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class BindingRegistry {
+public class GraphFactory {
 
     private final Map<Key, ParameterBinding> parameterBindings;
     private final Map<Key, InjectBinding> providers;
 
-    private BindingRegistry(
+    private GraphFactory(
             Map<Key, ParameterBinding> parameterBindings,
             Map<Key, InjectBinding> providers) {
         this.parameterBindings = parameterBindings;
         this.providers = providers;
     }
 
-    public static BindingRegistry create(ComponentElement componentElement) {
+    public static GraphFactory create(ComponentElement componentElement) {
         List<ParameterBinding> pBindings = componentElement.factoryElement()
                 .map(FactoryElement::parameterBindings)
                 .orElse(List.of());
@@ -42,10 +42,10 @@ public class BindingRegistry {
                         p.asType() + ' ' + p.getSimpleName(), b.parameter());
             }
         }
-        return new BindingRegistry(parameterBindings, componentElement.providers());
+        return new GraphFactory(parameterBindings, componentElement.providers());
     }
 
-    Binding getBinding(DependencyRequest request) {
+    private Binding getBinding(DependencyRequest request) {
         Key key = request.key();
         ParameterBinding parameterBinding = parameterBindings.get(key);
         if (parameterBinding != null) {
@@ -59,7 +59,8 @@ public class BindingRegistry {
         return injectBinding.orElseThrow();
     }
 
-    Graph getDependencies(Binding startNode) {
+    Graph getGraph(DependencyRequest request) {
+        Binding startNode = getBinding(request);
         Set<Edge> edges = new LinkedHashSet<>();
         Set<Binding> nodes = new LinkedHashSet<>();
         nodes.add(startNode);
