@@ -9,27 +9,23 @@ import javax.lang.model.util.Elements;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-/**
- * A wrapper around {@link Elements} where none of the methods can return {@code null}.
- */
 public class SafeElements {
 
     private final Elements elements;
 
-    private final Map<String, Optional<TypeElement>> typeElementCache = new HashMap<>();
+    private final Map<String, TypeElement> typeElementCache = new HashMap<>();
 
     public SafeElements(Elements elements) {
         this.elements = elements;
     }
 
-    public Optional<TypeElement> getTypeElement(String name) {
-        Optional<TypeElement> fromCache = typeElementCache.get(name);
+    public TypeElement getTypeElement(String name) {
+        TypeElement fromCache = typeElementCache.get(name);
         if (fromCache != null) {
             return fromCache;
         }
-        Optional<TypeElement> result = Optional.ofNullable(elements.getTypeElement(name));
+        TypeElement result = elements.getTypeElement(name);
         typeElementCache.put(name, result);
         return result;
     }

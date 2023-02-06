@@ -9,7 +9,7 @@ import static io.jbock.simple.processor.Compilers.simpleCompiler;
 import static io.jbock.testing.compile.CompilationSubject.assertThat;
 import static io.jbock.testing.compile.JavaFileObjects.forSourceLines;
 
-class ProviderTest {
+class ProvidesTest {
 
     @Test
     void providedString() {

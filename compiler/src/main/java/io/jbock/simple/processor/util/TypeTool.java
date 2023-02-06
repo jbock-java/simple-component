@@ -1,17 +1,20 @@
 package io.jbock.simple.processor.util;
 
+import io.jbock.simple.processor.util.ProviderType.ProviderKind;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-
 import java.util.List;
+import java.util.Optional;
 
 import static io.jbock.simple.processor.util.TypeNames.JAKARTA_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.JAVAX_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.SIMPLE_INJECT;
+import static io.jbock.simple.processor.util.Visitors.DECLARED_TYPE_VISITOR;
 
 public final class TypeTool {
 
@@ -34,10 +37,11 @@ public final class TypeTool {
      * Works for classes with no type parameters.
      */
     public boolean isSameType(TypeMirror mirror, String canonicalName) {
-        return elements.getTypeElement(canonicalName)
-                .map(TypeElement::asType)
-                .map(type -> types.isSameType(mirror, type))
-                .orElse(false);
+        TypeElement typeElement = elements.getTypeElement(canonicalName);
+        if (typeElement == null) {
+            return false;
+        }
+        return types.isSameType(mirror, typeElement.asType());
     }
 
     public boolean hasInjectAnnotation(Element m) {
@@ -67,6 +71,31 @@ public final class TypeTool {
                     || isSameType(annotationType, TypeNames.JAKARTA_QUALIFIER)
                     || isSameType(annotationType, TypeNames.JAVAX_QUALIFIER);
         });
+    }
+
+    public Optional<ProviderType> getProviderType(TypeMirror mirror) {
+        return getSingleTypeArgument(mirror, elements.getTypeElement(TypeNames.JAVAX_PROVIDER))
+                .map(m -> new ProviderType(ProviderKind.JAVAX, m))
+                .or(() -> getSingleTypeArgument(mirror, elements.getTypeElement(TypeNames.JAKARTA_PROVIDER))
+                        .map(m -> new ProviderType(ProviderKind.JAKARTA, m)))
+                .or(() -> getSingleTypeArgument(mirror, elements.getTypeElement(TypeNames.SIMPLE_PROVIDER))
+                        .map(m -> new ProviderType(ProviderKind.SIMPLE, m)));
+    }
+
+    private Optional<TypeMirror> getSingleTypeArgument(
+            TypeMirror mirror, TypeElement someClass) {
+        DeclaredType declaredType = DECLARED_TYPE_VISITOR.visit(mirror);
+        if (declaredType == null) {
+            return Optional.empty();
+        }
+        List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+        if (typeArguments.size() != 1) {
+            return Optional.empty();
+        }
+        if (types.isSameType(types.erasure(declaredType), types.erasure(someClass.asType()))) {
+            return Optional.of(typeArguments.get(0));
+        }
+        return Optional.empty();
     }
 
     public SafeElements elements() {
