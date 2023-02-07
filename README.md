@@ -7,30 +7,41 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 2. `@Qualifier` and `@Named`
 3. `@Component` along with `@Component.Factory`
 
-There is no `@Scope`. Instead, you have a guarantee that every injection point gets invoked at most once per component instance.
-Hence, the `@Singleton` annotation is unnecessary and is ignored.
-There is no "prototype scope", which is the default scope in dagger.
+### Note to `javax.inject` users
 
-There are no subcomponents or "component dependencies" (in dagger terms). You can still have more than one component though.
+The `@Scope` and `@Singleton` annotations are **ignored!**
+They are too confusing.
+Instead, you have a simple rule: Everywhere a particular bean is injected, you get *the same instance* of the bean.
 
-There is no `@Module` (in dagger terms); all `@Provides` methods must be static and live directly in the component.
-There is no restriction on the return type of a `@Provides` method, as long as it does not return `void`.
+But of course, if you *need* to have multiple (distinct) instances of a bean, you can inject a `Provider<TheBean> beanProvider`.
+It will create a new bean instance everytime `beanProvider.get()` is invoked.
 
-There is no `@Binds` which, in dagger, does binding of a bean to its interface type.
-It can be emulated with a simple `@Provides` method, or, if you control the source code of the interface, a static `@Inject` method.
+### Note to dagger users
 
-There is no need for `@BindsInstance`. Each parameter of a `@Component.Factory` method is treated as if it had that annotation.
+There are no "subcomponents" or "component dependencies".
+It may not be very elegant, but declaring several regular components should be enough in most cases.
+
+There is no `@Module`; instead, you can have `@Provides` methods directly in the component.
+A `@Provides` method must be `static`.
+
+There is no `@Binds`.
+It can be emulated with a `@Provides` method, or, if you control the source code of the interface, a static `@Inject` method.
+
+There is no need for the `@BindsInstance` annotation.
+
+Please note, unlike in dagger, there is no way to associate a particular bean with a particular component.
+A component implementation may use *any* `@Inject` - annotated constructor (or static method), as long as it is accessible to it, by Java's normal visibility rules.
 
 ### Do more with less
 
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
-* It also includes its own `@Inject` annotation, so you don't *have* to depend on one of these.
+* Includes its own copy of the JSR-330 annotations, excluding `@Scope` and `@Singleton`, so you don't *have* to depend on one of these.
 * Allows injection into static method.
-* No typecasts in generated code, duh.
-* Generates only the component implementation and nothing else, so this *should* be faster than dagger and doesn't bloat your jar as much.
+* No typecasts in generated code. Yes, dagger may generate unnecessary typecasts if some of your beans are package-private, even if they are in the same package as the component.
+* Generates only the component implementation and nothing else, so it doesn't bloat your jar as much.
 
 The new feature, "injection into static method" is only allowed if the method's return value matches the type of the enclosing class.
-For example, this is allowed because the method returns `Heater`:
+The following is allowed because the method returns `Heater`:
 
 ```java
 public interface Heater {
@@ -43,7 +54,7 @@ public interface Heater {
 }
 ```
 
-In the following example, the method `setHeaterFactory` *could* be used to sneak in a mock `Heater` for testing purpose, if invoked before the component is created: 
+In the next example, the method `setHeaterFactory` *could* be used to sneak in a mock `Heater` for testing purpose, if invoked early in the test, before the component is created: 
 
 ```java
 public interface Heater {
@@ -67,7 +78,7 @@ public interface Heater {
 }
 ```
 
-You can have more than one static injection point in the same class, if you add a qualifier:
+By the way you can have more than one "static inject" method in the same class, if you add a qualifier:
 
 ```java
 public interface Heater {
