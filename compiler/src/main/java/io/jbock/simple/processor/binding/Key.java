@@ -27,6 +27,10 @@ public final class Key {
         return new Key(mirror, typeName, qualifier);
     }
 
+    public Key changeType(TypeMirror newType) {
+        return create(newType, qualifier);
+    }
+
     @Override
     public String toString() {
         if (qualifier.isEmpty()) {

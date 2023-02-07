@@ -63,12 +63,11 @@ public final class InjectBinding extends Binding {
             Key key,
             ExecutableElement bindingElement,
             Function<CodeBlock, CodeBlock> invokeExpression,
-            Qualifiers qualifiers,
-            TypeTool tool) {
+            Qualifiers qualifiers) {
         List<DependencyRequest> dependencies = new ArrayList<>();
         for (VariableElement parameter : bindingElement.getParameters()) {
             dependencies.add(new DependencyRequest(Key.create(parameter.asType(),
-                    qualifiers.getQualifier(parameter)), parameter, qualifiers, tool));
+                    qualifiers.getQualifier(parameter)), parameter, qualifiers));
         }
         return new InjectBinding(key, bindingElement, invokeExpression, dependencies);
     }
@@ -81,18 +80,17 @@ public final class InjectBinding extends Binding {
         Key key = Key.create(typeElement.asType(), qualifiers.getQualifier(element));
         return create(key, element,
                 params -> CodeBlock.of("new $T($L)", typeElement.asType(), params),
-                qualifiers, tool);
+                qualifiers);
     }
 
     public static InjectBinding createMethod(
             Qualifiers qualifiers,
-            TypeTool tool,
             ExecutableElement element) {
         TypeMirror returnType = element.getReturnType();
         Key key = Key.create(returnType, qualifiers.getQualifier(element));
         return InjectBinding.create(key, element,
                 params -> CodeBlock.of("$T.$L($L)", element.getEnclosingElement().asType(), element.getSimpleName().toString(), params),
-                qualifiers, tool);
+                qualifiers);
     }
 
     public String suggestedVariableName() {

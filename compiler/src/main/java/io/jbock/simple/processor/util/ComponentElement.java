@@ -68,7 +68,7 @@ public final class ComponentElement {
                 throw new ValidationFailure("The method may not return void", method);
             }
             Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
-            result.put(key, new DependencyRequest(key, method, qualifiers(), tool()));
+            result.put(key, new DependencyRequest(key, method, qualifiers()));
         }
         return result;
     });
@@ -107,7 +107,7 @@ public final class ComponentElement {
                 continue; // ignore
             }
             Key key = Key.create(method.getReturnType(), qualifiers.getQualifier(method));
-            InjectBinding b = InjectBinding.createMethod(qualifiers, tool, method);
+            InjectBinding b = InjectBinding.createMethod(qualifiers, method);
             result.put(key, b);
         }
         return result;
@@ -117,11 +117,7 @@ public final class ComponentElement {
         return generatedClass.get();
     }
 
-    private TypeTool tool() {
-        return tool;
-    }
-
-    private Qualifiers qualifiers() {
+    public Qualifiers qualifiers() {
         return qualifiers;
     }
 }

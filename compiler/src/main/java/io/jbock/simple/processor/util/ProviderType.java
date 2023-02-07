@@ -12,7 +12,7 @@ public class ProviderType {
         this.innerType = innerType;
     }
 
-    enum ProviderKind {
+    public enum ProviderKind {
         SIMPLE(TypeNames.SIMPLE_PROVIDER),
         JAVAX(TypeNames.JAVAX_PROVIDER),
         JAKARTA(TypeNames.JAKARTA_PROVIDER);
@@ -22,6 +22,18 @@ public class ProviderType {
         ProviderKind(String className) {
             this.className = className;
         }
+
+        public String className() {
+            return className;
+        }
+    }
+
+    public ProviderKind kind() {
+        return kind;
+    }
+
+    public TypeMirror innerType() {
+        return innerType;
     }
 
     @Override
