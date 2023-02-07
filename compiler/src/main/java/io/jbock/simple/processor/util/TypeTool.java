@@ -84,6 +84,9 @@ public final class TypeTool {
 
     private Optional<TypeMirror> getSingleTypeArgument(
             TypeMirror mirror, TypeElement someClass) {
+        if (someClass == null) {
+            return Optional.empty();
+        }
         DeclaredType declaredType = DECLARED_TYPE_VISITOR.visit(mirror);
         if (declaredType == null) {
             return Optional.empty();

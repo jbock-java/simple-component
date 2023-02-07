@@ -25,6 +25,9 @@ public class SafeElements {
         if (fromCache != null) {
             return fromCache;
         }
+        if (typeElementCache.containsKey(name)) {
+            return null;
+        }
         TypeElement result = elements.getTypeElement(name);
         typeElementCache.put(name, result);
         return result;
