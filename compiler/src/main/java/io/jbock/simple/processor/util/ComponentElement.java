@@ -26,7 +26,6 @@ import static javax.lang.model.util.ElementFilter.methodsIn;
 public final class ComponentElement {
 
     private final TypeElement element;
-    private final TypeTool tool;
     private final Qualifiers qualifiers;
 
     private final Supplier<ClassName> generatedClass = memoize(() -> {
@@ -68,19 +67,18 @@ public final class ComponentElement {
                 throw new ValidationFailure("The method may not return void", method);
             }
             Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
-            result.put(key, new DependencyRequest(key, method, qualifiers(), tool()));
+            result.put(key, new DependencyRequest(key, method, qualifiers()));
         }
         return result;
     });
 
-    private ComponentElement(TypeElement element, TypeTool tool, Qualifiers qualifiers) {
+    private ComponentElement(TypeElement element, Qualifiers qualifiers) {
         this.element = element;
-        this.tool = tool;
         this.qualifiers = qualifiers;
     }
 
-    public static ComponentElement create(TypeElement element, TypeTool tool, Qualifiers qualifiers) {
-        return new ComponentElement(element, tool, qualifiers);
+    public static ComponentElement create(TypeElement element, Qualifiers qualifiers) {
+        return new ComponentElement(element, qualifiers);
     }
 
     public TypeElement element() {
@@ -107,7 +105,7 @@ public final class ComponentElement {
                 continue; // ignore
             }
             Key key = Key.create(method.getReturnType(), qualifiers.getQualifier(method));
-            InjectBinding b = InjectBinding.createMethod(qualifiers, tool, method);
+            InjectBinding b = InjectBinding.createMethod(qualifiers, method);
             result.put(key, b);
         }
         return result;
@@ -117,11 +115,7 @@ public final class ComponentElement {
         return generatedClass.get();
     }
 
-    private TypeTool tool() {
-        return tool;
-    }
-
-    private Qualifiers qualifiers() {
+    public Qualifiers qualifiers() {
         return qualifiers;
     }
 }

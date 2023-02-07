@@ -2,7 +2,6 @@ package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.simple.processor.util.Qualifiers;
-import io.jbock.simple.processor.util.TypeTool;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -63,36 +62,33 @@ public final class InjectBinding extends Binding {
             Key key,
             ExecutableElement bindingElement,
             Function<CodeBlock, CodeBlock> invokeExpression,
-            Qualifiers qualifiers,
-            TypeTool tool) {
+            Qualifiers qualifiers) {
         List<DependencyRequest> dependencies = new ArrayList<>();
         for (VariableElement parameter : bindingElement.getParameters()) {
             dependencies.add(new DependencyRequest(Key.create(parameter.asType(),
-                    qualifiers.getQualifier(parameter)), parameter, qualifiers, tool));
+                    qualifiers.getQualifier(parameter)), parameter, qualifiers));
         }
         return new InjectBinding(key, bindingElement, invokeExpression, dependencies);
     }
 
     public static InjectBinding createConstructor(
             Qualifiers qualifiers,
-            TypeTool tool,
             ExecutableElement element) {
         Element typeElement = element.getEnclosingElement();
         Key key = Key.create(typeElement.asType(), qualifiers.getQualifier(element));
         return create(key, element,
                 params -> CodeBlock.of("new $T($L)", typeElement.asType(), params),
-                qualifiers, tool);
+                qualifiers);
     }
 
     public static InjectBinding createMethod(
             Qualifiers qualifiers,
-            TypeTool tool,
             ExecutableElement element) {
         TypeMirror returnType = element.getReturnType();
         Key key = Key.create(returnType, qualifiers.getQualifier(element));
         return InjectBinding.create(key, element,
                 params -> CodeBlock.of("$T.$L($L)", element.getEnclosingElement().asType(), element.getSimpleName().toString(), params),
-                qualifiers, tool);
+                qualifiers);
     }
 
     public String suggestedVariableName() {

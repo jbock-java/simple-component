@@ -5,6 +5,7 @@ import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
+import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.FactoryElement;
 import io.jbock.simple.processor.util.UniqueNameSet;
@@ -45,6 +46,10 @@ public class Generator {
             if (binding instanceof InjectBinding) {
                 InjectBinding b = (InjectBinding) binding;
                 String name = uniqueNameSet.getUniqueName(b.suggestedVariableName());
+                result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
+            } else if (binding instanceof ProviderBinding) {
+                ProviderBinding b = (ProviderBinding) binding;
+                String name = uniqueNameSet.getUniqueName(b.sourceBinding().suggestedVariableName() + "Provider");
                 result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
             }
         }

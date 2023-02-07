@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Visitors.EXECUTABLE_ELEMENT_VISITOR;
+import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
 public class Qualifiers {
 
@@ -66,12 +67,12 @@ public class Qualifiers {
         InjectBinding b;
         for (ExecutableElement m : allMembers) {
             if (m.getKind() == ElementKind.CONSTRUCTOR) {
-                b = InjectBinding.createConstructor(this, tool, m);
+                b = InjectBinding.createConstructor(this, m);
                 if (b.key().qualifier().isPresent()) {
-                    throw new ValidationFailure("Constructors can't have qualifiers, consider a static method", b.element());   
+                    throw new ValidationFailure("Constructors can't have qualifiers, consider a static method", b.element());
                 }
             } else {
-                b = InjectBinding.createMethod(this, tool, m);
+                b = InjectBinding.createMethod(this, m);
             }
             InjectBinding previous = result.put(b.key(), b);
             if (previous != null) {
@@ -84,5 +85,22 @@ public class Qualifiers {
 
     public TypeTool tool() {
         return tool;
+    }
+
+    public Optional<Element> keyElement(Key key) {
+        return tool().types().asElement(key.type());
+    }
+
+    public Optional<InjectBinding> binding(Key key) {
+        return keyElement(key).flatMap(element -> binding(key, element));
+    }
+
+    public Optional<InjectBinding> binding(Key key, Element element) {
+        TypeElement typeElement = TYPE_ELEMENT_VISITOR.visit(element);
+        if (typeElement == null) {
+            return Optional.empty();
+        }
+        Map<Key, InjectBinding> m = injectBindings(typeElement);
+        return Optional.ofNullable(m.get(key));
     }
 }

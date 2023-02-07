@@ -63,7 +63,7 @@ public class ComponentStep implements Step {
             List<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement typeElement : typeElements) {
                 typeElementValidator.validate(typeElement);
-                ComponentElement component = ComponentElement.create(typeElement, tool, qualifiers);
+                ComponentElement component = ComponentElement.create(typeElement, qualifiers);
                 component.factoryElement().ifPresent(factory -> {
                     ExecutableElement method = factory.singleAbstractMethod();
                     if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {

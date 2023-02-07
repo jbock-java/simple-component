@@ -12,6 +12,7 @@ import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
+import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.FactoryElement;
 
@@ -57,6 +58,12 @@ public class ComponentImpl {
                 } else if (namedBinding.binding() instanceof ParameterBinding) {
                     ParameterBinding b = (ParameterBinding) namedBinding.binding();
                     constructor.addStatement("this.$N = $N", field, b.parameterSpec());
+                } else if (namedBinding.binding() instanceof ProviderBinding) {
+                    ProviderBinding b = (ProviderBinding) namedBinding.binding();
+                    constructor.addStatement("this.$N = () -> $L", field,
+                            b.sourceBinding().invokeExpression(b.dependencies().stream()
+                                    .map(d -> CodeBlock.of("$L", sorted.get(d.key()).name()))
+                                    .collect(CodeBlock.joining(", "))));
                 }
             } else {
                 ParameterSpec param = ParameterSpec.builder(key.typeName(), name).build();
@@ -66,8 +73,14 @@ public class ComponentImpl {
                             b.invokeExpression(b.dependencies().stream()
                                     .map(d -> CodeBlock.of("$L", sorted.get(d.key()).name()))
                                     .collect(CodeBlock.joining(", "))));
+                } else if (namedBinding.binding() instanceof ProviderBinding) {
+                    ProviderBinding b = (ProviderBinding) namedBinding.binding();
+                    constructor.addStatement("$T $N = () -> $L", b.key().typeName(), param,
+                            b.sourceBinding().invokeExpression(b.dependencies().stream()
+                                    .map(d -> CodeBlock.of("$L", sorted.get(d.key()).name()))
+                                    .collect(CodeBlock.joining(", "))));
                 }
-            } 
+            }
         }
         List<ParameterBinding> parameterBindings = component.factoryElement()
                 .map(FactoryElement::parameterBindings)
