@@ -11,7 +11,7 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 
 Instead, you have one simple rule:
 
-    If two beans of same key are injected by the same component instance, then they are the same bean instance.
+> If two beans of same key are injected by the same component instance, then they are the same bean instance.
     
 Here, "same key" means "same type and same qualifier".
 You can still obtain multiple instances of a bean by injecting `Provider<TheBean>`.
