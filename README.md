@@ -7,21 +7,21 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 2. `@Qualifier` and `@Named`
 3. `@Component` along with `@Component.Factory`
 
-### Note to `javax.inject` users
+### The `@Scope` and `@Singleton` annotations are ignored.
 
-The `@Scope` and `@Singleton` annotations are **ignored!**
-They are too confusing.
-Instead, you have a simple rule: Everywhere a particular bean is injected, you get *the same instance* of the bean.
+Instead, you have one simple rule:
 
-But of course, if you *need* to have multiple (distinct) instances of a bean, you can inject a `Provider<TheBean> beanProvider`.
-It will create a new bean instance everytime `beanProvider.get()` is invoked.
+    If two beans of same key are injected by the same component instance, then they are the same bean instance.
+    
+Here, "same key" means "same type and same qualifier".
+You can still obtain multiple instances of a bean by injecting `Provider<TheBean>`.
 
 ### Note to dagger users
 
 There are no "subcomponents" or "component dependencies".
-It may not be very elegant, but declaring several regular components should be enough in most cases.
+It may not be very elegant, but declaring multiple "normal" components should be "good enough" for most users.
 
-There is no `@Module`; instead, you can have `@Provides` methods directly in the component.
+There is no `@Module`, but you can still have `@Provides` methods, only you declare them directly in your component.
 A `@Provides` method must be `static`.
 
 There is no `@Binds`.
@@ -37,7 +37,7 @@ A component implementation may use *any* `@Inject` - annotated constructor (or s
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
 * Includes its own copy of the JSR-330 annotations, excluding `@Scope` and `@Singleton`, so you don't *have* to depend on one of these.
 * Allows injection into static method.
-* No typecasts in generated code. Yes, dagger may generate unnecessary typecasts if some of your beans are package-private, even if they are in the same package as the component.
+* No typecasts in generated code. Yes, dagger does this, if some of your beans are package-private. Yikes.
 * Generates only the component implementation and nothing else, so it doesn't bloat your jar as much.
 
 The new feature, "injection into static method" is only allowed if the method's return value matches the type of the enclosing class.
