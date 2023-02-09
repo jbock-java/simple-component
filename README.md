@@ -29,6 +29,8 @@ It can be emulated with a `@Provides` method, or, if you control the source code
 
 There is no need for the `@BindsInstance` annotation.
 
+There is no `@AssistedInject`, it looks like a can of worms.
+
 Please note, unlike in dagger, there is no way to associate a particular bean with a particular component.
 A component implementation may use *any* `@Inject` - annotated constructor (or static method), as long as it is accessible to it, by Java's normal visibility rules.
 
