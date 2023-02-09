@@ -10,6 +10,7 @@ import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.FactoryElement;
 import io.jbock.simple.processor.util.UniqueNameSet;
 
+import javax.lang.model.SourceVersion;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,21 +39,63 @@ public class Generator {
                 .orElse(List.of());
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
         for (ParameterBinding b : parameterBindings) {
-            String name = b.parameter().getSimpleName().toString();
+            String name = validJavaName(b.parameter().getSimpleName().toString());
             result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
             uniqueNameSet.claim(name);
         }
         for (Binding binding : sorted) {
             if (binding instanceof InjectBinding) {
                 InjectBinding b = (InjectBinding) binding;
-                String name = uniqueNameSet.getUniqueName(b.suggestedVariableName());
+                String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));
                 result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
             } else if (binding instanceof ProviderBinding) {
                 ProviderBinding b = (ProviderBinding) binding;
-                String name = uniqueNameSet.getUniqueName(b.sourceBinding().suggestedVariableName() + "Provider");
+                String name = uniqueNameSet.getUniqueName(validJavaName(b.sourceBinding().suggestedVariableName() + "Provider"));
                 result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
             }
         }
         return result;
     }
+
+    private static String validJavaName(CharSequence name) {
+        if (SourceVersion.isIdentifier(name)) {
+            return protectAgainstKeywords(name.toString());
+        }
+        StringBuilder newName = new StringBuilder(name.length());
+        char firstChar = name.charAt(0);
+        if (!Character.isJavaIdentifierStart(firstChar)) {
+            newName.append('_');
+        }
+        name.chars().forEach(c -> newName.append(Character.isJavaIdentifierPart(c) ? c : '_'));
+        return newName.toString();
+    }
+
+    private static String protectAgainstKeywords(String candidateName) {
+        switch (candidateName) {
+            case "package":
+                return "pkg";
+            case "boolean":
+            case "byte":
+                return "b";
+            case "double":
+                return "d";
+            case "int":
+                return "i";
+            case "short":
+                return "s";
+            case "char":
+                return "c";
+            case "void":
+                return "v";
+            case "class":
+                return "clazz";
+            case "float":
+                return "f";
+            case "long":
+                return "l";
+            default:
+                return SourceVersion.isKeyword(candidateName) ? candidateName + '_' : candidateName;
+        }
+    }
+
 }
