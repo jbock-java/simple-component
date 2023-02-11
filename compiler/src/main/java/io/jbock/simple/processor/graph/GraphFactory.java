@@ -9,7 +9,7 @@ import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.FactoryElement;
 import io.jbock.simple.processor.util.ProviderType;
-import io.jbock.simple.processor.util.Qualifiers;
+import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.VariableElement;
@@ -24,15 +24,15 @@ public class GraphFactory {
 
     private final Map<Key, ParameterBinding> parameterBindings;
     private final Map<Key, InjectBinding> providers;
-    private final Qualifiers qualifiers;
+    private final KeyFactory keyFactory;
 
     private GraphFactory(
             Map<Key, ParameterBinding> parameterBindings,
             Map<Key, InjectBinding> providers,
-            Qualifiers qualifiers) {
+            KeyFactory keyFactory) {
         this.parameterBindings = parameterBindings;
         this.providers = providers;
-        this.qualifiers = qualifiers;
+        this.keyFactory = keyFactory;
     }
 
     public static GraphFactory create(ComponentElement componentElement) {
@@ -60,13 +60,13 @@ public class GraphFactory {
         return request.binding()
                 .or(() -> Optional.ofNullable(providers.get(key)))
                 .or(() -> {
-                    Optional<ProviderType> providerType = qualifiers.tool().getProviderType(request.key().type());
+                    Optional<ProviderType> providerType = keyFactory.tool().getProviderType(request.key().type());
                     if (providerType.isEmpty()) {
                         return Optional.empty();
                     }
                     ProviderType provider = providerType.orElseThrow();
                     Key innerKey = key.changeType(provider.innerType());
-                    return qualifiers.binding(innerKey)
+                    return keyFactory.binding(innerKey)
                             .or(() -> Optional.ofNullable(providers.get(innerKey)))
                             .map(b -> new ProviderBinding(key, b, provider));
                 })

@@ -1,13 +1,10 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.CodeBlock;
-import io.jbock.simple.processor.util.Qualifiers;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -62,33 +59,30 @@ public final class InjectBinding extends Binding {
             Key key,
             ExecutableElement bindingElement,
             Function<CodeBlock, CodeBlock> invokeExpression,
-            Qualifiers qualifiers) {
+            KeyFactory keyFactory) {
         List<DependencyRequest> dependencies = new ArrayList<>();
         for (VariableElement parameter : bindingElement.getParameters()) {
-            dependencies.add(new DependencyRequest(Key.create(parameter.asType(),
-                    qualifiers.getQualifier(parameter)), parameter, qualifiers));
+            dependencies.add(new DependencyRequest(keyFactory.getKey(parameter), parameter, keyFactory));
         }
         return new InjectBinding(key, bindingElement, invokeExpression, dependencies);
     }
 
     public static InjectBinding createConstructor(
-            Qualifiers qualifiers,
+            KeyFactory keyFactory,
             ExecutableElement element) {
-        Element typeElement = element.getEnclosingElement();
-        Key key = Key.create(typeElement.asType(), qualifiers.getQualifier(element));
+        Key key = keyFactory.getKey(element);
         return create(key, element,
-                params -> CodeBlock.of("new $T($L)", typeElement.asType(), params),
-                qualifiers);
+                params -> CodeBlock.of("new $T($L)", element.getEnclosingElement().asType(), params),
+                keyFactory);
     }
 
     public static InjectBinding createMethod(
-            Qualifiers qualifiers,
+            KeyFactory keyFactory,
             ExecutableElement element) {
-        TypeMirror returnType = element.getReturnType();
-        Key key = Key.create(returnType, qualifiers.getQualifier(element));
+        Key key = keyFactory.getKey(element);
         return InjectBinding.create(key, element,
                 params -> CodeBlock.of("$T.$L($L)", element.getEnclosingElement().asType(), element.getSimpleName().toString(), params),
-                qualifiers);
+                keyFactory);
     }
 
     @Override

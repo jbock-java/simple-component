@@ -22,7 +22,7 @@ public final class Key {
         this.qualifier = qualifier;
     }
 
-    public static Key create(TypeMirror mirror, Optional<SimpleAnnotation> qualifier) {
+    static Key create(TypeMirror mirror, Optional<SimpleAnnotation> qualifier) {
         TypeName typeName = TypeName.get(mirror);
         return new Key(mirror, typeName, qualifier);
     }

@@ -3,7 +3,6 @@ package io.jbock.simple.processor.binding;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.TypeName;
-import io.jbock.simple.processor.util.Qualifiers;
 import io.jbock.simple.processor.util.Suppliers;
 
 import javax.lang.model.element.Element;
@@ -28,8 +27,8 @@ public final class ParameterBinding extends Binding {
         this.parameter = parameter;
     }
 
-    public static ParameterBinding create(VariableElement parameter, Qualifiers qualifiers) {
-        Key key = Key.create(parameter.asType(), qualifiers.getQualifier(parameter));
+    public static ParameterBinding create(VariableElement parameter, KeyFactory keyFactory) {
+        Key key = keyFactory.getKey(parameter);
         return new ParameterBinding(key, parameter);
     }
 

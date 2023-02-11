@@ -1,7 +1,5 @@
 package io.jbock.simple.processor.binding;
 
-import io.jbock.simple.processor.util.Qualifiers;
-
 import javax.lang.model.element.Element;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,15 +9,15 @@ public final class DependencyRequest {
 
     private final Key key;
     private final Element requestingElement;
-    private final Qualifiers qualifiers;
+    private final KeyFactory keyFactory;
 
     public DependencyRequest(
             Key key,
             Element requestingElement,
-            Qualifiers qualifiers) {
+            KeyFactory keyFactory) {
         this.key = key;
         this.requestingElement = requestingElement;
-        this.qualifiers = qualifiers;
+        this.keyFactory = keyFactory;
     }
 
     public Key key() {
@@ -31,7 +29,7 @@ public final class DependencyRequest {
     }
 
     public Optional<Binding> binding() {
-        return qualifiers.binding(key).map(Function.identity());
+        return keyFactory.binding(key).map(Function.identity());
     }
 
     @Override

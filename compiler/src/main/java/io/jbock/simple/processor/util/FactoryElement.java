@@ -2,6 +2,7 @@ package io.jbock.simple.processor.util;
 
 import io.jbock.javapoet.ClassName;
 import io.jbock.simple.processor.binding.ParameterBinding;
+import io.jbock.simple.processor.binding.KeyFactory;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -18,7 +19,7 @@ public class FactoryElement {
 
     private final TypeElement element;
     private final ClassName parentClass;
-    private final Qualifiers qualifiers;
+    private final KeyFactory keyFactory;
 
     private final Supplier<ExecutableElement> singleAbstractMethod = memoize(() -> {
         List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements())
@@ -45,10 +46,10 @@ public class FactoryElement {
     FactoryElement(
             TypeElement element,
             ClassName parentClass,
-            Qualifiers qualifiers) {
+            KeyFactory keyFactory) {
         this.element = element;
         this.parentClass = parentClass;
-        this.qualifiers = qualifiers;
+        this.keyFactory = keyFactory;
     }
 
     public TypeElement element() {
@@ -67,7 +68,7 @@ public class FactoryElement {
         return parameterBindings.get();
     }
 
-    private Qualifiers qualifiers() {
-        return qualifiers;
+    private KeyFactory qualifiers() {
+        return keyFactory;
     }
 }

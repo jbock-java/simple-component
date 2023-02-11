@@ -7,6 +7,7 @@ import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.binding.KeyFactory;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -26,7 +27,7 @@ import static javax.lang.model.util.ElementFilter.methodsIn;
 public final class ComponentElement {
 
     private final TypeElement element;
-    private final Qualifiers qualifiers;
+    private final KeyFactory keyFactory;
 
     private final Supplier<ClassName> generatedClass = memoize(() -> {
         ClassName className = ClassName.get(element());
@@ -66,19 +67,19 @@ public final class ComponentElement {
             if (method.getReturnType().getKind() == TypeKind.VOID) {
                 throw new ValidationFailure("The method may not return void", method);
             }
-            Key key = Key.create(method.getReturnType(), qualifiers().getQualifier(method));
+            Key key = qualifiers().getKey(method);
             result.put(key, new DependencyRequest(key, method, qualifiers()));
         }
         return result;
     });
 
-    private ComponentElement(TypeElement element, Qualifiers qualifiers) {
+    private ComponentElement(TypeElement element, KeyFactory keyFactory) {
         this.element = element;
-        this.qualifiers = qualifiers;
+        this.keyFactory = keyFactory;
     }
 
-    public static ComponentElement create(TypeElement element, Qualifiers qualifiers) {
-        return new ComponentElement(element, qualifiers);
+    public static ComponentElement create(TypeElement element, KeyFactory keyFactory) {
+        return new ComponentElement(element, keyFactory);
     }
 
     public TypeElement element() {
@@ -104,8 +105,8 @@ public final class ComponentElement {
             if (method.getAnnotation(Provides.class) == null) {
                 continue; // ignore
             }
-            Key key = Key.create(method.getReturnType(), qualifiers.getQualifier(method));
-            InjectBinding b = InjectBinding.createMethod(qualifiers, method);
+            Key key = keyFactory.getKey(method);
+            InjectBinding b = InjectBinding.createMethod(keyFactory, method);
             result.put(key, b);
         }
         return result;
@@ -115,7 +116,7 @@ public final class ComponentElement {
         return generatedClass.get();
     }
 
-    public Qualifiers qualifiers() {
-        return qualifiers;
+    public KeyFactory qualifiers() {
+        return keyFactory;
     }
 }

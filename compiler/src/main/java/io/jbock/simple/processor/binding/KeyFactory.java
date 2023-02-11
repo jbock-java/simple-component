@@ -1,15 +1,19 @@
-package io.jbock.simple.processor.util;
+package io.jbock.simple.processor.binding;
 
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.binding.InjectBinding;
-import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.util.SimpleAnnotation;
+import io.jbock.simple.processor.util.TypeTool;
+import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.util.Visitors;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,18 +25,18 @@ import java.util.stream.Collectors;
 import static io.jbock.simple.processor.util.Visitors.EXECUTABLE_ELEMENT_VISITOR;
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
-public class Qualifiers {
+public class KeyFactory {
 
     private final TypeTool tool;
 
     private final Map<TypeElement, Map<Key, InjectBinding>> injectBindingCache = new HashMap<>();
 
     @Inject
-    public Qualifiers(TypeTool tool) {
+    public KeyFactory(TypeTool tool) {
         this.tool = tool;
     }
 
-    public Optional<SimpleAnnotation> getQualifier(Element element) {
+    private Optional<SimpleAnnotation> getQualifier(Element element) {
         List<SimpleAnnotation> qualifiers = element.getAnnotationMirrors().stream()
                 .filter(this::hasQualifierAnnotation)
                 .map(mirror -> SimpleAnnotation.create(mirror, tool.elements()))
@@ -44,6 +48,20 @@ public class Qualifiers {
             return Optional.of(qualifiers.get(0));
         }
         throw new ValidationFailure("Found more than one qualifier annotation", element);
+    }
+
+    public Key getKey(ExecutableElement element) {
+        TypeMirror returnType;
+        if (element.getKind() == ElementKind.CONSTRUCTOR) {
+            returnType = element.getEnclosingElement().asType();
+        } else {
+            returnType = element.getReturnType();
+        }
+        return Key.create(returnType, getQualifier(element));
+    }
+
+    public Key getKey(VariableElement parameter) {
+        return Key.create(parameter.asType(), getQualifier(parameter));
     }
 
     private boolean hasQualifierAnnotation(AnnotationMirror mirror) {
@@ -71,14 +89,14 @@ public class Qualifiers {
             if (m.getKind() == ElementKind.CONSTRUCTOR) {
                 b = InjectBinding.createConstructor(this, m);
                 if (b.key().qualifier().isPresent()) {
-                    throw new ValidationFailure("Constructors can't have qualifiers, consider a static method", b.element());
+                    throw new ValidationFailure("Constructors can't have qualifiers", b.element());
                 }
             } else {
                 b = InjectBinding.createMethod(this, m);
             }
             InjectBinding previous = result.put(b.key(), b);
             if (previous != null) {
-                throw new ValidationFailure("This clashes with " + previous.signature() + ", consider a (different) qualifier", b.element());
+                throw new ValidationFailure("This binding clashes with " + previous.signature() + ", consider a (different) qualifier", b.element());
             }
             injectBindingCache.put(typeElement, result);
         }
