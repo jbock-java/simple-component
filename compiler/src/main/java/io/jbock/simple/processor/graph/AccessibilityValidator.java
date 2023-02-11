@@ -5,7 +5,6 @@ import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
@@ -31,7 +30,7 @@ class AccessibilityValidator {
         return new AccessibilityValidator(getPackage(component.element()), component);
     }
 
-    void checkBinding(ExecutableElement e) {
+    void checkAccessible(Element e) {
         if (getPackage(e).equals(componentPackage)) {
             return;
         }

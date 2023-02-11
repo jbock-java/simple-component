@@ -3,7 +3,7 @@ package io.jbock.simple.processor.graph;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.DependencyRequest;
-import io.jbock.simple.processor.binding.InjectBinding;
+import io.jbock.simple.processor.binding.ParameterBinding;
 import io.jbock.simple.processor.util.ComponentElement;
 
 import java.util.ArrayDeque;
@@ -29,9 +29,8 @@ public final class TopologicalSorter {
             graph.addAll(graphFactory.getGraph(request));
         }
         for (Binding binding : graph.nodes()) {
-            if (binding instanceof InjectBinding) {
-                InjectBinding b = (InjectBinding) binding;
-                validator.checkBinding(b.element());
+            if (!(binding instanceof ParameterBinding)) {
+                validator.checkAccessible(binding.element());
             }
         }
         return sortNodes(graph);

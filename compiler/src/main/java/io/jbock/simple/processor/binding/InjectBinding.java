@@ -91,6 +91,7 @@ public final class InjectBinding extends Binding {
                 qualifiers);
     }
 
+    @Override
     public String suggestedVariableName() {
         return suggestedVariableName.get();
     }
@@ -105,8 +106,15 @@ public final class InjectBinding extends Binding {
         return dependencies;
     }
 
-    public CodeBlock invokeExpression(CodeBlock params) {
+    CodeBlock invokeExpression(CodeBlock params) {
         return invokeExpression.apply(params);
+    }
+
+    @Override
+    public CodeBlock invocation(Function<Key, String> names) {
+        return invokeExpression(dependencies().stream()
+                .map(d -> CodeBlock.of("$L", names.apply(d.key())))
+                .collect(CodeBlock.joining(", ")));
     }
 
     public String signature() {

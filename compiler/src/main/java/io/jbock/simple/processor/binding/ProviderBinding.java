@@ -1,12 +1,11 @@
 package io.jbock.simple.processor.binding;
 
-import io.jbock.javapoet.ClassName;
-import io.jbock.javapoet.ParameterizedTypeName;
+import io.jbock.javapoet.CodeBlock;
 import io.jbock.simple.processor.util.ProviderType;
-import io.jbock.simple.processor.util.ProviderType.ProviderKind;
 
-import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import java.util.List;
+import java.util.function.Function;
 
 public class ProviderBinding extends Binding {
 
@@ -23,7 +22,7 @@ public class ProviderBinding extends Binding {
     }
 
     @Override
-    public Element element() {
+    public ExecutableElement element() {
         return sourceBinding.element();
     }
 
@@ -32,17 +31,14 @@ public class ProviderBinding extends Binding {
         return sourceBinding.dependencies();
     }
 
-    public ProviderKind kind() {
-        return providerType.kind();
+    @Override
+    public CodeBlock invocation(Function<Key, String> names) {
+        return CodeBlock.of("() -> $L", sourceBinding.invocation(names));
     }
 
-    public InjectBinding sourceBinding() {
-        return sourceBinding;
-    }
-
-    public ParameterizedTypeName providerType() {
-        ClassName frameworkClass = ClassName.bestGuess(kind().className());
-        return ParameterizedTypeName.get(frameworkClass, key().typeName());
+    @Override
+    public String suggestedVariableName() {
+        return sourceBinding.suggestedVariableName() + "Provider";
     }
 
     @Override

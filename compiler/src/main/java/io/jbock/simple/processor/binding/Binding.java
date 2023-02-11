@@ -1,8 +1,11 @@
 package io.jbock.simple.processor.binding;
 
+import io.jbock.javapoet.CodeBlock;
+
 import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * A node in the dependency graph. For instance, an inject-annotated constructor.
@@ -37,4 +40,8 @@ public abstract class Binding { // permits InjectBinding, ParameterBinding
     public abstract Element element();
 
     public abstract List<DependencyRequest> dependencies();
+
+    public abstract CodeBlock invocation(Function<Key, String> names);
+
+    public abstract String suggestedVariableName();
 }

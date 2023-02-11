@@ -2,17 +2,12 @@ package io.jbock.simple.processor.writing;
 
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
-import io.jbock.simple.processor.binding.ParameterBinding;
-import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ComponentElement;
-import io.jbock.simple.processor.util.FactoryElement;
 import io.jbock.simple.processor.util.UniqueNameSet;
 
 import javax.lang.model.SourceVersion;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,32 +29,17 @@ public class Generator {
 
     Map<Key, NamedBinding> addNames(Set<Binding> sorted) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
-        List<ParameterBinding> parameterBindings = component.factoryElement()
-                .map(FactoryElement::parameterBindings)
-                .orElse(List.of());
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
-        for (ParameterBinding b : parameterBindings) {
-            String name = validJavaName(b.parameter().getSimpleName().toString());
+        for (Binding b : sorted) {
+            String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));
             result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
-            uniqueNameSet.claim(name);
-        }
-        for (Binding binding : sorted) {
-            if (binding instanceof InjectBinding) {
-                InjectBinding b = (InjectBinding) binding;
-                String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));
-                result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
-            } else if (binding instanceof ProviderBinding) {
-                ProviderBinding b = (ProviderBinding) binding;
-                String name = uniqueNameSet.getUniqueName(validJavaName(b.sourceBinding().suggestedVariableName() + "Provider"));
-                result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
-            }
         }
         return result;
     }
 
-    private static String validJavaName(CharSequence name) {
+    private static String validJavaName(String name) {
         if (SourceVersion.isIdentifier(name)) {
-            return protectAgainstKeywords(name.toString());
+            return protectAgainstKeywords(name);
         }
         StringBuilder newName = new StringBuilder(name.length());
         char firstChar = name.charAt(0);
@@ -97,5 +77,4 @@ public class Generator {
                 return SourceVersion.isKeyword(candidateName) ? candidateName + '_' : candidateName;
         }
     }
-
 }
