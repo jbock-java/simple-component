@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.validation;
 
 import io.jbock.javapoet.TypeName;
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
@@ -17,6 +18,7 @@ public final class ExecutableElementValidator {
     private final TypeTool tool;
     private final TypeElementValidator typeElementValidator;
 
+    @Inject
     public ExecutableElementValidator(
             TypeTool tool,
             TypeElementValidator typeElementValidator) {

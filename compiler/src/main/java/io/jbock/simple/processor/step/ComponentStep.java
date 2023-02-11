@@ -3,6 +3,7 @@ package io.jbock.simple.processor.step;
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Component;
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.util.ComponentElement;
@@ -34,6 +35,7 @@ public class ComponentStep implements Step {
     private final TopologicalSorter topologicalSorter;
     private final SpecWriter specWriter;
 
+    @Inject
     public ComponentStep(
             Messager messager,
             TypeTool tool,

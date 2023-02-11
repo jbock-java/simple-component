@@ -1,5 +1,7 @@
 package io.jbock.simple.processor.util;
 
+import io.jbock.simple.Inject;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -16,6 +18,7 @@ public class SafeElements {
 
     private final Map<String, TypeElement> typeElementCache = new HashMap<>();
 
+    @Inject
     public SafeElements(Elements elements) {
         this.elements = elements;
     }

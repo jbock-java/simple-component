@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.util;
 
 import io.jbock.javapoet.JavaFile;
+import io.jbock.simple.Inject;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -16,6 +17,7 @@ public final class SourceFileGenerator {
     private final Filer filer;
     private final Messager messager;
 
+    @Inject
     public SourceFileGenerator(Filer filer, Messager messager) {
         this.filer = filer;
         this.messager = messager;

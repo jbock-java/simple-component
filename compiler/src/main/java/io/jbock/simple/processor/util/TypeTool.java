@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.util;
 
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.ProviderType.ProviderKind;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -21,6 +22,7 @@ public final class TypeTool {
     private final SafeElements elements;
     private final SafeTypes types;
 
+    @Inject
     public TypeTool(SafeElements elements, SafeTypes types) {
         this.elements = elements;
         this.types = types;

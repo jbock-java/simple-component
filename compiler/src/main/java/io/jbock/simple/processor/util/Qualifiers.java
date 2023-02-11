@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.util;
 
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
 
@@ -26,6 +27,7 @@ public class Qualifiers {
 
     private final Map<TypeElement, Map<Key, InjectBinding>> injectBindingCache = new HashMap<>();
 
+    @Inject
     public Qualifiers(TypeTool tool) {
         this.tool = tool;
     }

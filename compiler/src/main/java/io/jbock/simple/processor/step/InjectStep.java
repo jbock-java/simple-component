@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeNames;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.validation.ExecutableElementValidator;
@@ -23,6 +24,7 @@ public class InjectStep implements Step {
     private final ExecutableElementValidator executableElementValidator;
     private final Messager messager;
 
+    @Inject
     public InjectStep(
             InjectBindingValidator validator,
             ExecutableElementValidator executableElementValidator,

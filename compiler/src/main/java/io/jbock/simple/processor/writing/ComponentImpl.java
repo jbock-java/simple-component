@@ -7,6 +7,7 @@ import io.jbock.javapoet.MethodSpec;
 import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.TypeName;
 import io.jbock.javapoet.TypeSpec;
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.SimpleComponentProcessor;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
@@ -29,6 +30,10 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
 public class ComponentImpl {
+
+    @Inject
+    public ComponentImpl() {
+    }
 
     TypeSpec generate(
             ComponentElement component,

@@ -1,5 +1,7 @@
 package io.jbock.simple.processor.util;
 
+import io.jbock.simple.Inject;
+
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
@@ -10,6 +12,10 @@ import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
 public final class TypeElementValidator {
+
+    @Inject
+    public TypeElementValidator() {
+    }
 
     /**
      * Assert that the given TypeElement is a regular interface.

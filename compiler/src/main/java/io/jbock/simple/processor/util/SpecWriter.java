@@ -3,6 +3,7 @@ package io.jbock.simple.processor.util;
 import io.jbock.javapoet.ClassName;
 import io.jbock.javapoet.JavaFile;
 import io.jbock.javapoet.TypeSpec;
+import io.jbock.simple.Inject;
 
 import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic;
@@ -14,6 +15,7 @@ public final class SpecWriter {
     private final SourceFileGenerator sourceFileGenerator;
     private final Messager messager;
 
+    @Inject
     public SpecWriter(SourceFileGenerator sourceFileGenerator, Messager messager) {
         this.sourceFileGenerator = sourceFileGenerator;
         this.messager = messager;

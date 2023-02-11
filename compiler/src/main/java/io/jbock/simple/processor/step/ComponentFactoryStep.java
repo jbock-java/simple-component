@@ -2,6 +2,7 @@ package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.simple.Component;
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -19,6 +20,7 @@ public class ComponentFactoryStep implements Step {
     private final TypeElementValidator validator;
     private final Messager messager;
 
+    @Inject
     public ComponentFactoryStep(
             Messager messager,
             TypeElementValidator validator) {

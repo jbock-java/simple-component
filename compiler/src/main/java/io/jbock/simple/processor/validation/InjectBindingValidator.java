@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.validation;
 
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.util.Qualifiers;
@@ -22,6 +23,7 @@ public final class InjectBindingValidator {
 
     private final Qualifiers qualifiers;
 
+    @Inject
     public InjectBindingValidator(Qualifiers qualifiers) {
         this.qualifiers = qualifiers;
     }

@@ -2,6 +2,7 @@ package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.simple.Component;
+import io.jbock.simple.Inject;
 import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -20,6 +21,7 @@ public class ProvidesStep implements Step {
 
     private final Messager messager;
 
+    @Inject
     public ProvidesStep(
             Messager messager) {
         this.messager = messager;

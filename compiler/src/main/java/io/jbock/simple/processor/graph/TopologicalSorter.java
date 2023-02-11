@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.graph;
 
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
@@ -15,6 +16,7 @@ public final class TopologicalSorter {
 
     private final Function<ComponentElement, GraphFactory> bindingRegistryFactory;
 
+    @Inject
     public TopologicalSorter(Function<ComponentElement, GraphFactory> bindingRegistryFactory) {
         this.bindingRegistryFactory = bindingRegistryFactory;
     }
