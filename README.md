@@ -19,7 +19,7 @@ You can still obtain multiple instances of a bean by injecting `Provider<TheBean
 ### Note to dagger users
 
 There are no "subcomponents" or "component dependencies".
-It may not be very elegant, but declaring multiple "normal" components should be "good enough" for most users.
+It may not be very elegant, but declaring multiple "normal" components should be "good enough" in most cases.
 
 There is no `@Module`, but you can still have `@Provides` methods, only you declare them directly in your component.
 A `@Provides` method must be `static`.
@@ -29,17 +29,14 @@ It can be emulated with a `@Provides` method, or, if you control the source code
 
 There is no need for the `@BindsInstance` annotation.
 
-There is no `@AssistedInject`, it looks like a can of worms.
-
-Please note, unlike in dagger, there is no way to associate a particular bean with a particular component.
-A component implementation may use *any* `@Inject` - annotated constructor (or static method), as long as it is accessible to it, by Java's normal visibility rules.
+There is no `@AssistedInject`, it's a can of worms.
 
 ### Do more with less
 
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
 * Includes its own copy of the JSR-330 annotations, excluding `@Scope` and `@Singleton`, so you don't *have* to depend on one of these.
 * Allows injection into static method.
-* No typecasts in generated code. Yes, dagger does this, if some of your beans are package-private. Yikes.
+* No typecasts in generated code. Yes, dagger does this, if some of your beans are package-private. Ew, gross!
 * Generates only the component implementation and nothing else, so it doesn't bloat your jar as much.
 
 The new feature, "injection into static method" is only allowed if the method's return value matches the type of the enclosing class.
