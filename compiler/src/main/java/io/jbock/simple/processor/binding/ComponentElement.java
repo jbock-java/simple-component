@@ -1,13 +1,10 @@
-package io.jbock.simple.processor.util;
+package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.ClassName;
 import io.jbock.simple.Component;
 import io.jbock.simple.Provides;
-import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.DependencyRequest;
-import io.jbock.simple.processor.binding.InjectBinding;
-import io.jbock.simple.processor.binding.Key;
-import io.jbock.simple.processor.binding.KeyFactory;
+import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.util.Visitors;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -28,6 +25,7 @@ public final class ComponentElement {
 
     private final TypeElement element;
     private final KeyFactory keyFactory;
+    private final InjectBindingFactory injectBindingFactory;
 
     private final Supplier<ClassName> generatedClass = memoize(() -> {
         ClassName className = ClassName.get(element());
@@ -68,18 +66,25 @@ public final class ComponentElement {
                 throw new ValidationFailure("The method may not return void", method);
             }
             Key key = qualifiers().getKey(method);
-            result.put(key, new DependencyRequest(key, method, qualifiers()));
+            result.put(key, new DependencyRequest(key, method, injectBindingCache()));
         }
         return result;
     });
 
-    private ComponentElement(TypeElement element, KeyFactory keyFactory) {
+    private ComponentElement(
+            TypeElement element,
+            KeyFactory keyFactory,
+            InjectBindingFactory injectBindingFactory) {
         this.element = element;
         this.keyFactory = keyFactory;
+        this.injectBindingFactory = injectBindingFactory;
     }
 
-    public static ComponentElement create(TypeElement element, KeyFactory keyFactory) {
-        return new ComponentElement(element, keyFactory);
+    public static ComponentElement create(
+            TypeElement element,
+            KeyFactory keyFactory,
+            InjectBindingFactory injectBindingFactory) {
+        return new ComponentElement(element, keyFactory, injectBindingFactory);
     }
 
     public TypeElement element() {
@@ -106,7 +111,7 @@ public final class ComponentElement {
                 continue; // ignore
             }
             Key key = keyFactory.getKey(method);
-            InjectBinding b = InjectBinding.createMethod(keyFactory, method);
+            InjectBinding b = InjectBinding.create(keyFactory, method, injectBindingCache());
             result.put(key, b);
         }
         return result;
@@ -118,5 +123,9 @@ public final class ComponentElement {
 
     public KeyFactory qualifiers() {
         return keyFactory;
+    }
+
+    private InjectBindingFactory injectBindingCache() {
+        return injectBindingFactory;
     }
 }

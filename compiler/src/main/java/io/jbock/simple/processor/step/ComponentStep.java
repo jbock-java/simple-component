@@ -5,9 +5,10 @@ import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.graph.TopologicalSorter;
-import io.jbock.simple.processor.util.ComponentElement;
+import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.KeyFactory;
+import io.jbock.simple.processor.graph.TopologicalSorter;
+import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.TypeTool;
@@ -34,6 +35,7 @@ public class ComponentStep implements Step {
     private final Function<ComponentElement, Generator> generatorFactory;
     private final TopologicalSorter topologicalSorter;
     private final SpecWriter specWriter;
+    private final InjectBindingFactory injectBindingFactory;
 
     @Inject
     public ComponentStep(
@@ -43,7 +45,8 @@ public class ComponentStep implements Step {
             TypeElementValidator typeElementValidator,
             Function<ComponentElement, Generator> generatorFactory,
             TopologicalSorter topologicalSorter,
-            SpecWriter specWriter) {
+            SpecWriter specWriter,
+            InjectBindingFactory injectBindingFactory) {
         this.messager = messager;
         this.tool = tool;
         this.keyFactory = keyFactory;
@@ -51,6 +54,7 @@ public class ComponentStep implements Step {
         this.generatorFactory = generatorFactory;
         this.topologicalSorter = topologicalSorter;
         this.specWriter = specWriter;
+        this.injectBindingFactory = injectBindingFactory;
     }
 
     @Override
@@ -65,7 +69,7 @@ public class ComponentStep implements Step {
             List<TypeElement> typeElements = ElementFilter.typesIn(elements);
             for (TypeElement typeElement : typeElements) {
                 typeElementValidator.validate(typeElement);
-                ComponentElement component = ComponentElement.create(typeElement, keyFactory);
+                ComponentElement component = ComponentElement.create(typeElement, keyFactory, injectBindingFactory);
                 component.factoryElement().ifPresent(factory -> {
                     ExecutableElement method = factory.singleAbstractMethod();
                     if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {

@@ -2,6 +2,7 @@ package io.jbock.simple.processor.validation;
 
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.InjectBinding;
+import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.ValidationFailure;
@@ -22,10 +23,14 @@ import static io.jbock.simple.processor.util.TypeNames.SIMPLE_INJECT;
 public final class InjectBindingValidator {
 
     private final KeyFactory keyFactory;
+    private final InjectBindingFactory injectBindingFactory;
 
     @Inject
-    public InjectBindingValidator(KeyFactory keyFactory) {
+    public InjectBindingValidator(
+            KeyFactory keyFactory,
+            InjectBindingFactory injectBindingFactory) {
         this.keyFactory = keyFactory;
+        this.injectBindingFactory = injectBindingFactory;
     }
 
     public void validateConstructor(ExecutableElement element) {
@@ -45,7 +50,7 @@ public final class InjectBindingValidator {
         if (!typeElement.getTypeParameters().isEmpty()) {
             throw new ValidationFailure("Type parameters are not allowed on element", typeElement);
         }
-        Map<Key, InjectBinding> m = keyFactory.injectBindings(typeElement);
+        Map<Key, InjectBinding> m = injectBindingFactory.injectBindings(typeElement);
         for (InjectBinding b : m.values()) {
             if (b.element().getKind() == ElementKind.METHOD) {
                 if (!b.element().getModifiers().contains(Modifier.STATIC)) {

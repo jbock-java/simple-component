@@ -2,11 +2,12 @@ package io.jbock.simple.processor;
 
 import io.jbock.simple.Component;
 import io.jbock.simple.Provides;
+import io.jbock.simple.processor.binding.ComponentElement;
+import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.graph.GraphFactory;
 import io.jbock.simple.processor.step.ComponentFactoryStep;
 import io.jbock.simple.processor.step.ComponentStep;
 import io.jbock.simple.processor.step.InjectStep;
-import io.jbock.simple.processor.util.ComponentElement;
 import io.jbock.simple.processor.writing.ComponentImpl;
 import io.jbock.simple.processor.writing.Generator;
 
@@ -46,8 +47,9 @@ interface ProcessorComponent {
     }
 
     @Provides
-    static Function<ComponentElement, GraphFactory> provideBindingRegistryFactory() {
-        return GraphFactory::create;
+    static Function<ComponentElement, GraphFactory> provideBindingRegistryFactory(
+            InjectBindingFactory injectBindingFactory) {
+        return component -> GraphFactory.create(component, injectBindingFactory);
     }
 
     @Provides

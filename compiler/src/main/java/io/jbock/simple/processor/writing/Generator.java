@@ -3,7 +3,7 @@ package io.jbock.simple.processor.writing;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.Key;
-import io.jbock.simple.processor.util.ComponentElement;
+import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.util.UniqueNameSet;
 
 import javax.lang.model.SourceVersion;

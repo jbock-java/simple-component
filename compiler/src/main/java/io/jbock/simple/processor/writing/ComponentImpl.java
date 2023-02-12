@@ -13,8 +13,8 @@ import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
-import io.jbock.simple.processor.util.ComponentElement;
-import io.jbock.simple.processor.util.FactoryElement;
+import io.jbock.simple.processor.binding.ComponentElement;
+import io.jbock.simple.processor.binding.FactoryElement;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.ExecutableElement;

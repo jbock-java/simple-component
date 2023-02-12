@@ -3,11 +3,12 @@ package io.jbock.simple.processor.graph;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
+import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
 import io.jbock.simple.processor.binding.ProviderBinding;
-import io.jbock.simple.processor.util.ComponentElement;
-import io.jbock.simple.processor.util.FactoryElement;
+import io.jbock.simple.processor.binding.ComponentElement;
+import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.util.ProviderType;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.ValidationFailure;
@@ -25,17 +26,22 @@ public class GraphFactory {
     private final Map<Key, ParameterBinding> parameterBindings;
     private final Map<Key, InjectBinding> providers;
     private final KeyFactory keyFactory;
+    private final InjectBindingFactory injectBindingFactory;
 
     private GraphFactory(
             Map<Key, ParameterBinding> parameterBindings,
             Map<Key, InjectBinding> providers,
-            KeyFactory keyFactory) {
+            KeyFactory keyFactory, 
+            InjectBindingFactory injectBindingFactory) {
         this.parameterBindings = parameterBindings;
         this.providers = providers;
         this.keyFactory = keyFactory;
+        this.injectBindingFactory = injectBindingFactory;
     }
 
-    public static GraphFactory create(ComponentElement componentElement) {
+    public static GraphFactory create(
+            ComponentElement componentElement,
+            InjectBindingFactory injectBindingFactory) {
         List<ParameterBinding> pBindings = componentElement.factoryElement()
                 .map(FactoryElement::parameterBindings)
                 .orElse(List.of());
@@ -48,7 +54,7 @@ public class GraphFactory {
                         p.asType() + ' ' + p.getSimpleName(), b.parameter());
             }
         }
-        return new GraphFactory(parameterBindings, componentElement.providers(), componentElement.qualifiers());
+        return new GraphFactory(parameterBindings, componentElement.providers(), componentElement.qualifiers(), injectBindingFactory);
     }
 
     private Binding getBinding(DependencyRequest request) {
@@ -66,7 +72,7 @@ public class GraphFactory {
                     }
                     ProviderType provider = providerType.orElseThrow();
                     Key innerKey = key.changeType(provider.innerType());
-                    return keyFactory.binding(innerKey)
+                    return injectBindingFactory.binding(innerKey)
                             .or(() -> Optional.ofNullable(providers.get(innerKey)))
                             .map(b -> new ProviderBinding(key, b, provider));
                 })

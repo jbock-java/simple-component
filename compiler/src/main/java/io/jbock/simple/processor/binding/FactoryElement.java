@@ -1,8 +1,7 @@
-package io.jbock.simple.processor.util;
+package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.ClassName;
-import io.jbock.simple.processor.binding.ParameterBinding;
-import io.jbock.simple.processor.binding.KeyFactory;
+import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;

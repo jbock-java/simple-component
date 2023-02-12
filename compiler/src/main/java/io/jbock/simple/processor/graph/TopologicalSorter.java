@@ -2,9 +2,9 @@ package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.ParameterBinding;
-import io.jbock.simple.processor.util.ComponentElement;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

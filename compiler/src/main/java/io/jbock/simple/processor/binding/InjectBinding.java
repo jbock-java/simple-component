@@ -1,14 +1,14 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.CodeBlock;
+import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 
@@ -44,7 +44,7 @@ public final class InjectBinding extends Binding {
 
     private final List<DependencyRequest> dependencies;
 
-    public InjectBinding(
+    private InjectBinding(
             Key key,
             ExecutableElement bindingElement,
             Function<CodeBlock, CodeBlock> invokeExpression,
@@ -55,34 +55,24 @@ public final class InjectBinding extends Binding {
         this.dependencies = dependencies;
     }
 
-    public static InjectBinding create(
-            Key key,
-            ExecutableElement bindingElement,
-            Function<CodeBlock, CodeBlock> invokeExpression,
-            KeyFactory keyFactory) {
-        List<DependencyRequest> dependencies = new ArrayList<>();
-        for (VariableElement parameter : bindingElement.getParameters()) {
-            dependencies.add(new DependencyRequest(keyFactory.getKey(parameter), parameter, keyFactory));
+    static InjectBinding create(
+            KeyFactory keyFactory,
+            ExecutableElement m,
+            InjectBindingFactory injectBindingFactory) {
+        Key key = keyFactory.getKey(m);
+        Function<CodeBlock, CodeBlock> invokeExpression;
+        if (m.getKind() == ElementKind.CONSTRUCTOR) {
+            if (key.qualifier().isPresent()) {
+                throw new ValidationFailure("Constructors can't have qualifiers", m);
+            }
+            invokeExpression = params -> CodeBlock.of("new $T($L)", m.getEnclosingElement().asType(), params);
+        } else {
+            invokeExpression = params -> CodeBlock.of("$T.$L($L)", m.getEnclosingElement().asType(), m.getSimpleName().toString(), params);
         }
-        return new InjectBinding(key, bindingElement, invokeExpression, dependencies);
-    }
-
-    public static InjectBinding createConstructor(
-            KeyFactory keyFactory,
-            ExecutableElement element) {
-        Key key = keyFactory.getKey(element);
-        return create(key, element,
-                params -> CodeBlock.of("new $T($L)", element.getEnclosingElement().asType(), params),
-                keyFactory);
-    }
-
-    public static InjectBinding createMethod(
-            KeyFactory keyFactory,
-            ExecutableElement element) {
-        Key key = keyFactory.getKey(element);
-        return InjectBinding.create(key, element,
-                params -> CodeBlock.of("$T.$L($L)", element.getEnclosingElement().asType(), element.getSimpleName().toString(), params),
-                keyFactory);
+        List<DependencyRequest> dependencies = m.getParameters().stream()
+                .map(parameter -> new DependencyRequest(keyFactory.getKey(parameter), parameter, injectBindingFactory))
+                .collect(Collectors.toList());
+        return new InjectBinding(key, m, invokeExpression, dependencies);
     }
 
     @Override

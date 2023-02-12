@@ -9,15 +9,15 @@ public final class DependencyRequest {
 
     private final Key key;
     private final Element requestingElement;
-    private final KeyFactory keyFactory;
+    private final InjectBindingFactory injectBindingFactory;
 
     public DependencyRequest(
             Key key,
             Element requestingElement,
-            KeyFactory keyFactory) {
+            InjectBindingFactory injectBindingFactory) {
         this.key = key;
         this.requestingElement = requestingElement;
-        this.keyFactory = keyFactory;
+        this.injectBindingFactory = injectBindingFactory;
     }
 
     public Key key() {
@@ -29,7 +29,7 @@ public final class DependencyRequest {
     }
 
     public Optional<Binding> binding() {
-        return keyFactory.binding(key).map(Function.identity());
+        return injectBindingFactory.binding(key).map(Function.identity());
     }
 
     @Override
