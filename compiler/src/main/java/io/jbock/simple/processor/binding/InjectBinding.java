@@ -21,7 +21,11 @@ public final class InjectBinding extends Binding {
 
     private final Function<CodeBlock, CodeBlock> invokeExpression;
 
-    private static final List<String> COMMON_PREFIXES = List.of("get", "provide");
+    private static final List<String> PROVIDES_METHOD_COMMON_PREFIXES = List.of(
+            "get",
+            "provides",
+            "provide",
+            "create");
 
     private final Supplier<String> signature = memoize(() -> {
         CodeBlock deps = dependencies().stream()
@@ -36,7 +40,7 @@ public final class InjectBinding extends Binding {
 
     private final Supplier<String> suggestedVariableName = memoize(() -> {
         if (element().getAnnotation(Provides.class) != null) {
-            return lowerFirst(removeCommonPrefix(element().getSimpleName().toString()));
+            return lowerFirst(removeMethodNamePrefix(element().getSimpleName().toString()));
         }
         TypeName typeName = key().typeName();
         if (typeName instanceof ParameterizedTypeName) {
@@ -45,8 +49,8 @@ public final class InjectBinding extends Binding {
         return lowerFirst(verySimpleTypeName(typeName.toString()));
     });
 
-    private static String removeCommonPrefix(String s) {
-        for (String p : COMMON_PREFIXES) {
+    private static String removeMethodNamePrefix(String s) {
+        for (String p : PROVIDES_METHOD_COMMON_PREFIXES) {
             if (s.startsWith(p) && s.length() > p.length()) {
                 return s.substring(p.length());
             }
@@ -148,6 +152,6 @@ public final class InjectBinding extends Binding {
 
     @Override
     public String toString() {
-        return "InjectBinding[" + "" + key() + ']';
+        return "InjectBinding[" + key() + ']';
     }
 }
