@@ -12,7 +12,7 @@ import static io.jbock.testing.compile.JavaFileObjects.forSourceLines;
 class ProvidesTest {
 
     @Test
-    void providedString() {
+    void providesString() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",
                 "",
@@ -60,7 +60,7 @@ class ProvidesTest {
     }
 
     @Test
-    void providedList() {
+    void providesFunction() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",
                 "",
@@ -68,10 +68,11 @@ class ProvidesTest {
                 "import io.jbock.simple.Inject;",
                 "import io.jbock.simple.Provides;",
                 "import java.util.function.Function;",
+                "import java.util.Map;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
-                "    @Inject A(Function<String, Integer> f) {}",
+                "    @Inject A(Map<String, Function<String, Integer>> f) {}",
                 "  }",
                 "",
                 "  static class B {",
@@ -82,7 +83,7 @@ class ProvidesTest {
                 "  interface AComponent {",
                 "    A getA();",
                 "",
-                "    @Provides static Function<String, Integer> getFunction(B b) { return null; }",
+                "    @Provides static Map<String, Function<String, Integer>> provideMyMap(B b) { return null; }",
                 "  }",
                 "}");
 
@@ -97,8 +98,8 @@ class ProvidesTest {
                         "",
                         "  private TestClass_AComponent_Impl() {",
                         "    TestClass.B b = new TestClass.B();",
-                        "    Function<String, Integer> function = TestClass.AComponent.getFunction(b);",
-                        "    this.a = new TestClass.A(function);",
+                        "    Map<String, Function<String, Integer>> myMap = TestClass.AComponent.provideMyMap(b);",
+                        "    this.a = new TestClass.A(myMap);",
                         "  }",
                         "",
                         "  @Override",

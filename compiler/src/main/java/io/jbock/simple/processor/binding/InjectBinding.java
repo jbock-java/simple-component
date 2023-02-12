@@ -1,6 +1,9 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.CodeBlock;
+import io.jbock.javapoet.ParameterizedTypeName;
+import io.jbock.javapoet.TypeName;
+import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.ElementKind;
@@ -18,6 +21,8 @@ public final class InjectBinding extends Binding {
 
     private final Function<CodeBlock, CodeBlock> invokeExpression;
 
+    private static final List<String> COMMON_PREFIXES = List.of("get", "provide");
+
     private final Supplier<String> signature = memoize(() -> {
         CodeBlock deps = dependencies().stream()
                 .map(d -> CodeBlock.of("$L", d.requestingElement().getSimpleName().toString()))
@@ -30,7 +35,39 @@ public final class InjectBinding extends Binding {
     });
 
     private final Supplier<String> suggestedVariableName = memoize(() -> {
-        String typeName = key().typeName().toString();
+        if (element().getAnnotation(Provides.class) != null) {
+            return lowerFirst(removeCommonPrefix(element().getSimpleName().toString()));
+        }
+        TypeName typeName = key().typeName();
+        if (typeName instanceof ParameterizedTypeName) {
+            return lowerFirst(simpleTypeName((ParameterizedTypeName) typeName));
+        }
+        return lowerFirst(verySimpleTypeName(typeName.toString()));
+    });
+
+    private static String removeCommonPrefix(String s) {
+        for (String p : COMMON_PREFIXES) {
+            if (s.startsWith(p) && s.length() > p.length()) {
+                return s.substring(p.length());
+            }
+        }
+        return s;
+    }
+
+    static String simpleTypeName(ParameterizedTypeName type) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type.rawType.simpleName());
+        for (TypeName typeName : type.typeArguments) {
+            if (typeName instanceof ParameterizedTypeName) {
+                sb.append(simpleTypeName((ParameterizedTypeName) typeName));
+            } else {
+                sb.append(verySimpleTypeName(typeName.toString()));
+            }
+        }
+        return sb.toString();
+    }
+
+    static String verySimpleTypeName(String typeName) {
         int i = typeName.indexOf('<');
         if (i >= 0) {
             typeName = typeName.substring(0, i);
@@ -39,8 +76,12 @@ public final class InjectBinding extends Binding {
         if (i >= 0) {
             typeName = typeName.substring(i + 1);
         }
-        return Character.toLowerCase(typeName.charAt(0)) + typeName.substring(1);
-    });
+        return typeName;
+    }
+
+    private static String lowerFirst(String s) {
+        return Character.toLowerCase(s.charAt(0)) + s.substring(1);
+    }
 
     private final List<DependencyRequest> dependencies;
 
