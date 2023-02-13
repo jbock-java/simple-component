@@ -1,9 +1,10 @@
 package io.jbock.simple.processor.writing;
 
 import io.jbock.javapoet.TypeSpec;
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ComponentElement;
+import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.util.UniqueNameSet;
 
 import javax.lang.model.SourceVersion;
@@ -16,6 +17,7 @@ public class Generator {
     private final ComponentImpl componentImpl;
     private final ComponentElement component;
 
+    @Inject
     public Generator(
             ComponentImpl componentImpl,
             ComponentElement component) {
@@ -24,7 +26,7 @@ public class Generator {
     }
 
     public TypeSpec generate(Set<Binding> sorted) {
-        return componentImpl.generate(component, addNames(sorted));
+        return componentImpl.generate(addNames(sorted));
     }
 
     Map<Key, NamedBinding> addNames(Set<Binding> sorted) {

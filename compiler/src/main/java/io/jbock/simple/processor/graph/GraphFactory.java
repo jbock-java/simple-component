@@ -1,16 +1,16 @@
 package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
+import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ParameterBinding;
 import io.jbock.simple.processor.binding.ProviderBinding;
-import io.jbock.simple.processor.binding.ComponentElement;
-import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.util.ProviderType;
-import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.VariableElement;
@@ -31,7 +31,7 @@ public class GraphFactory {
     private GraphFactory(
             Map<Key, ParameterBinding> parameterBindings,
             Map<Key, InjectBinding> providers,
-            KeyFactory keyFactory, 
+            KeyFactory keyFactory,
             InjectBindingFactory injectBindingFactory) {
         this.parameterBindings = parameterBindings;
         this.providers = providers;

@@ -10,11 +10,11 @@ import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.SimpleComponentProcessor;
 import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
+import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
-import io.jbock.simple.processor.binding.ComponentElement;
-import io.jbock.simple.processor.binding.FactoryElement;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.ExecutableElement;
@@ -31,13 +31,14 @@ import static javax.lang.model.element.Modifier.STATIC;
 
 public class ComponentImpl {
 
+    private final ComponentElement component;
+
     @Inject
-    public ComponentImpl() {
+    public ComponentImpl(ComponentElement component) {
+        this.component = component;
     }
 
-    TypeSpec generate(
-            ComponentElement component,
-            Map<Key, NamedBinding> sorted) {
+    TypeSpec generate(Map<Key, NamedBinding> sorted) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass()).addSuperinterface(component.element().asType());
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
         if (component.factoryElement().isEmpty()) {
@@ -81,7 +82,7 @@ public class ComponentImpl {
                     .returns(TypeName.get(factory.element().asType()))
                     .addStatement("return new $T()", factory.generatedClass())
                     .build());
-            spec.addType(createFactory(parameterBindings, component, factory));
+            spec.addType(createFactory(parameterBindings, factory));
         });
         for (ParameterBinding b : parameterBindings) {
             constructor.addParameter(b.parameterSpec());
@@ -96,9 +97,8 @@ public class ComponentImpl {
         return spec.build();
     }
 
-    private static TypeSpec createFactory(
+    private TypeSpec createFactory(
             List<ParameterBinding> parameterBindings,
-            ComponentElement component,
             FactoryElement factory) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
         spec.addModifiers(PRIVATE, STATIC, FINAL);

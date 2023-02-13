@@ -10,19 +10,21 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.Function;
 
 public final class TopologicalSorter {
 
-    private final Function<ComponentElement, GraphFactory> bindingRegistryFactory;
+    private final GraphFactory graphFactory;
+    private final ComponentElement component;
 
     @Inject
-    public TopologicalSorter(Function<ComponentElement, GraphFactory> bindingRegistryFactory) {
-        this.bindingRegistryFactory = bindingRegistryFactory;
+    public TopologicalSorter(
+            GraphFactory graphFactory,
+            ComponentElement component) {
+        this.graphFactory = graphFactory;
+        this.component = component;
     }
 
-    public Set<Binding> analyze(ComponentElement component) {
-        GraphFactory graphFactory = bindingRegistryFactory.apply(component);
+    public Set<Binding> analyze() {
         AccessibilityValidator validator = AccessibilityValidator.create(component);
         Graph graph = Graph.newGraph();
         for (DependencyRequest request : component.requests()) {

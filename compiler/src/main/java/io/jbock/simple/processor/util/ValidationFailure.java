@@ -2,6 +2,7 @@ package io.jbock.simple.processor.util;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
@@ -15,15 +16,11 @@ public final class ValidationFailure extends RuntimeException {
         this.about = about;
     }
 
-    public ValidationFailure prepend(String prefix) {
-        return new ValidationFailure(prefix + message, about);
-    }
-
-    public ValidationFailure about(Element about) {
-        return new ValidationFailure(message, about);
-    }
-
     public void writeTo(Messager messager) {
         messager.printMessage(ERROR, message, about);
+    }
+
+    public void writeTo(Messager messager, TypeElement component) {
+        messager.printMessage(ERROR, "While validating " + component.getSimpleName() + ": " + message, component);
     }
 }
