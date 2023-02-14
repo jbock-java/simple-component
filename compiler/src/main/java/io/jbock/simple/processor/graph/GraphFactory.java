@@ -1,9 +1,9 @@
 package io.jbock.simple.processor.graph;
 
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
-import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
@@ -13,10 +13,7 @@ import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ProviderType;
 import io.jbock.simple.processor.util.ValidationFailure;
 
-import javax.lang.model.element.VariableElement;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -28,33 +25,15 @@ public class GraphFactory {
     private final KeyFactory keyFactory;
     private final InjectBindingFactory injectBindingFactory;
 
-    private GraphFactory(
-            Map<Key, ParameterBinding> parameterBindings,
-            Map<Key, InjectBinding> providers,
+    @Inject
+    public GraphFactory(
+            ComponentElement componentElement,
             KeyFactory keyFactory,
             InjectBindingFactory injectBindingFactory) {
-        this.parameterBindings = parameterBindings;
-        this.providers = providers;
+        this.parameterBindings = componentElement.parameterBindings();
+        this.providers = componentElement.providers();
         this.keyFactory = keyFactory;
         this.injectBindingFactory = injectBindingFactory;
-    }
-
-    public static GraphFactory create(
-            ComponentElement componentElement,
-            InjectBindingFactory injectBindingFactory) {
-        List<ParameterBinding> pBindings = componentElement.factoryElement()
-                .map(FactoryElement::parameterBindings)
-                .orElse(List.of());
-        Map<Key, ParameterBinding> parameterBindings = new HashMap<>();
-        for (ParameterBinding b : pBindings) {
-            ParameterBinding previousBinding = parameterBindings.put(b.key(), b);
-            if (previousBinding != null) {
-                VariableElement p = previousBinding.parameter();
-                throw new ValidationFailure("The binding is in conflict with another parameter: " +
-                        p.asType() + ' ' + p.getSimpleName(), b.parameter());
-            }
-        }
-        return new GraphFactory(parameterBindings, componentElement.providers(), componentElement.qualifiers(), injectBindingFactory);
     }
 
     private Binding getBinding(DependencyRequest request) {

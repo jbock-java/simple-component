@@ -4,7 +4,6 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
@@ -56,20 +55,14 @@ public final class InjectBindingFactory {
         return result;
     }
 
-    private Optional<Element> keyElement(Key key) {
-        return tool.types().asElement(key.type());
-    }
-
     public Optional<InjectBinding> binding(Key key) {
-        return keyElement(key).flatMap(element -> binding(key, element));
-    }
-
-    public Optional<InjectBinding> binding(Key key, Element element) {
-        TypeElement typeElement = TYPE_ELEMENT_VISITOR.visit(element);
-        if (typeElement == null) {
-            return Optional.empty();
-        }
-        Map<Key, InjectBinding> m = injectBindings(typeElement);
-        return Optional.ofNullable(m.get(key));
+        return tool.types().asElement(key.type()).flatMap(element -> {
+            TypeElement typeElement = TYPE_ELEMENT_VISITOR.visit(element);
+            if (typeElement == null) {
+                return Optional.empty();
+            }
+            Map<Key, InjectBinding> m = injectBindings(typeElement);
+            return Optional.ofNullable(m.get(key));
+        });
     }
 }

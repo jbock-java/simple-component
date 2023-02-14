@@ -4,10 +4,8 @@ import io.jbock.simple.Component;
 import io.jbock.simple.Provides;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
-import io.jbock.simple.processor.graph.GraphFactory;
+import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.graph.TopologicalSorter;
-import io.jbock.simple.processor.util.SafeElements;
-import io.jbock.simple.processor.util.SafeTypes;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.writing.Generator;
 
@@ -19,34 +17,22 @@ public interface ContextComponent {
         ContextComponent create(
                 ComponentElement component,
                 InjectBindingFactory injectBindingFactory,
-                TypeTool tool);
+                KeyFactory keyFactory);
     }
 
     static ContextComponent create(
             ComponentElement component,
             InjectBindingFactory injectBindingFactory,
-            TypeTool tool) {
+            KeyFactory keyFactory) {
         return ContextComponent_Impl.factory().create(
                 component,
                 injectBindingFactory,
-                tool);
+                keyFactory);
     }
 
     @Provides
-    static SafeElements provideElements(TypeTool tool) {
-        return tool.elements();
-    }
-
-    @Provides
-    static SafeTypes provideTypes(TypeTool tool) {
-        return tool.types();
-    }
-
-    @Provides
-    static GraphFactory provideGraphFactory(
-            InjectBindingFactory injectBindingFactory,
-            ComponentElement component) {
-        return GraphFactory.create(component, injectBindingFactory);
+    static TypeTool provideTypeTool(KeyFactory keyFactory) {
+        return keyFactory.tool();
     }
 
     Generator generator();

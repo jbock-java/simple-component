@@ -10,6 +10,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -44,7 +45,7 @@ public final class ComponentElement {
             if (tel == null) {
                 return Optional.empty();
             }
-            return Optional.of(new FactoryElement(tel, generatedClass(), qualifiers()));
+            return Optional.of(new FactoryElement(tel, generatedClass(), keyFactory()));
         }
         return Optional.empty();
     });
@@ -65,8 +66,24 @@ public final class ComponentElement {
             if (method.getReturnType().getKind() == TypeKind.VOID) {
                 throw new ValidationFailure("The method may not return void", method);
             }
-            Key key = qualifiers().getKey(method);
+            Key key = keyFactory().getKey(method);
             result.put(key, new DependencyRequest(key, method, injectBindingCache()));
+        }
+        return result;
+    });
+
+    private final Supplier<Map<Key, ParameterBinding>> parameterBindings = memoize(() -> {
+        List<ParameterBinding> pBindings = factoryElement()
+                .map(FactoryElement::parameterBindings)
+                .orElse(List.of());
+        Map<Key, ParameterBinding> result = new LinkedHashMap<>();
+        for (ParameterBinding b : pBindings) {
+            ParameterBinding previousBinding = result.put(b.key(), b);
+            if (previousBinding != null) {
+                VariableElement p = previousBinding.parameter();
+                throw new ValidationFailure("The binding is in conflict with another parameter: " +
+                        p.asType() + ' ' + p.getSimpleName(), b.parameter());
+            }
         }
         return result;
     });
@@ -121,8 +138,12 @@ public final class ComponentElement {
         return generatedClass.get();
     }
 
-    public KeyFactory qualifiers() {
+    private KeyFactory keyFactory() {
         return keyFactory;
+    }
+
+    public Map<Key, ParameterBinding> parameterBindings() {
+        return parameterBindings.get();
     }
 
     private InjectBindingFactory injectBindingCache() {

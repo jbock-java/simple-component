@@ -69,7 +69,7 @@ public class ComponentStep implements Step {
                         throw new ValidationFailure("Factory method must return the component type", method);
                     }
                 });
-                ContextComponent componentComponent = ContextComponent.create(component, injectBindingFactory, tool);
+                ContextComponent componentComponent = ContextComponent.create(component, injectBindingFactory, keyFactory);
                 Generator generator = componentComponent.generator();
                 Set<Binding> sorted = componentComponent.topologicalSorter().analyze();
                 TypeSpec typeSpec = generator.generate(sorted);
