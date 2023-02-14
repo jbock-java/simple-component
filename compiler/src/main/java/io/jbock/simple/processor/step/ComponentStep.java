@@ -62,7 +62,7 @@ public class ComponentStep implements Step {
         for (TypeElement typeElement : typeElements) {
             try {
                 typeElementValidator.validate(typeElement);
-                ComponentElement component = ComponentElement.create(typeElement, keyFactory, injectBindingFactory);
+                ComponentElement component = ComponentElement.create(typeElement, keyFactory);
                 component.factoryElement().ifPresent(factory -> {
                     ExecutableElement method = factory.singleAbstractMethod();
                     if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
@@ -71,7 +71,7 @@ public class ComponentStep implements Step {
                 });
                 ContextComponent componentComponent = ContextComponent.create(component, injectBindingFactory, keyFactory);
                 Generator generator = componentComponent.generator();
-                Set<Binding> sorted = componentComponent.topologicalSorter().analyze();
+                List<Binding> sorted = componentComponent.topologicalSorter().sortedBindings();
                 TypeSpec typeSpec = generator.generate(sorted);
                 specWriter.write(component.generatedClass(), typeSpec);
             } catch (ValidationFailure f) {

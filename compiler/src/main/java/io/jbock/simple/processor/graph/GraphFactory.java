@@ -4,15 +4,14 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
-import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
-import io.jbock.simple.processor.binding.ParameterBinding;
 import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ProviderType;
 import io.jbock.simple.processor.util.ValidationFailure;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -20,42 +19,47 @@ import java.util.Set;
 
 public class GraphFactory {
 
-    private final Map<Key, ParameterBinding> parameterBindings;
-    private final Map<Key, InjectBinding> providers;
+    private final ComponentElement component;
     private final KeyFactory keyFactory;
     private final InjectBindingFactory injectBindingFactory;
+    private final Map<Key, Binding> bindingCache = new HashMap<>();
 
     @Inject
     public GraphFactory(
-            ComponentElement componentElement,
+            ComponentElement component,
             KeyFactory keyFactory,
             InjectBindingFactory injectBindingFactory) {
-        this.parameterBindings = componentElement.parameterBindings();
-        this.providers = componentElement.providers();
+        this.component = component;
         this.keyFactory = keyFactory;
         this.injectBindingFactory = injectBindingFactory;
     }
 
     private Binding getBinding(DependencyRequest request) {
         Key key = request.key();
-        ParameterBinding parameterBinding = parameterBindings.get(key);
-        if (parameterBinding != null) {
-            return parameterBinding; // takes precedence
+        Binding result = bindingCache.get(key);
+        if (result != null) {
+            return result;
         }
-        return request.binding()
-                .or(() -> Optional.ofNullable(providers.get(key)))
-                .or(() -> {
-                    Optional<ProviderType> providerType = keyFactory.tool().getProviderType(request.key().type());
-                    if (providerType.isEmpty()) {
-                        return Optional.empty();
-                    }
-                    ProviderType provider = providerType.orElseThrow();
-                    Key innerKey = key.changeType(provider.innerType());
-                    return injectBindingFactory.binding(innerKey)
-                            .or(() -> Optional.ofNullable(providers.get(innerKey)))
-                            .map(b -> new ProviderBinding(key, b, provider));
-                })
+        result = component.parameterBinding(key)
+                .or(() -> injectBindingFactory.binding(key))
+                .or(() -> Optional.ofNullable(component.providesBindings().get(key)))
+                .or(() -> providerBinding(key))
                 .orElseThrow(() -> new ValidationFailure("Binding not found", request.requestingElement()));
+        bindingCache.put(key, result);
+        return result;
+    }
+
+    private Optional<Binding> providerBinding(Key key) {
+        Optional<ProviderType> providerType = keyFactory.tool().getProviderType(key.type());
+        if (providerType.isEmpty()) {
+            return Optional.empty();
+        }
+        ProviderType provider = providerType.orElseThrow();
+        Key innerKey = key.changeType(provider.innerType());
+        return component.parameterBinding(innerKey)
+                .or(() -> injectBindingFactory.binding(innerKey))
+                .or(() -> Optional.ofNullable(component.providesBindings().get(innerKey)))
+                .map(b -> new ProviderBinding(key, b, provider));
     }
 
     Graph getGraph(DependencyRequest request) {

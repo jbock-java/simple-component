@@ -45,7 +45,7 @@ public final class InjectBindingFactory {
         }
         result = new LinkedHashMap<>();
         for (ExecutableElement m : allMembers) {
-            InjectBinding b = InjectBinding.create(keyFactory, m, this);
+            InjectBinding b = InjectBinding.create(keyFactory, m);
             InjectBinding previous = result.put(b.key(), b);
             if (previous != null) {
                 throw new ValidationFailure("This binding clashes with " + previous.signature() + ", consider a (different) qualifier", b.element());
@@ -55,7 +55,7 @@ public final class InjectBindingFactory {
         return result;
     }
 
-    public Optional<InjectBinding> binding(Key key) {
+    public Optional<Binding> binding(Key key) {
         return tool.types().asElement(key.type()).flatMap(element -> {
             TypeElement typeElement = TYPE_ELEMENT_VISITOR.visit(element);
             if (typeElement == null) {

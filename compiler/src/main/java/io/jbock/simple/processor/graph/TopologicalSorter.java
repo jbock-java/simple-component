@@ -7,9 +7,9 @@ import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.ParameterBinding;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 public final class TopologicalSorter {
 
@@ -24,7 +24,7 @@ public final class TopologicalSorter {
         this.component = component;
     }
 
-    public Set<Binding> analyze() {
+    public List<Binding> sortedBindings() {
         AccessibilityValidator validator = AccessibilityValidator.create(component);
         Graph graph = Graph.newGraph();
         for (DependencyRequest request : component.requests()) {
@@ -35,12 +35,12 @@ public final class TopologicalSorter {
                 validator.checkAccessible(binding.element());
             }
         }
-        return sortNodes(graph);
+        return sort(graph);
     }
 
     // https://en.wikipedia.org/wiki/Topological_sorting
-    Set<Binding> sortNodes(Graph graph) {
-        Set<Binding> result = new LinkedHashSet<>();
+    List<Binding> sort(Graph graph) {
+        List<Binding> result = new ArrayList<>(graph.nodes().size());
         Deque<Binding> s = new ArrayDeque<>(graph.startNodes());
         while (!s.isEmpty()) {
             Binding n = s.pop();

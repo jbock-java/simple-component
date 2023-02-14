@@ -102,8 +102,7 @@ public final class InjectBinding extends Binding {
 
     static InjectBinding create(
             KeyFactory keyFactory,
-            ExecutableElement m,
-            InjectBindingFactory injectBindingFactory) {
+            ExecutableElement m) {
         Key key = keyFactory.getKey(m);
         Function<CodeBlock, CodeBlock> invokeExpression;
         if (m.getKind() == ElementKind.CONSTRUCTOR) {
@@ -115,7 +114,7 @@ public final class InjectBinding extends Binding {
             invokeExpression = params -> CodeBlock.of("$T.$L($L)", m.getEnclosingElement().asType(), m.getSimpleName().toString(), params);
         }
         List<DependencyRequest> dependencies = m.getParameters().stream()
-                .map(parameter -> new DependencyRequest(keyFactory.getKey(parameter), parameter, injectBindingFactory))
+                .map(parameter -> new DependencyRequest(keyFactory.getKey(parameter), parameter))
                 .collect(Collectors.toList());
         return new InjectBinding(key, m, invokeExpression, dependencies);
     }

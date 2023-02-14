@@ -9,8 +9,8 @@ import io.jbock.simple.processor.util.UniqueNameSet;
 
 import javax.lang.model.SourceVersion;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class Generator {
 
@@ -25,11 +25,11 @@ public class Generator {
         this.component = component;
     }
 
-    public TypeSpec generate(Set<Binding> sorted) {
+    public TypeSpec generate(List<Binding> sorted) {
         return componentImpl.generate(addNames(sorted));
     }
 
-    Map<Key, NamedBinding> addNames(Set<Binding> sorted) {
+    Map<Key, NamedBinding> addNames(List<Binding> sorted) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
         for (Binding b : sorted) {

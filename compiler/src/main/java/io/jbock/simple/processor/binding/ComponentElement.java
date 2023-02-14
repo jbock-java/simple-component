@@ -26,7 +26,6 @@ public final class ComponentElement {
 
     private final TypeElement element;
     private final KeyFactory keyFactory;
-    private final InjectBindingFactory injectBindingFactory;
 
     private final Supplier<ClassName> generatedClass = memoize(() -> {
         ClassName className = ClassName.get(element());
@@ -67,7 +66,7 @@ public final class ComponentElement {
                 throw new ValidationFailure("The method may not return void", method);
             }
             Key key = keyFactory().getKey(method);
-            result.put(key, new DependencyRequest(key, method, injectBindingCache()));
+            result.put(key, new DependencyRequest(key, method));
         }
         return result;
     });
@@ -90,18 +89,15 @@ public final class ComponentElement {
 
     private ComponentElement(
             TypeElement element,
-            KeyFactory keyFactory,
-            InjectBindingFactory injectBindingFactory) {
+            KeyFactory keyFactory) {
         this.element = element;
         this.keyFactory = keyFactory;
-        this.injectBindingFactory = injectBindingFactory;
     }
 
     public static ComponentElement create(
             TypeElement element,
-            KeyFactory keyFactory,
-            InjectBindingFactory injectBindingFactory) {
-        return new ComponentElement(element, keyFactory, injectBindingFactory);
+            KeyFactory keyFactory) {
+        return new ComponentElement(element, keyFactory);
     }
 
     public TypeElement element() {
@@ -120,7 +116,7 @@ public final class ComponentElement {
         return requests.get().values();
     }
 
-    public Map<Key, InjectBinding> providers() {
+    public Map<Key, InjectBinding> providesBindings() {
         List<ExecutableElement> methods = methodsIn(element.getEnclosedElements());
         Map<Key, InjectBinding> result = new LinkedHashMap<>();
         for (ExecutableElement method : methods) {
@@ -128,7 +124,7 @@ public final class ComponentElement {
                 continue; // ignore
             }
             Key key = keyFactory.getKey(method);
-            InjectBinding b = InjectBinding.create(keyFactory, method, injectBindingCache());
+            InjectBinding b = InjectBinding.create(keyFactory, method);
             result.put(key, b);
         }
         return result;
@@ -142,11 +138,7 @@ public final class ComponentElement {
         return keyFactory;
     }
 
-    public Map<Key, ParameterBinding> parameterBindings() {
-        return parameterBindings.get();
-    }
-
-    private InjectBindingFactory injectBindingCache() {
-        return injectBindingFactory;
+    public Optional<Binding> parameterBinding(Key key) {
+        return Optional.ofNullable(parameterBindings.get().get(key));
     }
 }

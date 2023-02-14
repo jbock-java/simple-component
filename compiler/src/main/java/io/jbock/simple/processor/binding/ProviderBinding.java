@@ -3,18 +3,18 @@ package io.jbock.simple.processor.binding;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.simple.processor.util.ProviderType;
 
-import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.function.Function;
 
 public class ProviderBinding extends Binding {
 
-    private final InjectBinding sourceBinding;
+    private final Binding sourceBinding;
     private final ProviderType providerType;
 
     public ProviderBinding(
             Key key,
-            InjectBinding sourceBinding,
+            Binding sourceBinding,
             ProviderType providerType) {
         super(key);
         this.sourceBinding = sourceBinding;
@@ -22,7 +22,7 @@ public class ProviderBinding extends Binding {
     }
 
     @Override
-    public ExecutableElement element() {
+    public Element element() {
         return sourceBinding.element();
     }
 
