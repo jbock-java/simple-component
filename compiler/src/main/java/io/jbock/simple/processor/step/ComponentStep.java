@@ -10,14 +10,16 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.SpecWriter;
-import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.validation.ExecutableElementValidator;
+import io.jbock.simple.processor.validation.TypeElementValidator;
 import io.jbock.simple.processor.writing.Generator;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
@@ -31,6 +33,7 @@ public class ComponentStep implements Step {
     private final TypeTool tool;
     private final KeyFactory keyFactory;
     private final TypeElementValidator typeElementValidator;
+    private final ExecutableElementValidator executableElementValidator;
     private final SpecWriter specWriter;
     private final InjectBindingFactory injectBindingFactory;
 
@@ -40,12 +43,14 @@ public class ComponentStep implements Step {
             TypeTool tool,
             KeyFactory keyFactory,
             TypeElementValidator typeElementValidator,
+            ExecutableElementValidator executableElementValidator,
             SpecWriter specWriter,
             InjectBindingFactory injectBindingFactory) {
         this.messager = messager;
         this.tool = tool;
         this.keyFactory = keyFactory;
         this.typeElementValidator = typeElementValidator;
+        this.executableElementValidator = executableElementValidator;
         this.specWriter = specWriter;
         this.injectBindingFactory = injectBindingFactory;
     }
@@ -61,23 +66,32 @@ public class ComponentStep implements Step {
         List<TypeElement> typeElements = ElementFilter.typesIn(elements);
         for (TypeElement typeElement : typeElements) {
             try {
-                typeElementValidator.validate(typeElement);
-                ComponentElement component = ComponentElement.create(typeElement, keyFactory);
-                component.factoryElement().ifPresent(factory -> {
-                    ExecutableElement method = factory.singleAbstractMethod();
-                    if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
-                        throw new ValidationFailure("Factory method must return the component type", method);
-                    }
-                });
-                ContextComponent componentComponent = ContextComponent.create(component, injectBindingFactory, keyFactory);
-                Generator generator = componentComponent.generator();
-                List<Binding> sorted = componentComponent.topologicalSorter().sortedBindings();
-                TypeSpec typeSpec = generator.generate(sorted);
-                specWriter.write(component.generatedClass(), typeSpec);
+                process(typeElement);
             } catch (ValidationFailure f) {
                 f.writeTo(messager, typeElement);
             }
         }
         return Set.of();
+    }
+
+    private void process(TypeElement typeElement) {
+        typeElementValidator.validate(typeElement);
+        ComponentElement component = ComponentElement.create(typeElement, keyFactory);
+        component.factoryElement().ifPresent(factory -> {
+            ExecutableElement method = factory.singleAbstractMethod();
+            if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
+                throw new ValidationFailure("Factory method must return the component type", method);
+            }
+        });
+        for (ExecutableElement m : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
+            if (m.getModifiers().contains(Modifier.ABSTRACT)) {
+                executableElementValidator.validate(m);
+            }
+        }
+        ContextComponent componentComponent = ContextComponent.create(component, injectBindingFactory, keyFactory);
+        Generator generator = componentComponent.generator();
+        List<Binding> sorted = componentComponent.topologicalSorter().sortedBindings();
+        TypeSpec typeSpec = generator.generate(sorted);
+        specWriter.write(component.generatedClass(), typeSpec);
     }
 }

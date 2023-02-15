@@ -3,11 +3,14 @@ package io.jbock.simple.processor.step;
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.validation.ExecutableElementValidator;
+import io.jbock.simple.processor.validation.TypeElementValidator;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
@@ -18,14 +21,17 @@ import java.util.stream.Collectors;
 public class ComponentFactoryStep implements Step {
 
     private final TypeElementValidator validator;
+    private final ExecutableElementValidator executableElementValidator;
     private final Messager messager;
 
     @Inject
     public ComponentFactoryStep(
             Messager messager,
-            TypeElementValidator validator) {
+            TypeElementValidator validator,
+            ExecutableElementValidator executableElementValidator) {
         this.messager = messager;
         this.validator = validator;
+        this.executableElementValidator = executableElementValidator;
     }
 
     @Override
@@ -51,6 +57,11 @@ public class ComponentFactoryStep implements Step {
                         .filter(enclosed -> enclosed.getAnnotation(Component.Factory.class) != null)
                         .count() >= 2) {
                     throw new ValidationFailure("Found more than one @Factory", enclosing);
+                }
+                for (ExecutableElement m : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
+                    if (m.getModifiers().contains(Modifier.ABSTRACT)) {
+                        executableElementValidator.validate(m);
+                    }
                 }
             }
         } catch (ValidationFailure f) {

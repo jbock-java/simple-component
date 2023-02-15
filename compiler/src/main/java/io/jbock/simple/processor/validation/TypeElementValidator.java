@@ -1,6 +1,7 @@
-package io.jbock.simple.processor.util;
+package io.jbock.simple.processor.validation;
 
 import io.jbock.simple.Inject;
+import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;

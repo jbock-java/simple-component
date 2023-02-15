@@ -2,13 +2,11 @@ package io.jbock.simple.processor.validation;
 
 import io.jbock.javapoet.TypeName;
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.util.TypeElementValidator;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.Optional;
@@ -27,9 +25,6 @@ public final class ExecutableElementValidator {
     }
 
     public void validate(ExecutableElement element) {
-        if (element.getModifiers().contains(Modifier.DEFAULT)) {
-            throw new ValidationFailure("The default modifier is not allowed here", element);
-        }
         if (!element.getTypeParameters().isEmpty()) {
             throw new ValidationFailure("Type parameters are not allowed here", element);
         }
