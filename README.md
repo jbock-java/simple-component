@@ -27,7 +27,7 @@ A `@Provides` method must be `static`.
 There is no `@Binds`.
 It can be emulated with a `@Provides` method, or, if you control the source code of the interface, a static `@Inject` method.
 
-There is no need for the `@BindsInstance` annotation.
+There is no need for the `@BindsInstance` annotation: *every* factory parameter is a bound instance.
 
 There is no `@AssistedInject`, it's a can of worms.
 
