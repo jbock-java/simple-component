@@ -23,6 +23,9 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
+/**
+ * String-based qualifier.
+ */
 @Qualifier
 @Target({METHOD, PARAMETER})
 @Retention(SOURCE)
