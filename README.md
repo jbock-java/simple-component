@@ -31,6 +31,8 @@ There is no need for the `@BindsInstance` annotation.
 
 There is no `@AssistedInject`, it's a can of worms.
 
+There is no `@IntoList` or `@IntoSet`, you can return these collections from a `@Provides` method.
+
 ### Do more with less
 
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
