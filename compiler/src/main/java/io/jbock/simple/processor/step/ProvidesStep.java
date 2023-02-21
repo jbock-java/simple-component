@@ -41,10 +41,10 @@ public class ProvidesStep implements Step {
             List<ExecutableElement> methods = ElementFilter.methodsIn(elements);
             for (ExecutableElement m : methods) {
                 if (!m.getModifiers().contains(Modifier.STATIC)) {
-                    throw new ValidationFailure("The method must be static", m);
+                    throw new ValidationFailure("The @Provides method must be static", m);
                 }
                 if (m.getReturnType().getKind() == TypeKind.VOID) {
-                    throw new ValidationFailure("The method may not return void", m);
+                    throw new ValidationFailure("The @Provides method may not return void", m);
                 }
                 Element enclosing = m.getEnclosingElement();
                 if (enclosing.getAnnotation(Component.class) == null) {

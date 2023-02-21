@@ -40,7 +40,6 @@ public final class Visitors {
         }
     };
 
-
     private Visitors() {
     }
 }

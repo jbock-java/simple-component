@@ -12,6 +12,7 @@ public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
         ProcessorComponent component = ProcessorComponent_Impl.factory().create(processingEnv);
         return List.of(
                 component.injectStep(),
+                component.providesStep(),
                 component.componentStep(),
                 component.componentFactoryStep());
     }

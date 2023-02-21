@@ -56,14 +56,17 @@ public final class ComponentElement {
             if (method.getModifiers().contains(Modifier.STATIC)) {
                 continue; // ignore
             }
+            if (method.getAnnotation(Provides.class) != null) {
+                continue; // ignore
+            }
             if (!method.getParameters().isEmpty()) {
-                throw new ValidationFailure("The method may not have any parameters", method);
+                throw new ValidationFailure("Request method may not have any parameters", method);
             }
             if (method.getModifiers().contains(Modifier.DEFAULT)) {
-                throw new ValidationFailure("Default method is not allowed here", method);
+                throw new ValidationFailure("Default modifier is not allowed here", method);
             }
             if (method.getReturnType().getKind() == TypeKind.VOID) {
-                throw new ValidationFailure("The method may not return void", method);
+                throw new ValidationFailure("Request method may not return void", method);
             }
             Key key = keyFactory().getKey(method);
             result.put(key, new DependencyRequest(key, method));

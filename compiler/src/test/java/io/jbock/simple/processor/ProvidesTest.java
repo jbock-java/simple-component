@@ -108,4 +108,36 @@ class ProvidesTest {
                         "  }",
                         "}");
     }
+
+
+    @Test
+    void nonstaticProvidesMethod() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "",
+                "import io.jbock.simple.Component;",
+                "import io.jbock.simple.Inject;",
+                "import io.jbock.simple.Provides;",
+                "",
+                "final class TestClass {",
+                "  static class A {",
+                "    @Inject A(String s) {}",
+                "  }",
+                "",
+                "  static class B {",
+                "    @Inject B() {}",
+                "  }",
+                "",
+                "  @Component",
+                "  interface AComponent {",
+                "    A getA();",
+                "",
+                "    @Provides default String getString() { return null; }",
+                "  }",
+                "}");
+
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).failed();
+        assertThat(compilation).hadErrorContaining("The @Provides method must be static");
+    }
 }

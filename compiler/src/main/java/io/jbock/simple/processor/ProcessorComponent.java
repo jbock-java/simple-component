@@ -5,6 +5,7 @@ import io.jbock.simple.Provides;
 import io.jbock.simple.processor.step.ComponentFactoryStep;
 import io.jbock.simple.processor.step.ComponentStep;
 import io.jbock.simple.processor.step.InjectStep;
+import io.jbock.simple.processor.step.ProvidesStep;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -43,6 +44,8 @@ interface ProcessorComponent {
     ComponentStep componentStep();
 
     InjectStep injectStep();
+
+    ProvidesStep providesStep();
 
     ComponentFactoryStep componentFactoryStep();
 }

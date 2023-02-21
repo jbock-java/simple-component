@@ -3,8 +3,6 @@ package io.jbock.simple.processor.util;
 import io.jbock.simple.Inject;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.type.PrimitiveType;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.Optional;
