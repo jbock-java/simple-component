@@ -33,6 +33,8 @@ There is no `@AssistedInject`, it's a can of worms.
 
 There is no `@IntoList` or `@IntoSet`, you can return these collections from a `@Provides` method.
 
+There is no `Lazy<T>`, please be sure `Provider<T>` does not cover your case before opening an issue.
+
 ### Do more with less
 
 * Works with both `javax.inject.Inject` or `jakarta.inject.Inject`.
