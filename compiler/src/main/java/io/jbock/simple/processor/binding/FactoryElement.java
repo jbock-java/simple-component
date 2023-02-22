@@ -37,11 +37,6 @@ public class FactoryElement {
         return method;
     });
 
-    private final Supplier<List<ParameterBinding>> parameterBindings = memoize(() ->
-            singleAbstractMethod().getParameters().stream()
-                    .map(p -> ParameterBinding.create(p, qualifiers()))
-                    .collect(Collectors.toList()));
-
     FactoryElement(
             TypeElement element,
             ClassName parentClass,
@@ -63,8 +58,10 @@ public class FactoryElement {
         return singleAbstractMethod.get();
     }
 
-    public List<ParameterBinding> parameterBindings() {
-        return parameterBindings.get();
+    List<ParameterBinding> parameterBindings() {
+        return singleAbstractMethod().getParameters().stream()
+                .map(p -> ParameterBinding.create(p, qualifiers()))
+                .collect(Collectors.toList());
     }
 
     private KeyFactory qualifiers() {

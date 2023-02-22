@@ -18,7 +18,7 @@ import io.jbock.simple.processor.binding.ParameterBinding;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.ExecutableElement;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -63,9 +63,6 @@ public class ComponentImpl {
                 constructor.addStatement("$T $N = $L", b.key().typeName(), param, b.invocation(names));
             }
         }
-        List<ParameterBinding> parameterBindings = component.factoryElement()
-                .map(FactoryElement::parameterBindings)
-                .orElse(List.of());
         for (DependencyRequest r : component.requests()) {
             MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestingElement().getSimpleName().toString());
             method.addStatement("return $L", sorted.get(r.key()).name());
@@ -82,9 +79,9 @@ public class ComponentImpl {
                     .returns(TypeName.get(factory.element().asType()))
                     .addStatement("return new $T()", factory.generatedClass())
                     .build());
-            spec.addType(createFactory(parameterBindings, factory));
+            spec.addType(createFactory(factory));
         });
-        for (ParameterBinding b : parameterBindings) {
+        for (ParameterBinding b : component.parameterBindings()) {
             constructor.addParameter(b.parameterSpec());
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
@@ -98,8 +95,8 @@ public class ComponentImpl {
     }
 
     private TypeSpec createFactory(
-            List<ParameterBinding> parameterBindings,
             FactoryElement factory) {
+        Collection<ParameterBinding> parameterBindings = component.parameterBindings();
         TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
         spec.addModifiers(PRIVATE, STATIC, FINAL);
         spec.addSuperinterface(factory.element().asType());

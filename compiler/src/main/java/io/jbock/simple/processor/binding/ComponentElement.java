@@ -49,6 +49,20 @@ public final class ComponentElement {
         return Optional.empty();
     });
 
+    private final Supplier<Map<Key, InjectBinding>> providesBindings = memoize(() -> {
+        List<ExecutableElement> methods = methodsIn(element().getEnclosedElements());
+        Map<Key, InjectBinding> result = new LinkedHashMap<>();
+        for (ExecutableElement method : methods) {
+            if (method.getAnnotation(Provides.class) == null) {
+                continue; // ignore
+            }
+            Key key = keyFactory().getKey(method);
+            InjectBinding b = InjectBinding.create(keyFactory(), method);
+            result.put(key, b);
+        }
+        return result;
+    });
+
     private final Supplier<Map<Key, DependencyRequest>> requests = memoize(() -> {
         List<ExecutableElement> methods = methodsIn(element().getEnclosedElements());
         Map<Key, DependencyRequest> result = new LinkedHashMap<>();
@@ -120,17 +134,7 @@ public final class ComponentElement {
     }
 
     public Map<Key, InjectBinding> providesBindings() {
-        List<ExecutableElement> methods = methodsIn(element.getEnclosedElements());
-        Map<Key, InjectBinding> result = new LinkedHashMap<>();
-        for (ExecutableElement method : methods) {
-            if (method.getAnnotation(Provides.class) == null) {
-                continue; // ignore
-            }
-            Key key = keyFactory.getKey(method);
-            InjectBinding b = InjectBinding.create(keyFactory, method);
-            result.put(key, b);
-        }
-        return result;
+        return providesBindings.get();
     }
 
     public ClassName generatedClass() {
@@ -143,5 +147,9 @@ public final class ComponentElement {
 
     public Optional<Binding> parameterBinding(Key key) {
         return Optional.ofNullable(parameterBindings.get().get(key));
+    }
+
+    public Collection<ParameterBinding> parameterBindings() {
+        return parameterBindings.get().values();
     }
 }
