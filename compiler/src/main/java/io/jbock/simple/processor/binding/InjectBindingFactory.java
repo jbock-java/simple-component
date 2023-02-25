@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.simple.Inject;
+import io.jbock.simple.processor.util.ClearableCache;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 import static io.jbock.simple.processor.util.Visitors.EXECUTABLE_ELEMENT_VISITOR;
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
-public final class InjectBindingFactory {
+public final class InjectBindingFactory implements ClearableCache {
 
     private final Map<TypeElement, Map<Key, InjectBinding>> injectBindingCache = new HashMap<>();
 
@@ -64,5 +65,10 @@ public final class InjectBindingFactory {
             Map<Key, InjectBinding> m = injectBindings(typeElement);
             return Optional.ofNullable(m.get(key));
         });
+    }
+
+    @Override
+    public void clearCache() {
+        injectBindingCache.clear();
     }
 }

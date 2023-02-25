@@ -48,7 +48,9 @@ public class GraphFactory {
                 .or(() -> injectBindingFactory.binding(key))
                 .or(() -> Optional.ofNullable(component.providesBindings().get(key)))
                 .or(() -> providerBinding(key));
-        bindingCache.put(key, result);
+        if (result.isPresent()) {
+            bindingCache.put(key, result);
+        }
         return result;
     }
 

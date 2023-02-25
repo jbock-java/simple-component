@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.simple.Inject;
+import io.jbock.simple.processor.util.ClearableCache;
 import io.jbock.simple.processor.util.SimpleAnnotation;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
 
-public class KeyFactory {
+public class KeyFactory implements ClearableCache {
 
     private final TypeTool tool;
     private final Map<Element, Key> keyCache = new HashMap<>();
@@ -75,5 +76,10 @@ public class KeyFactory {
         DeclaredType type = mirror.getAnnotationType();
         TypeElement element = TYPE_ELEMENT_VISITOR.visit(type.asElement());
         return tool.hasQualifierAnnotation(element);
+    }
+
+    @Override
+    public void clearCache() {
+        keyCache.clear();
     }
 }
