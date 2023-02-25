@@ -27,8 +27,8 @@ public class ProviderBinding extends Binding {
     }
 
     @Override
-    public List<DependencyRequest> dependencies() {
-        return sourceBinding.dependencies();
+    public List<DependencyRequest> requests() {
+        return sourceBinding.requests();
     }
 
     @Override

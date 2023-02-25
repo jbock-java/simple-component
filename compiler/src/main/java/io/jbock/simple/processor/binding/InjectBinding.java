@@ -28,7 +28,7 @@ public final class InjectBinding extends Binding {
             "create");
 
     private final Supplier<String> signature = memoize(() -> {
-        CodeBlock deps = dependencies().stream()
+        CodeBlock deps = requests().stream()
                 .map(d -> CodeBlock.of("$L", d.requestingElement().getSimpleName().toString()))
                 .collect(CodeBlock.joining(", "));
         if (element().getKind() == ElementKind.CONSTRUCTOR) {
@@ -114,7 +114,7 @@ public final class InjectBinding extends Binding {
             invokeExpression = params -> CodeBlock.of("$T.$L($L)", m.getEnclosingElement().asType(), m.getSimpleName().toString(), params);
         }
         List<DependencyRequest> dependencies = m.getParameters().stream()
-                .map(parameter -> new DependencyRequest(keyFactory.getKey(parameter), parameter))
+                .map(parameter -> new DependencyRequest(keyFactory.getKey(parameter), parameter, m))
                 .collect(Collectors.toList());
         return new InjectBinding(key, m, invokeExpression, dependencies);
     }
@@ -130,7 +130,7 @@ public final class InjectBinding extends Binding {
     }
 
     @Override
-    public List<DependencyRequest> dependencies() {
+    public List<DependencyRequest> requests() {
         return dependencies;
     }
 
@@ -140,7 +140,7 @@ public final class InjectBinding extends Binding {
 
     @Override
     public CodeBlock invocation(Function<Key, String> names) {
-        return invokeExpression(dependencies().stream()
+        return invokeExpression(requests().stream()
                 .map(d -> CodeBlock.of("$L", names.apply(d.key())))
                 .collect(CodeBlock.joining(", ")));
     }

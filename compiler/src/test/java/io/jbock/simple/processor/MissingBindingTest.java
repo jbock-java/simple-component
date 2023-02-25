@@ -2,7 +2,6 @@ package io.jbock.simple.processor;
 
 import io.jbock.testing.compile.Compilation;
 import io.jbock.testing.compile.JavaFileObjects;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.tools.JavaFileObject;
@@ -34,12 +33,11 @@ class MissingBindingTest {
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContainingMatch("String cannot be provided without an @Inject constructor")
+        assertThat(compilation).hadErrorContainingMatch("java.lang.String cannot be provided.")
                 .inFile(component)
                 .onLineContaining("interface AComponent");
     }
 
-    @Disabled("TODO MissingBindingPrinter")
     @Test
     void bindsMethodAppearsInTrace() {
         JavaFileObject component =
@@ -72,12 +70,11 @@ class MissingBindingTest {
         assertThat(compilation)
                 .hadErrorContaining(
                         TestUtils.message(
-                                "String cannot be provided without an @Inject constructor or an "
-                                        + "@Provides-annotated method.",
-                                "    String is injected at",
-                                "        TestImplementation(missingBinding)",
+                                "java.lang.String cannot be provided.",
+                                "    java.lang.String is injected at",
+                                "        TestImplementation(java.lang.String)",
                                 "    TestImplementation is injected at",
-                                "        TestModule.bindTestInterface(implementation)",
+                                "        TestComponent.bindTestInterface(TestImplementation)",
                                 "    TestInterface is requested at",
                                 "        TestComponent.testInterface()"))
                 .inFile(component)

@@ -39,7 +39,7 @@ public abstract class Binding { // permits InjectBinding, ParameterBinding
 
     public abstract Element element();
 
-    public abstract List<DependencyRequest> dependencies();
+    public abstract List<DependencyRequest> requests();
 
     public abstract CodeBlock invocation(Function<Key, String> names);
 

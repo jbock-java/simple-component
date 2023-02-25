@@ -56,7 +56,7 @@ public final class ParameterBinding extends Binding {
     }
 
     @Override
-    public List<DependencyRequest> dependencies() {
+    public List<DependencyRequest> requests() {
         return List.of();
     }
 

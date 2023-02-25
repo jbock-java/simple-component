@@ -38,7 +38,7 @@ class ProviderTest {
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("Provider<test.TestClass.B> with qualifier @Named(\"b\") cannot be provided without an @Inject constructor")
+        assertThat(compilation).hadErrorContaining("io.jbock.simple.Provider<test.TestClass.B> with qualifier @Named(\"b\") cannot be provided.")
                 .inFile(component)
                 .onLineContaining("interface AComponent");
     }
