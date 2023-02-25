@@ -9,6 +9,7 @@ import io.jbock.simple.processor.step.ComponentStep;
 import io.jbock.simple.processor.step.InjectStep;
 import io.jbock.simple.processor.step.ProvidesStep;
 import io.jbock.simple.processor.util.ClearableCache;
+import io.jbock.simple.processor.util.SafeElements;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -48,8 +49,9 @@ interface ProcessorComponent {
     @Provides
     static List<ClearableCache> caches(
             InjectBindingFactory injectBindingFactory,
-            KeyFactory keyFactory) {
-        return List.of(injectBindingFactory, keyFactory);
+            KeyFactory keyFactory,
+            SafeElements safeElements) {
+        return List.of(injectBindingFactory, keyFactory, safeElements);
     }
 
     ComponentStep componentStep();

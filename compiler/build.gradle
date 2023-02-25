@@ -7,7 +7,7 @@ plugins {
 
 group = 'io.github.jbock-java'
 
-repositories { maven {url 'https://s01.oss.sonatype.org/content/repositories/iogithubjbock-java-1180' }}
+repositories { maven {url 'https://s01.oss.sonatype.org/content/repositories/iogithubjbock-java-1181' }}
 
 java {
     toolchain {

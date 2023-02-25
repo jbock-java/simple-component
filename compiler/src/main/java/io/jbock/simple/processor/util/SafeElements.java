@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SafeElements {
+public final class SafeElements implements ClearableCache {
 
     private final Elements elements;
 
@@ -42,5 +42,10 @@ public class SafeElements {
 
     public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(AnnotationMirror a) {
         return elements.getElementValuesWithDefaults(a);
+    }
+
+    @Override
+    public void clearCache() {
+        typeElementCache.clear();
     }
 }
