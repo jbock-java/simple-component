@@ -76,8 +76,4 @@ public class KeyFactory {
         TypeElement element = TYPE_ELEMENT_VISITOR.visit(type.asElement());
         return tool.hasQualifierAnnotation(element);
     }
-
-    public TypeTool tool() {
-        return tool;
-    }
 }

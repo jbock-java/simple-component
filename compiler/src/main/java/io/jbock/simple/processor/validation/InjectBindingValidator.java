@@ -4,7 +4,7 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
-import io.jbock.simple.processor.binding.KeyFactory;
+import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
 
@@ -22,14 +22,14 @@ import static io.jbock.simple.processor.util.TypeNames.SIMPLE_INJECT;
 
 public final class InjectBindingValidator {
 
-    private final KeyFactory keyFactory;
+    private final TypeTool tool;
     private final InjectBindingFactory injectBindingFactory;
 
     @Inject
     public InjectBindingValidator(
-            KeyFactory keyFactory,
+            TypeTool tool,
             InjectBindingFactory injectBindingFactory) {
-        this.keyFactory = keyFactory;
+        this.tool = tool;
         this.injectBindingFactory = injectBindingFactory;
     }
 
@@ -39,7 +39,7 @@ public final class InjectBindingValidator {
 
     public void validateStaticMethod(ExecutableElement element) {
         validate(element);
-        if (!keyFactory.tool().types().isSameType(element.getReturnType(), element.getEnclosingElement().asType())) {
+        if (!tool.types().isSameType(element.getReturnType(), element.getEnclosingElement().asType())) {
             throw new ValidationFailure("Static method binding must return the enclosing type",
                     element);
         }
@@ -59,15 +59,15 @@ public final class InjectBindingValidator {
                 if (b.element().getReturnType().getKind() == TypeKind.VOID) {
                     throw new ValidationFailure("The factory method may not return void", b.element());
                 }
-                if (!keyFactory.tool().types().isSameType(b.element().getReturnType(), typeElement.asType())) {
+                if (!tool.types().isSameType(b.element().getReturnType(), typeElement.asType())) {
                     throw new ValidationFailure("The factory method must return the type of its enclosing class", b.element());
                 }
             }
             if (b.element().getAnnotationMirrors().stream().filter(mirror -> {
                 DeclaredType annotationType = mirror.getAnnotationType();
-                return keyFactory.tool().isSameType(annotationType, JAVAX_INJECT)
-                        || keyFactory.tool().isSameType(annotationType, JAKARTA_INJECT)
-                        || keyFactory.tool().isSameType(annotationType, SIMPLE_INJECT);
+                return tool.isSameType(annotationType, JAVAX_INJECT)
+                        || tool.isSameType(annotationType, JAKARTA_INJECT)
+                        || tool.isSameType(annotationType, SIMPLE_INJECT);
             }).count() >= 2) {
                 throw new ValidationFailure("Duplicate inject annotation", b.element());
             }

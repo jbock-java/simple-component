@@ -6,10 +6,9 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
-import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ProviderType;
-import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.util.TypeTool;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -20,18 +19,21 @@ import java.util.Set;
 public class GraphFactory {
 
     private final ComponentElement component;
-    private final KeyFactory keyFactory;
+    private final TypeTool tool;
     private final InjectBindingFactory injectBindingFactory;
     private final Map<Key, Binding> bindingCache = new HashMap<>();
+    private final MissingBindingPrinter.Factory missingBindingPrinter;
 
     @Inject
     public GraphFactory(
             ComponentElement component,
-            KeyFactory keyFactory,
-            InjectBindingFactory injectBindingFactory) {
+            TypeTool tool,
+            InjectBindingFactory injectBindingFactory, 
+            MissingBindingPrinter.Factory missingBindingPrinter) {
         this.component = component;
-        this.keyFactory = keyFactory;
+        this.tool = tool;
         this.injectBindingFactory = injectBindingFactory;
+        this.missingBindingPrinter = missingBindingPrinter;
     }
 
     private Binding getBinding(DependencyRequest request) {
@@ -44,13 +46,13 @@ public class GraphFactory {
                 .or(() -> injectBindingFactory.binding(key))
                 .or(() -> Optional.ofNullable(component.providesBindings().get(key)))
                 .or(() -> providerBinding(key))
-                .orElseThrow(() -> new ValidationFailure("Binding not found", request.requestingElement()));
+                .orElseThrow(() -> missingBindingPrinter.fail(request));
         bindingCache.put(key, result);
         return result;
     }
 
     private Optional<Binding> providerBinding(Key key) {
-        Optional<ProviderType> providerType = keyFactory.tool().getProviderType(key.type());
+        Optional<ProviderType> providerType = tool.getProviderType(key.type());
         if (providerType.isEmpty()) {
             return Optional.empty();
         }

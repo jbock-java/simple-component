@@ -34,9 +34,9 @@ public final class Key {
     @Override
     public String toString() {
         if (qualifier.isEmpty()) {
-            return "" + typeName;
+            return typeName.toString();
         }
-        return "" + typeName + "-" + qualifier.orElseThrow();
+        return typeName + " with qualifier @" + qualifier.orElseThrow();
     }
 
     public TypeName typeName() {

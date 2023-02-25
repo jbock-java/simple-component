@@ -68,7 +68,7 @@ public class ComponentStep implements Step {
             try {
                 process(typeElement);
             } catch (ValidationFailure f) {
-                f.writeTo(messager, typeElement);
+                f.writeTo(messager);
             }
         }
         return Set.of();
@@ -88,7 +88,8 @@ public class ComponentStep implements Step {
                 executableElementValidator.validate(m);
             }
         }
-        ContextComponent componentComponent = ContextComponent.create(component, injectBindingFactory, keyFactory);
+        ContextComponent componentComponent = ContextComponent.create(
+                component, tool, injectBindingFactory, keyFactory);
         Generator generator = componentComponent.generator();
         List<Binding> sorted = componentComponent.topologicalSorter().sortedBindings();
         TypeSpec typeSpec = generator.generate(sorted);

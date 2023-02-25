@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class SimpleAnnotation {
 
@@ -57,6 +58,10 @@ public final class SimpleAnnotation {
 
     @Override
     public String toString() {
-        return annotationType.toString() + values;
+        String simpleName = Visitors.TYPE_ELEMENT_VISITOR.visit(annotationType.asElement()).getSimpleName().toString();
+        if (values.isEmpty()) {
+            return simpleName;
+        }
+        return simpleName + values.stream().map(Objects::toString).collect(Collectors.joining(", ", "(", ")"));
     }
 }
