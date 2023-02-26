@@ -1,6 +1,7 @@
 package io.jbock.simple.processor;
 
 import io.jbock.simple.Component;
+import io.jbock.simple.Provides;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.KeyFactory;
@@ -17,7 +18,6 @@ public interface ContextComponent {
         ContextComponent create(
                 ComponentElement component,
                 TypeTool tool,
-                SafeElements elements,
                 InjectBindingFactory injectBindingFactory,
                 KeyFactory keyFactory);
     }
@@ -25,13 +25,11 @@ public interface ContextComponent {
     static ContextComponent create(
             ComponentElement component,
             TypeTool tool,
-            SafeElements elements,
             InjectBindingFactory injectBindingFactory,
             KeyFactory keyFactory) {
         return ContextComponent_Impl.factory().create(
                 component,
                 tool,
-                elements,
                 injectBindingFactory,
                 keyFactory);
     }

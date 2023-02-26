@@ -89,7 +89,7 @@ public class ComponentStep implements Step {
             }
         }
         ContextComponent componentComponent = ContextComponent.create(
-                component, tool, tool.elements(), injectBindingFactory, keyFactory);
+                component, tool, injectBindingFactory, keyFactory);
         Generator generator = componentComponent.generator();
         List<Binding> sorted = componentComponent.topologicalSorter().sortedBindings();
         TypeSpec typeSpec = generator.generate(sorted);
