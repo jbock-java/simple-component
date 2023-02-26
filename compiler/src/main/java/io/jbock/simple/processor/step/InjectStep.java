@@ -2,10 +2,12 @@ package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.simple.Inject;
+import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeNames;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.validation.ExecutableElementValidator;
 import io.jbock.simple.processor.validation.InjectBindingValidator;
+import io.jbock.simple.processor.writing.AccessImpl;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 import static javax.lang.model.util.ElementFilter.constructorsIn;
 import static javax.lang.model.util.ElementFilter.methodsIn;
 
@@ -23,15 +26,21 @@ public class InjectStep implements Step {
     private final InjectBindingValidator validator;
     private final ExecutableElementValidator executableElementValidator;
     private final Messager messager;
+    private final SpecWriter specWriter;
+    private final AccessImpl accessImpl;
 
     @Inject
     public InjectStep(
             InjectBindingValidator validator,
             ExecutableElementValidator executableElementValidator,
-            Messager messager) {
+            Messager messager,
+            SpecWriter specWriter, 
+            AccessImpl accessImpl) {
         this.validator = validator;
         this.executableElementValidator = executableElementValidator;
         this.messager = messager;
+        this.specWriter = specWriter;
+        this.accessImpl = accessImpl;
     }
 
     @Override
@@ -57,6 +66,15 @@ public class InjectStep implements Step {
             for (ExecutableElement method : methods) {
                 executableElementValidator.validate(method);
                 validator.validateStaticMethod(method);
+            }
+            List<AccessImpl.Spec> specs = elements.stream()
+                    .map(element -> element.getEnclosingElement())
+                    .map(TYPE_ELEMENT_VISITOR::visit)
+                    .distinct()
+                    .map(accessImpl::generate)
+                    .collect(Collectors.toList());
+            for (AccessImpl.Spec spec : specs) {
+                specWriter.write(spec.generatedClass(), spec.typeSpec());
             }
         } catch (ValidationFailure f) {
             f.writeTo(messager);

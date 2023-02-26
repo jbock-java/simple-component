@@ -84,14 +84,18 @@ public class ComponentImpl {
         for (ParameterBinding b : component.parameterBindings()) {
             constructor.addParameter(b.parameterSpec());
         }
-        spec.addAnnotation(AnnotationSpec.builder(Generated.class)
-                .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
-                .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
-                .build());
+        spec.addAnnotation(generatedAnnotation());
         spec.addModifiers(FINAL);
         spec.addMethod(constructor.build());
         spec.addOriginatingElement(component.element());
         return spec.build();
+    }
+
+    static AnnotationSpec generatedAnnotation() {
+        return AnnotationSpec.builder(Generated.class)
+                .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
+                .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
+                .build();
     }
 
     private TypeSpec createFactory(
