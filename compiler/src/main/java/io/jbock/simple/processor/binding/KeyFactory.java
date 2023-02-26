@@ -35,7 +35,7 @@ public class KeyFactory implements ClearableCache {
     private Optional<SimpleAnnotation> getQualifier(Element element) {
         List<SimpleAnnotation> qualifiers = element.getAnnotationMirrors().stream()
                 .filter(this::hasQualifierAnnotation)
-                .map(mirror -> SimpleAnnotation.create(mirror, tool.elements()))
+                .map(mirror -> SimpleAnnotation.create(mirror, tool.elements(), tool.types()))
                 .collect(Collectors.toList());
         if (qualifiers.isEmpty()) {
             return Optional.empty();

@@ -21,14 +21,14 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * String-based qualifier.
  */
 @Qualifier
 @Target({METHOD, PARAMETER})
-@Retention(SOURCE)
+@Retention(RUNTIME)
 public @interface Named {
 
     String value();

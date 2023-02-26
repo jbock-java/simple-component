@@ -5,6 +5,7 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.graph.TopologicalSorter;
+import io.jbock.simple.processor.util.SafeElements;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.writing.Generator;
 
@@ -16,6 +17,7 @@ public interface ContextComponent {
         ContextComponent create(
                 ComponentElement component,
                 TypeTool tool,
+                SafeElements elements,
                 InjectBindingFactory injectBindingFactory,
                 KeyFactory keyFactory);
     }
@@ -23,11 +25,13 @@ public interface ContextComponent {
     static ContextComponent create(
             ComponentElement component,
             TypeTool tool,
+            SafeElements elements,
             InjectBindingFactory injectBindingFactory,
             KeyFactory keyFactory) {
         return ContextComponent_Impl.factory().create(
                 component,
                 tool,
+                elements,
                 injectBindingFactory,
                 keyFactory);
     }

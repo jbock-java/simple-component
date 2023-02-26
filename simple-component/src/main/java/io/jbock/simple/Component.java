@@ -1,11 +1,10 @@
 package io.jbock.simple;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Annotates an interface for which a dependency-injected
@@ -28,7 +27,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * </ul>
  */
 @Target(TYPE)
-@Retention(SOURCE)
+@Retention(RUNTIME)
 public @interface Component {
 
     /**
@@ -47,9 +46,8 @@ public @interface Component {
      *   <li>The method parameters bind the instance passed for that parameter within the component.
      * </ul>
      */
-    @Retention(SOURCE)
     @Target(TYPE)
-    @Documented
+    @Retention(RUNTIME)
     @interface Factory {
     }
 }

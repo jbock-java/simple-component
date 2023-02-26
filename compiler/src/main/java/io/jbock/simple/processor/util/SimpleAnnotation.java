@@ -1,5 +1,7 @@
 package io.jbock.simple.processor.util;
 
+import io.jbock.javapoet.TypeName;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.type.DeclaredType;
@@ -12,19 +14,27 @@ import java.util.stream.Collectors;
 public final class SimpleAnnotation {
 
     private final DeclaredType annotationType;
+    private final TypeName typeName;
     private final List<AnnotationValue> values;
+    private final SafeTypes types;
 
     private SimpleAnnotation(
             DeclaredType annotationType,
-            List<AnnotationValue> values) {
+            List<AnnotationValue> values,
+            SafeTypes types) {
         this.annotationType = annotationType;
         this.values = values;
+        this.types = types;
+        this.typeName = TypeName.get(annotationType);
     }
 
-    public static SimpleAnnotation create(AnnotationMirror mirror, SafeElements elements) {
+    public static SimpleAnnotation create(
+            AnnotationMirror mirror,
+            SafeElements elements,
+            SafeTypes types) {
         DeclaredType annotationType = mirror.getAnnotationType();
         List<AnnotationValue> values = new ArrayList<>(elements.getElementValuesWithDefaults(mirror).values());
-        return new SimpleAnnotation(annotationType, values);
+        return new SimpleAnnotation(annotationType, values, types);
     }
 
     @Override
@@ -32,7 +42,7 @@ public final class SimpleAnnotation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SimpleAnnotation that = (SimpleAnnotation) o;
-        if (!annotationType.equals(that.annotationType)) {
+        if (!types.isSameType(annotationType, that.annotationType)) {
             return false;
         }
         if (values.size() != that.values.size()) {
@@ -49,7 +59,7 @@ public final class SimpleAnnotation {
     @Override
     public int hashCode() {
         int[] result = new int[values.size() + 1];
-        result[0] = Objects.hashCode(annotationType);
+        result[0] = Objects.hashCode(typeName); //avoid TypeMirror hashCode
         for (int i = 0; i < values.size(); i++) {
             result[i + 1] = Objects.hashCode(values.get(i).getValue());
         }

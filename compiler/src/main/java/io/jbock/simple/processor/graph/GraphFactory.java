@@ -45,8 +45,8 @@ public class GraphFactory {
             return result;
         }
         result = component.parameterBinding(key)
-                .or(() -> injectBindingFactory.binding(key))
                 .or(() -> Optional.ofNullable(component.providesBindings().get(key)))
+                .or(() -> injectBindingFactory.binding(key))
                 .or(() -> providerBinding(key));
         if (result.isPresent()) {
             bindingCache.put(key, result);
@@ -62,8 +62,8 @@ public class GraphFactory {
         ProviderType provider = providerType.orElseThrow();
         Key innerKey = key.changeType(provider.innerType());
         return component.parameterBinding(innerKey)
-                .or(() -> injectBindingFactory.binding(innerKey))
                 .or(() -> Optional.ofNullable(component.providesBindings().get(innerKey)))
+                .or(() -> injectBindingFactory.binding(innerKey))
                 .map(b -> new ProviderBinding(key, b, provider));
     }
 
