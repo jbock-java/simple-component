@@ -1,7 +1,6 @@
 plugins {
     id('java-library')
     id('maven-publish')
-    id('signing')
 }
 
 group = 'io.github.jbock-java'
@@ -74,7 +73,7 @@ publishing {
             pom {
                 name = 'simple-component'
                 packaging = 'jar'
-                description = 'annotations for simple-component'
+                description = 'A very basic dependency injector.'
                 url = 'https://github.com/jbock-java/simple-component'
 
                 licenses {
@@ -98,21 +97,4 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            credentials {
-                username = System.getenv('OSS_USER')
-                password = System.getenv('OSS_PASS')
-            }
-        }
-    }
-}
-
-// https://docs.gradle.org/current/userguide/signing_plugin.html
-signing {
-    def signingKey = findProperty('signingKey')
-    def signingPassword = findProperty('signingPassword')
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications.mavenJava
 }

@@ -1,11 +1,11 @@
 plugins {
     id('java')
     id('maven-publish')
-    id('com.github.johnrengelman.shadow') version('7.1.2')
-    id('signing')
 }
 
 group = 'io.github.jbock-java'
+
+repositories { mavenLocal() }
 
 java {
     toolchain {
@@ -29,11 +29,6 @@ repositories {
     mavenCentral()
 }
 
-shadowJar {
-    minimize()
-    archiveClassifier.set('')
-}
-
 tasks.withType(AbstractArchiveTask) {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
@@ -43,18 +38,11 @@ tasks.withType(GenerateModuleMetadata) {
     enabled = true
 }
 
-shadowJar {
-    minimize()
-    archiveClassifier.set('')
-    relocate('io.jbock.auto.common', 'io.jbock.simple.auto.common')
-    relocate('io.jbock.javapoet', 'io.jbock.simple.javapoet')
-}
-
 dependencies {
-    def simple_component = project(':simple-component')
+    def simple_component = 'io.github.jbock-java:simple-component:1.011'
     implementation('io.github.jbock-java:javapoet:1.15')
     implementation('io.github.jbock-java:auto-common:1.2.3')
-    shadow(simple_component)
+    implementation(simple_component)
     annotationProcessor('io.github.jbock-java:simple-component-compiler:1.011')
     testImplementation('io.github.jbock-java:compile-testing:0.19.12')
     testImplementation('org.junit.jupiter:junit-jupiter:5.9.1')
@@ -79,34 +67,16 @@ test {
     }
 }
 
-task javadocJar(type: Jar) {
-    from javadoc
-    archiveClassifier.set('javadoc')
-}
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier.set('sources')
-}
-
-artifacts {
-    archives(javadocJar, sourcesJar)
-}
-
 // https://central.sonatype.org/pages/gradle.html
 publishing {
     publications {
-        shadow(MavenPublication) { publication ->
-            project.shadow.component(publication)
+        mavenJava(MavenPublication) {
             artifactId = 'simple-component-compiler'
-
-            artifact sourcesJar
-            artifact javadocJar
-
+            from components.java
             pom {
                 name = 'simple-component-compiler'
                 packaging = 'jar'
-                description = 'simple-component'
+                description = 'A very basic dependency injector.'
                 url = 'https://github.com/jbock-java/simple-component'
 
                 licenses {
@@ -130,21 +100,4 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            credentials {
-                username = System.getenv('OSS_USER')
-                password = System.getenv('OSS_PASS')
-            }
-        }
-    }
-}
-
-// https://docs.gradle.org/current/userguide/signing_plugin.html
-signing {
-    def signingKey = findProperty('signingKey')
-    def signingPassword = findProperty('signingPassword')
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications.shadow
 }
