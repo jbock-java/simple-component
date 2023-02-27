@@ -2,6 +2,7 @@ package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.InjectBinding;
+import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ValidationFailure;
 
 import java.util.ArrayList;
@@ -54,6 +55,11 @@ class CyclePrinter {
                 InjectBinding b = (InjectBinding) destination;
                 message.add(INDENT + edge.source().key().typeName() + " is injected at");
                 message.add(DOUBLE_INDENT + b.signature());
+            } else if (destination instanceof ProviderBinding
+                    && ((ProviderBinding) destination).sourceBinding() instanceof InjectBinding) {
+                ProviderBinding b = (ProviderBinding) destination;
+                message.add(INDENT + edge.source().key().typeName() + " is injected at");
+                message.add(DOUBLE_INDENT + ((InjectBinding) b.sourceBinding()).signature());
             } else {
                 throw new AssertionError("we should never get here");
             }

@@ -36,6 +36,10 @@ public class ProviderBinding extends Binding {
         return CodeBlock.of("() -> $L", sourceBinding.invocation(names));
     }
 
+    public Binding sourceBinding() {
+        return sourceBinding;
+    }
+
     @Override
     public String suggestedVariableName() {
         return sourceBinding.suggestedVariableName() + "Provider";
