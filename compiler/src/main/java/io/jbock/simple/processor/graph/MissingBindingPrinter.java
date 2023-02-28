@@ -23,22 +23,25 @@ public class MissingBindingPrinter {
     public static final String DOUBLE_INDENT = INDENT + INDENT;
 
     private final ComponentElement component;
-    private final List<DependencyRequest> dependencyTrace;
 
-    private MissingBindingPrinter(
-            ComponentElement component,
-            List<DependencyRequest> dependencyTrace) {
+    @Inject
+    public MissingBindingPrinter(ComponentElement component) {
         this.component = component;
-        this.dependencyTrace = dependencyTrace;
     }
 
-    private ValidationFailure fail() {
-        DependencyRequest request = dependencyTrace.get(0);
+    ValidationFailure fail(List<DependencyRequest> dependencyTrace) {
+        List<DependencyRequest> trace = new ArrayList<>(dependencyTrace);
+        Collections.reverse(trace);
+        return failInternal(trace);
+    }
+
+    private ValidationFailure failInternal(List<DependencyRequest> trace) {
+        DependencyRequest request = trace.get(0);
         StringBuilder message = new StringBuilder();
         message.append(request.key().toString()).append(" cannot be provided.");
-        for (int i = 0; i < dependencyTrace.size(); i++) {
-            DependencyRequest r = dependencyTrace.get(i);
-            String formatted = format(r, i == dependencyTrace.size() - 1 ? "requested" : "injected");
+        for (int i = 0; i < trace.size(); i++) {
+            DependencyRequest r = trace.get(i);
+            String formatted = format(r, i == trace.size() - 1 ? "requested" : "injected");
             message.append("\n").append(formatted);
         }
         return new ValidationFailure(message.toString(), component.element());
@@ -88,21 +91,5 @@ public class MissingBindingPrinter {
             return "<init>";
         }
         return element.toString();
-    }
-
-
-    public static final class Factory {
-        private final ComponentElement component;
-
-        @Inject
-        public Factory(ComponentElement component) {
-            this.component = component;
-        }
-
-        ValidationFailure fail(List<DependencyRequest> dependencyTrace) {
-            List<DependencyRequest> trace = new ArrayList<>(dependencyTrace);
-            Collections.reverse(trace);
-            return new MissingBindingPrinter(component, trace).fail();
-        }
     }
 }

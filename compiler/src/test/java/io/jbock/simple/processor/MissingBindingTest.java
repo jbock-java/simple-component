@@ -41,7 +41,9 @@ class MissingBindingTest {
     @Test
     void bindsMethodAppearsInTrace() {
         JavaFileObject component =
-                JavaFileObjects.forSourceLines("TestComponent",
+                JavaFileObjects.forSourceLines("p.TestComponent",
+                        "package p;",
+                        "",
                         "import io.jbock.simple.Component;",
                         "import io.jbock.simple.Provides;",
                         "",
@@ -54,9 +56,14 @@ class MissingBindingTest {
                         "  }",
                         "}");
         JavaFileObject interfaceFile =
-                JavaFileObjects.forSourceLines("TestInterface", "interface TestInterface {}");
+                JavaFileObjects.forSourceLines("p.TestInterface",
+                        "package p;",
+                        "",
+                        "interface TestInterface {}");
         JavaFileObject implementationFile =
-                JavaFileObjects.forSourceLines("TestImplementation",
+                JavaFileObjects.forSourceLines("p.TestImplementation",
+                        "package p;",
+                        "",
                         "import io.jbock.simple.Inject;",
                         "",
                         "final class TestImplementation implements TestInterface {",
@@ -73,9 +80,9 @@ class MissingBindingTest {
                                 "java.lang.String cannot be provided.",
                                 "    java.lang.String is injected at",
                                 "        TestImplementation(java.lang.String)",
-                                "    TestImplementation is injected at",
-                                "        TestComponent.bindTestInterface(TestImplementation)",
-                                "    TestInterface is requested at",
+                                "    p.TestImplementation is injected at",
+                                "        TestComponent.bindTestInterface(p.TestImplementation)",
+                                "    p.TestInterface is requested at",
                                 "        TestComponent.testInterface()"))
                 .inFile(component)
                 .onLineContaining("interface TestComponent");

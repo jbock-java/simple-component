@@ -24,14 +24,14 @@ public class GraphFactory {
     private final TypeTool tool;
     private final InjectBindingFactory injectBindingFactory;
     private final Map<Key, Optional<Binding>> bindingCache = new HashMap<>();
-    private final MissingBindingPrinter.Factory missingBindingPrinter;
+    private final MissingBindingPrinter missingBindingPrinter;
 
     @Inject
     public GraphFactory(
             ComponentElement component,
             TypeTool tool,
             InjectBindingFactory injectBindingFactory,
-            MissingBindingPrinter.Factory missingBindingPrinter) {
+            MissingBindingPrinter missingBindingPrinter) {
         this.component = component;
         this.tool = tool;
         this.injectBindingFactory = injectBindingFactory;
