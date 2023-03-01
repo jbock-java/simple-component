@@ -27,17 +27,6 @@ public final class InjectBinding extends Binding {
             "provide",
             "create");
 
-    private final Supplier<String> signature = memoize(() -> {
-        CodeBlock deps = requests().stream()
-                .map(d -> CodeBlock.of("$L", d.requestingElement().getSimpleName().toString()))
-                .collect(CodeBlock.joining(", "));
-        if (element().getKind() == ElementKind.CONSTRUCTOR) {
-            return CodeBlock.of("$T($L)", key().typeName(), deps).toString();
-        }
-        return CodeBlock.of("$T.$L($L)",
-                element().getEnclosingElement().asType(), element().getSimpleName(), deps).toString();
-    });
-
     private final Supplier<String> suggestedVariableName = memoize(() -> {
         if (element().getAnnotation(Provides.class) != null) {
             return lowerFirst(removeMethodNamePrefix(element().getSimpleName().toString()));
@@ -143,10 +132,6 @@ public final class InjectBinding extends Binding {
         return invokeExpression(requests().stream()
                 .map(d -> CodeBlock.of("$L", names.apply(d.key())))
                 .collect(CodeBlock.joining(", ")));
-    }
-
-    public String signature() {
-        return signature.get();
     }
 
     @Override

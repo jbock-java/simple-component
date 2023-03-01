@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-class CyclePrinter {
+import static io.jbock.simple.processor.util.Printing.DOUBLE_INDENT;
+import static io.jbock.simple.processor.util.Printing.INDENT;
+import static io.jbock.simple.processor.util.Printing.elementToString;
+
+final class CyclePrinter {
 
     private final Graph graph;
-    private static final String INDENT = "    ";
-    private static final String DOUBLE_INDENT = INDENT + INDENT;
 
     CyclePrinter(Graph graph) {
         this.graph = graph;
@@ -54,12 +56,12 @@ class CyclePrinter {
             if (destination instanceof InjectBinding) {
                 InjectBinding b = (InjectBinding) destination;
                 message.add(INDENT + edge.source().key().typeName() + " is injected at");
-                message.add(DOUBLE_INDENT + b.signature());
+                message.add(DOUBLE_INDENT + elementToString(b.element()));
             } else if (destination instanceof ProviderBinding
                     && ((ProviderBinding) destination).sourceBinding() instanceof InjectBinding) {
                 ProviderBinding b = (ProviderBinding) destination;
                 message.add(INDENT + edge.source().key().typeName() + " is injected at");
-                message.add(DOUBLE_INDENT + ((InjectBinding) b.sourceBinding()).signature());
+                message.add(DOUBLE_INDENT + elementToString(((InjectBinding) b.sourceBinding()).element()));
             } else {
                 throw new AssertionError("we should never get here");
             }

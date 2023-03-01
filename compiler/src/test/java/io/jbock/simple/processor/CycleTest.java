@@ -48,11 +48,11 @@ class CycleTest {
         assertThat(compilation).hadErrorContaining(message(
                 "Found a dependency cycle:",
                 "    test.TestClass.B is injected at",
-                "        test.TestClass.D(b)",
+                "        D(test.TestClass.B)",
                 "    test.TestClass.D is injected at",
-                "        test.TestClass.C.createC(d)",
+                "        C.createC(test.TestClass.D)",
                 "    test.TestClass.C is injected at",
-                "        test.TestClass.B(c)"));
+                "        B(test.TestClass.C)"));
     }
 
     @Test
@@ -92,10 +92,10 @@ class CycleTest {
         assertThat(compilation).hadErrorContaining(message(
                 "Found a dependency cycle:",
                 "    test.TestClass.C is injected at",
-                "        test.TestClass.B(c)",
+                "        B(test.TestClass.C)",
                 "    io.jbock.simple.Provider<test.TestClass.B> is injected at",
-                "        test.TestClass.D(bProvider)",
+                "        D(io.jbock.simple.Provider<test.TestClass.B>)",
                 "    test.TestClass.D is injected at",
-                "        test.TestClass.C.createC(d)"));
+                "        C.createC(test.TestClass.D)"));
     }
 }
