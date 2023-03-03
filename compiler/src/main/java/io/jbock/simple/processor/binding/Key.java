@@ -10,6 +10,7 @@ import java.util.Optional;
 public final class Key {
 
     private final TypeMirror type;
+    private final int hashCode;
     private final TypeName typeName;
     private final Optional<SimpleAnnotation> qualifier;
 
@@ -20,6 +21,7 @@ public final class Key {
         this.type = type;
         this.typeName = typeName;
         this.qualifier = qualifier;
+        this.hashCode = computeHashCode(typeName, qualifier);
     }
 
     static Key create(TypeMirror mirror, Optional<SimpleAnnotation> qualifier) {
@@ -59,8 +61,14 @@ public final class Key {
         return typeName.equals(key.typeName) && qualifier.equals(key.qualifier);
     }
 
+    private static int computeHashCode(
+            TypeName typeName,
+            Optional<SimpleAnnotation> qualifier) {
+        return Objects.hash(typeName, qualifier);
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(typeName, qualifier);
+        return hashCode;
     }
 }

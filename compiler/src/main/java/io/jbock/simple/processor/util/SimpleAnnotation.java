@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public final class SimpleAnnotation {
 
     private final DeclaredType annotationType;
-    private final TypeName typeName;
+    private final int hashCode;
     private final List<AnnotationValue> values;
     private final SafeTypes types;
 
@@ -25,7 +25,7 @@ public final class SimpleAnnotation {
         this.annotationType = annotationType;
         this.values = values;
         this.types = types;
-        this.typeName = TypeName.get(annotationType);
+        this.hashCode = computeHashCode(annotationType, values);
     }
 
     public static SimpleAnnotation create(
@@ -58,8 +58,14 @@ public final class SimpleAnnotation {
 
     @Override
     public int hashCode() {
+        return hashCode;
+    }
+
+    private static int computeHashCode(
+            DeclaredType annotationType,
+            List<AnnotationValue> values) {
         int[] result = new int[values.size() + 1];
-        result[0] = Objects.hashCode(typeName); //avoid TypeMirror hashCode
+        result[0] = TypeName.get(annotationType).hashCode(); //avoid TypeMirror hashCode
         for (int i = 0; i < values.size(); i++) {
             result[i + 1] = Objects.hashCode(values.get(i).getValue());
         }
