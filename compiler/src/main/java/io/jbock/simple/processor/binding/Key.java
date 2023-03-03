@@ -2,17 +2,20 @@ package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.TypeName;
 import io.jbock.simple.processor.util.SimpleAnnotation;
+import io.jbock.simple.processor.util.Suppliers;
 
 import javax.lang.model.type.TypeMirror;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.IntSupplier;
 
 public final class Key {
 
     private final TypeMirror type;
-    private final int hashCode;
     private final TypeName typeName;
     private final Optional<SimpleAnnotation> qualifier;
+
+    private final IntSupplier hashCode = Suppliers.memoizeInt(() -> Objects.hash(typeName(), qualifier()));
 
     private Key(
             TypeMirror type,
@@ -21,7 +24,6 @@ public final class Key {
         this.type = type;
         this.typeName = typeName;
         this.qualifier = qualifier;
-        this.hashCode = computeHashCode(typeName, qualifier);
     }
 
     static Key create(TypeMirror mirror, Optional<SimpleAnnotation> qualifier) {
@@ -61,14 +63,8 @@ public final class Key {
         return typeName.equals(key.typeName) && qualifier.equals(key.qualifier);
     }
 
-    private static int computeHashCode(
-            TypeName typeName,
-            Optional<SimpleAnnotation> qualifier) {
-        return Objects.hash(typeName, qualifier);
-    }
-
     @Override
     public int hashCode() {
-        return hashCode;
+        return hashCode.getAsInt();
     }
 }

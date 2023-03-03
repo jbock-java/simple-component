@@ -9,14 +9,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 
 public final class SimpleAnnotation {
 
     private final DeclaredType annotationType;
-    private final int hashCode;
     private final List<AnnotationValue> values;
     private final SafeTypes types;
+
+    private final IntSupplier hashCode = Suppliers.memoizeInt(() -> computeHashCode(annotationType(), values()));
 
     private SimpleAnnotation(
             DeclaredType annotationType,
@@ -25,7 +27,6 @@ public final class SimpleAnnotation {
         this.annotationType = annotationType;
         this.values = values;
         this.types = types;
-        this.hashCode = computeHashCode(annotationType, values);
     }
 
     public static SimpleAnnotation create(
@@ -58,7 +59,7 @@ public final class SimpleAnnotation {
 
     @Override
     public int hashCode() {
-        return hashCode;
+        return hashCode.getAsInt();
     }
 
     private static int computeHashCode(
@@ -79,5 +80,13 @@ public final class SimpleAnnotation {
             return simpleName;
         }
         return simpleName + values.stream().map(Objects::toString).collect(Collectors.joining(", ", "(", ")"));
+    }
+
+    private DeclaredType annotationType() {
+        return annotationType;
+    }
+
+    private List<AnnotationValue> values() {
+        return values;
     }
 }
