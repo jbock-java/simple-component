@@ -39,19 +39,10 @@ public class GraphFactory {
     }
 
     private Optional<Binding> getBinding(DependencyRequest request) {
-        Key key = request.key();
-        Optional<Binding> result = bindingCache.get(key);
-        if (result != null) {
-            return result;
-        }
-        result = component.parameterBinding(key)
+        return bindingCache.computeIfAbsent(request.key(), key -> component.parameterBinding(key)
                 .or(() -> Optional.ofNullable(component.providesBindings().get(key)))
                 .or(() -> injectBindingFactory.binding(key))
-                .or(() -> providerBinding(key));
-        if (result.isPresent()) {
-            bindingCache.put(key, result);
-        }
-        return result;
+                .or(() -> providerBinding(key)));
     }
 
     private Optional<Binding> providerBinding(Key key) {
