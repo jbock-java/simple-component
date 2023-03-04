@@ -1,7 +1,6 @@
 package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -53,18 +52,14 @@ final class CyclePrinter {
         message.add("Found a dependency cycle:");
         for (Edge edge : cycle) {
             Binding destination = edge.destination();
-            if (destination instanceof InjectBinding) {
-                InjectBinding b = (InjectBinding) destination;
-                message.add(INDENT + edge.source().key().typeName() + " is injected at");
-                message.add(DOUBLE_INDENT + elementToString(b.element()));
-            } else if (destination instanceof ProviderBinding
-                    && ((ProviderBinding) destination).sourceBinding() instanceof InjectBinding) {
+            if (destination instanceof ProviderBinding) {
                 ProviderBinding b = (ProviderBinding) destination;
                 message.add(INDENT + edge.source().key().typeName() + " is injected at");
-                message.add(DOUBLE_INDENT + elementToString(((InjectBinding) b.sourceBinding()).element()));
-            } else {
-                throw new AssertionError("we should never get here");
+                message.add(DOUBLE_INDENT + elementToString(b.sourceBinding().element()));
+                continue;
             }
+            message.add(INDENT + edge.source().key().typeName() + " is injected at");
+            message.add(DOUBLE_INDENT + elementToString(destination.element()));
         }
         return String.join("\n", message);
     }

@@ -15,19 +15,25 @@ public final class Printing {
     public static final String INDENT = "    ";
     public static final String DOUBLE_INDENT = INDENT + INDENT;
     
-    public static String elementToString(ExecutableElement requestingElement) {
-        StringBuilder result = enclosingTypeAndMemberName(requestingElement);
-        result.append(EXECUTABLE_ELEMENT_VISITOR.visit(requestingElement).getParameters().stream()
+    public static String elementToString(Element element) {
+        if (element.getKind() == ElementKind.PARAMETER) {
+            return Visitors.PARAMETER_VISITOR.visit(element).getSimpleName().toString();
+        }
+        if (!(element instanceof ExecutableElement)) {
+            throw new IllegalArgumentException("unexpected kind: " + element.getKind());
+        }
+        StringBuilder result = enclosingTypeAndMemberName((ExecutableElement) element);
+        result.append(EXECUTABLE_ELEMENT_VISITOR.visit(element).getParameters().stream()
                 .map(parameter -> TypeName.get(parameter.asType()).toString())
                 .collect(joining(", ", "(", ")")));
         return result.toString();
     }
 
-    private static String enclosingElementToString(Element requestingElement) {
-        if (!(requestingElement.getKind().isClass() || requestingElement.getKind().isInterface())) {
-            return requestingElement.toString();
+    private static String enclosingElementToString(Element element) {
+        if (!(element.getKind().isClass() || element.getKind().isInterface())) {
+            return element.toString();
         }
-        return TYPE_ELEMENT_VISITOR.visit(requestingElement).getSimpleName().toString();
+        return TYPE_ELEMENT_VISITOR.visit(element).getSimpleName().toString();
     }
 
     private static StringBuilder enclosingTypeAndMemberName(ExecutableElement element) {

@@ -4,6 +4,7 @@ import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeVisitor;
 import javax.lang.model.util.SimpleElementVisitor9;
@@ -29,6 +30,14 @@ public final class Visitors {
 
         @Override
         public ExecutableElement visitExecutable(ExecutableElement e, Void unused) {
+            return e;
+        }
+    };
+
+    public static final ElementVisitor<VariableElement, Void> PARAMETER_VISITOR = new SimpleElementVisitor9<>() {
+
+        @Override
+        public VariableElement visitVariable(VariableElement e, Void unused) {
             return e;
         }
     };
