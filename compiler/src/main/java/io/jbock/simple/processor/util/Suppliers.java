@@ -8,7 +8,7 @@ public final class Suppliers {
     public static <T> Supplier<T> memoize(Supplier<T> delegate) {
         return new Cache<>(delegate);
     }
-    
+
     public static IntSupplier memoizeInt(IntSupplier delegate) {
         return new IntCache(delegate);
     }
@@ -33,7 +33,6 @@ public final class Suppliers {
             return value;
         }
     }
-
 
     private static final class IntCache implements IntSupplier {
 

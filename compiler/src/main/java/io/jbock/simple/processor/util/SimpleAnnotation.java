@@ -12,13 +12,15 @@ import java.util.Objects;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 
+import static io.jbock.simple.processor.util.Suppliers.memoizeInt;
+
 public final class SimpleAnnotation {
 
     private final DeclaredType annotationType;
     private final List<AnnotationValue> values;
     private final SafeTypes types;
 
-    private final IntSupplier hashCode = Suppliers.memoizeInt(() -> computeHashCode(annotationType(), values()));
+    private final IntSupplier hashCode = memoizeInt(() -> computeHashCode(annotationType(), values()));
 
     private SimpleAnnotation(
             DeclaredType annotationType,
