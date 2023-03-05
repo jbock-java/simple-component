@@ -14,16 +14,17 @@ public final class Printing {
 
     public static final String INDENT = "    ";
     public static final String DOUBLE_INDENT = INDENT + INDENT;
-    
+
     public static String elementToString(Element element) {
         if (element.getKind() == ElementKind.PARAMETER) {
             return Visitors.PARAMETER_VISITOR.visit(element).getSimpleName().toString();
         }
-        if (!(element instanceof ExecutableElement)) {
-            throw new IllegalArgumentException("unexpected kind: " + element.getKind());
+        ExecutableElement executableElement = EXECUTABLE_ELEMENT_VISITOR.visit(element);
+        if (executableElement == null) {
+            throw new UnsupportedOperationException("Can't determine string for element " + element);
         }
-        StringBuilder result = enclosingTypeAndMemberName((ExecutableElement) element);
-        result.append(EXECUTABLE_ELEMENT_VISITOR.visit(element).getParameters().stream()
+        StringBuilder result = enclosingTypeAndMemberName(executableElement);
+        result.append(executableElement.getParameters().stream()
                 .map(parameter -> TypeName.get(parameter.asType()).toString())
                 .collect(joining(", ", "(", ")")));
         return result.toString();
