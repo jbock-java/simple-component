@@ -15,7 +15,7 @@ public final class Printing {
     public static final String INDENT = "    ";
     public static final String DOUBLE_INDENT = INDENT + INDENT;
 
-    public static String elementToString(Element element) {
+    public static String bindingElementToString(Element element) {
         if (element.getKind() == ElementKind.PARAMETER) {
             return Visitors.PARAMETER_VISITOR.visit(element).getSimpleName().toString();
         }

@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Printing.INDENT;
-import static io.jbock.simple.processor.util.Printing.elementToString;
+import static io.jbock.simple.processor.util.Printing.bindingElementToString;
 import static io.jbock.simple.processor.util.Visitors.EXECUTABLE_ELEMENT_VISITOR;
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
@@ -53,7 +53,7 @@ public final class InjectBindingFactory implements ClearableCache {
             if (previous != null) {
                 throw new ValidationFailure("This binding clashes with:\n"
                         + INDENT
-                        + elementToString(previous.element())
+                        + bindingElementToString(previous.element())
                         + ".\n"
                         + "Consider a (different) qualifier", b.element());
             }

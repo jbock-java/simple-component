@@ -12,7 +12,7 @@ import java.util.Set;
 
 import static io.jbock.simple.processor.util.Printing.DOUBLE_INDENT;
 import static io.jbock.simple.processor.util.Printing.INDENT;
-import static io.jbock.simple.processor.util.Printing.elementToString;
+import static io.jbock.simple.processor.util.Printing.bindingElementToString;
 
 final class CyclePrinter {
 
@@ -55,11 +55,11 @@ final class CyclePrinter {
             if (destination instanceof ProviderBinding) {
                 ProviderBinding b = (ProviderBinding) destination;
                 message.add(INDENT + edge.source().key().typeName() + " is injected at");
-                message.add(DOUBLE_INDENT + elementToString(b.sourceBinding().element()));
+                message.add(DOUBLE_INDENT + bindingElementToString(b.sourceBinding().element()));
                 continue;
             }
             message.add(INDENT + edge.source().key().typeName() + " is injected at");
-            message.add(DOUBLE_INDENT + elementToString(destination.element()));
+            message.add(DOUBLE_INDENT + bindingElementToString(destination.element()));
         }
         return String.join("\n", message);
     }

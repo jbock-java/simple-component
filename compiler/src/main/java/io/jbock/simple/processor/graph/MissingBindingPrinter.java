@@ -11,7 +11,7 @@ import java.util.List;
 
 import static io.jbock.simple.processor.util.Printing.DOUBLE_INDENT;
 import static io.jbock.simple.processor.util.Printing.INDENT;
-import static io.jbock.simple.processor.util.Printing.elementToString;
+import static io.jbock.simple.processor.util.Printing.bindingElementToString;
 
 public final class MissingBindingPrinter {
 
@@ -47,6 +47,6 @@ public final class MissingBindingPrinter {
                 + verb
                 + " at\n"
                 + DOUBLE_INDENT
-                + elementToString(request.requestElement());
+                + bindingElementToString(request.requestElement());
     }
 }

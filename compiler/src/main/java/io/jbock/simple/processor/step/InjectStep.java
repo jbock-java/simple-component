@@ -10,12 +10,14 @@ import io.jbock.simple.processor.validation.InjectBindingValidator;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static javax.lang.model.util.ElementFilter.constructorsIn;
+import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static javax.lang.model.util.ElementFilter.methodsIn;
 
 public class InjectStep implements Step {
@@ -58,9 +60,17 @@ public class InjectStep implements Step {
                 executableElementValidator.validate(method);
                 validator.validateStaticMethod(method);
             }
+            checkFields(elements);
         } catch (ValidationFailure f) {
             f.writeTo(messager);
         }
         return Set.of();
+    }
+
+    private void checkFields(List<Element> elements) {
+        List<VariableElement> fields = fieldsIn(elements);
+        for (VariableElement field : fields) {
+            throw new ValidationFailure("Field injection is not supported", field);
+        }
     }
 }
