@@ -4,7 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Annotates an interface for which a dependency-injected
@@ -27,11 +27,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * </ul>
  */
 @Target(TYPE)
-@Retention(RUNTIME)
+@Retention(SOURCE)
 public @interface Component {
 
     /**
-     * A factory for a component.Components <em>may</em> have a single nested {@code interface}
+     * A factory for a component. Components <em>may</em> have a single nested {@code interface}
      * annotated with {@code @Component.Factory}.
      *
      * <p>A factory is a type with a single method that returns a new component instance each time it
@@ -47,7 +47,7 @@ public @interface Component {
      * </ul>
      */
     @Target(TYPE)
-    @Retention(RUNTIME)
+    @Retention(SOURCE)
     @interface Factory {
     }
 }

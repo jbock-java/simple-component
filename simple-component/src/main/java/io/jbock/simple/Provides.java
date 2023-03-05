@@ -4,7 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Annotates <em>static</em> methods of a {@linkplain Component component}
@@ -16,6 +16,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * implementation will pass dependencies to the method as parameters.
  */
 @Target(METHOD)
-@Retention(RUNTIME)
+@Retention(SOURCE)
 public @interface Provides {
 }
