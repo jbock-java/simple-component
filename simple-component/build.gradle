@@ -93,7 +93,7 @@ publishing {
                 scm {
                     connection = 'scm:git:https://github.com/jbock-java/simple-component.git'
                     developerConnection = 'scm:git:https://github.com/jbock-java/simple-component.git'
-                    url = 'https://github.com/jbock-java/jbock'
+                    url = 'https://github.com/jbock-java/simple-component'
                 }
             }
         }
