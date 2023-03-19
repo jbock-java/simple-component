@@ -1,12 +1,10 @@
 package io.jbock.simple.processor;
 
 import io.jbock.simple.Component;
-import io.jbock.simple.Provides;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.graph.TopologicalSorter;
-import io.jbock.simple.processor.util.SafeElements;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.writing.Generator;
 

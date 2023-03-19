@@ -19,7 +19,6 @@ import io.jbock.simple.processor.binding.ParameterBinding;
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.ExecutableElement;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,22 +32,21 @@ import static javax.lang.model.element.Modifier.STATIC;
 public class ComponentImpl {
 
     private final ComponentElement component;
+    private final Map<Key, NamedBinding> sorted;
+    private final Function<Key, ParameterSpec> names;
 
-    @Inject
-    public ComponentImpl(ComponentElement component) {
+    private ComponentImpl(
+            ComponentElement component,
+            Map<Key, NamedBinding> sorted,
+            Function<Key, ParameterSpec> names) {
         this.component = component;
+        this.sorted = sorted;
+        this.names = names;
     }
 
-    TypeSpec generate(Map<Key, NamedBinding> sorted) {
+    TypeSpec generate() {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass()).addSuperinterface(component.element().asType());
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
-        Map<Key, ParameterSpec> parameterCache = new HashMap<>();
-        Function<Key, ParameterSpec> names = key -> {
-            return parameterCache.computeIfAbsent(key, k -> {
-                String name = sorted.get(k).name();
-                return ParameterSpec.builder(k.typeName(), name).build();
-            });
-        };
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
@@ -120,5 +118,20 @@ public class ComponentImpl {
         }
         spec.addMethod(method.build());
         return spec.build();
+    }
+
+    public static final class Factory {
+        private final ComponentElement component;
+
+        @Inject
+        public Factory(ComponentElement component) {
+            this.component = component;
+        }
+
+        ComponentImpl create(
+                Map<Key, NamedBinding> sorted,
+                Function<Key, ParameterSpec> names) {
+            return new ComponentImpl(component, sorted, names);
+        }
     }
 }

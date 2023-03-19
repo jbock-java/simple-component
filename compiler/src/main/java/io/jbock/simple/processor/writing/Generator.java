@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.writing;
 
+import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
@@ -8,35 +9,49 @@ import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.util.UniqueNameSet;
 
 import javax.lang.model.SourceVersion;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class Generator {
 
-    private final ComponentImpl componentImpl;
+    private final ComponentImpl.Factory componentImpl;
     private final ComponentElement component;
 
     @Inject
     public Generator(
-            ComponentImpl componentImpl,
+            ComponentImpl.Factory componentImpl,
             ComponentElement component) {
         this.componentImpl = componentImpl;
         this.component = component;
     }
 
-    public TypeSpec generate(List<Binding> sorted) {
-        return componentImpl.generate(addNames(sorted));
+    public TypeSpec generate(List<Binding> bindings) {
+        Map<Key, NamedBinding> sorted = addNames(bindings);
+        return componentImpl.create(sorted, createNames(sorted)).generate();
     }
 
-    Map<Key, NamedBinding> addNames(List<Binding> sorted) {
+    private Map<Key, NamedBinding> addNames(List<Binding> bindings) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
-        for (Binding b : sorted) {
+        for (Binding b : bindings) {
             String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));
             result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
         }
         return result;
+    }
+
+    private static Function<Key, ParameterSpec> createNames(
+            Map<Key, NamedBinding> sorted) {
+        Map<Key, ParameterSpec> cache = new HashMap<>();
+        return key -> {
+            return cache.computeIfAbsent(key, k -> {
+                String name = sorted.get(k).name();
+                return ParameterSpec.builder(k.typeName(), name).build();
+            });
+        };
     }
 
     private static String validJavaName(String name) {
