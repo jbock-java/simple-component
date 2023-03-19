@@ -41,13 +41,6 @@ public class ComponentImpl {
     TypeSpec generate(Map<Key, NamedBinding> sorted) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass()).addSuperinterface(component.element().asType());
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
-        if (component.factoryElement().isEmpty()) {
-            spec.addMethod(MethodSpec.methodBuilder("create")
-                    .addModifiers(STATIC)
-                    .returns(TypeName.get(component.element().asType()))
-                    .addStatement("return new $T()", component.generatedClass())
-                    .build());
-        }
         Function<Key, String> names = key -> sorted.get(key).name();
         for (Map.Entry<Key, NamedBinding> e : sorted.entrySet()) {
             NamedBinding namedBinding = e.getValue();
@@ -73,13 +66,19 @@ public class ComponentImpl {
                     .collect(Collectors.toList()));
             spec.addMethod(method.build());
         }
-        component.factoryElement().ifPresent(factory -> {
+        component.factoryElement().ifPresentOrElse(factory -> {
             spec.addMethod(MethodSpec.methodBuilder("factory")
                     .addModifiers(STATIC)
                     .returns(TypeName.get(factory.element().asType()))
                     .addStatement("return new $T()", factory.generatedClass())
                     .build());
             spec.addType(createFactory(factory));
+        }, () -> {
+            spec.addMethod(MethodSpec.methodBuilder("create")
+                    .addModifiers(STATIC)
+                    .returns(TypeName.get(component.element().asType()))
+                    .addStatement("return new $T()", component.generatedClass())
+                    .build());
         });
         for (ParameterBinding b : component.parameterBindings()) {
             constructor.addParameter(b.parameterSpec());

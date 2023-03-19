@@ -111,13 +111,13 @@ class ProcessorComponentTest {
                         "    this.a = new TestClass.A(b, c);",
                         "  }",
                         "",
-                        "  static TestClass.AComponent create() {",
-                        "    return new TestClass_AComponent_Impl();",
-                        "  }",
-                        "",
                         "  @Override",
                         "  public TestClass.A getA() {",
                         "    return a;",
+                        "  }",
+                        "",
+                        "  static TestClass.AComponent create() {",
+                        "    return new TestClass_AComponent_Impl();",
                         "  }",
                         "}");
     }
