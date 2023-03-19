@@ -8,11 +8,13 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * A node in the dependency graph. For instance, an inject-annotated constructor.
- * Every constructor argument is an "incoming edge".
- * Parameters to the component factory are nodes without any incoming edges.
+ * A node in the dependency graph.
+ * For instance, consider an {@code @Inject}-annotated constructor.
+ * The constructor itself is a "node".
+ * From the constructor's perspective, each of its parameters is an "incoming edge"
+ * which connects it to another "node".
  */
-public abstract class Binding { // permits InjectBinding, ParameterBinding
+public abstract class Binding {
 
     private final Key key;
 

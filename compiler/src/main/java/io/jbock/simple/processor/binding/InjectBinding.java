@@ -15,11 +15,15 @@ import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 
+/**
+ * This class represents either a {@code @Inject}-annotated constructor
+ * or a {@code @Inject}-annotated static method.
+ */
 public final class InjectBinding extends Binding {
 
     private final ExecutableElement bindingElement;
 
-    private final Function<CodeBlock, CodeBlock> invokeExpression;
+    private final KeyFactory keyFactory;
 
     private static final List<String> PROVIDES_METHOD_COMMON_PREFIXES = List.of(
             "get",
@@ -76,36 +80,29 @@ public final class InjectBinding extends Binding {
         return Character.toLowerCase(s.charAt(0)) + s.substring(1);
     }
 
-    private final List<DependencyRequest> dependencies;
+    private final Supplier<List<DependencyRequest>> requests = memoize(() -> element().getParameters().stream()
+            .map(parameter -> new DependencyRequest(keyFactory().getKey(parameter), parameter, element()))
+            .collect(Collectors.toList()));
 
     private InjectBinding(
             Key key,
-            ExecutableElement bindingElement,
-            Function<CodeBlock, CodeBlock> invokeExpression,
-            List<DependencyRequest> dependencies) {
+            KeyFactory keyFactory,
+            ExecutableElement bindingElement) {
         super(key);
         this.bindingElement = bindingElement;
-        this.invokeExpression = invokeExpression;
-        this.dependencies = dependencies;
+        this.keyFactory = keyFactory;
     }
 
     static InjectBinding create(
             KeyFactory keyFactory,
             ExecutableElement m) {
         Key key = keyFactory.getKey(m);
-        Function<CodeBlock, CodeBlock> invokeExpression;
         if (m.getKind() == ElementKind.CONSTRUCTOR) {
             if (key.qualifier().isPresent()) {
                 throw new ValidationFailure("Constructors can't have qualifiers", m);
             }
-            invokeExpression = params -> CodeBlock.of("new $T($L)", m.getEnclosingElement().asType(), params);
-        } else {
-            invokeExpression = params -> CodeBlock.of("$T.$L($L)", m.getEnclosingElement().asType(), m.getSimpleName().toString(), params);
         }
-        List<DependencyRequest> dependencies = m.getParameters().stream()
-                .map(parameter -> new DependencyRequest(keyFactory.getKey(parameter), parameter, m))
-                .collect(Collectors.toList());
-        return new InjectBinding(key, m, invokeExpression, dependencies);
+        return new InjectBinding(key, keyFactory, m);
     }
 
     @Override
@@ -120,22 +117,27 @@ public final class InjectBinding extends Binding {
 
     @Override
     public List<DependencyRequest> requests() {
-        return dependencies;
-    }
-
-    CodeBlock invokeExpression(CodeBlock params) {
-        return invokeExpression.apply(params);
+        return requests.get();
     }
 
     @Override
     public CodeBlock invocation(Function<Key, String> names) {
-        return invokeExpression(requests().stream()
+        CodeBlock params = requests().stream()
                 .map(d -> CodeBlock.of("$L", names.apply(d.key())))
-                .collect(CodeBlock.joining(", ")));
+                .collect(CodeBlock.joining(", "));
+        if (bindingElement.getKind() == ElementKind.CONSTRUCTOR) {
+            return CodeBlock.of("new $T($L)", bindingElement.getEnclosingElement().asType(), params);
+        } else {
+            return CodeBlock.of("$T.$L($L)", bindingElement.getEnclosingElement().asType(), bindingElement.getSimpleName().toString(), params);
+        }
     }
 
     @Override
     public String toString() {
         return "InjectBinding[" + key() + ']';
+    }
+
+    private KeyFactory keyFactory() {
+        return keyFactory;
     }
 }
