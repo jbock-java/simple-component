@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.CodeBlock;
+import io.jbock.javapoet.ParameterSpec;
 
 import javax.lang.model.element.Element;
 import java.util.List;
@@ -43,7 +44,7 @@ public abstract class Binding {
 
     public abstract List<DependencyRequest> requests();
 
-    public abstract CodeBlock invocation(Function<Key, String> names);
+    public abstract CodeBlock invocation(Function<Key, ParameterSpec> names);
 
     public abstract String suggestedVariableName();
 }

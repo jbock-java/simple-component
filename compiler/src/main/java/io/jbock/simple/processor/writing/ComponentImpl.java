@@ -19,6 +19,7 @@ import io.jbock.simple.processor.binding.ParameterBinding;
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.ExecutableElement;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -41,9 +42,14 @@ public class ComponentImpl {
     TypeSpec generate(Map<Key, NamedBinding> sorted) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass()).addSuperinterface(component.element().asType());
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
-        Function<Key, String> names = key -> sorted.get(key).name();
-        for (Map.Entry<Key, NamedBinding> e : sorted.entrySet()) {
-            NamedBinding namedBinding = e.getValue();
+        Map<Key, ParameterSpec> parameterCache = new HashMap<>();
+        Function<Key, ParameterSpec> names = key -> {
+            return parameterCache.computeIfAbsent(key, k -> {
+                String name = sorted.get(k).name();
+                return ParameterSpec.builder(k.typeName(), name).build();
+            });
+        };
+        for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
             String name = namedBinding.name();
@@ -52,8 +58,11 @@ public class ComponentImpl {
                 spec.addField(field);
                 constructor.addStatement("this.$N = $L", field, b.invocation(names));
             } else if (!(b instanceof ParameterBinding)) {
-                ParameterSpec param = ParameterSpec.builder(key.typeName(), name).build();
+                ParameterSpec param = names.apply(key);
                 constructor.addStatement("$T $N = $L", b.key().typeName(), param, b.invocation(names));
+            }
+            if (b instanceof ParameterBinding) {
+                constructor.addParameter(names.apply(key));
             }
         }
         for (DependencyRequest r : component.requests()) {
@@ -72,7 +81,7 @@ public class ComponentImpl {
                     .returns(TypeName.get(factory.element().asType()))
                     .addStatement("return new $T()", factory.generatedClass())
                     .build());
-            spec.addType(createFactory(factory));
+            spec.addType(createFactory(factory, names));
         }, () -> {
             spec.addMethod(MethodSpec.methodBuilder("create")
                     .addModifiers(STATIC)
@@ -80,9 +89,6 @@ public class ComponentImpl {
                     .addStatement("return new $T()", component.generatedClass())
                     .build());
         });
-        for (ParameterBinding b : component.parameterBindings()) {
-            constructor.addParameter(b.parameterSpec());
-        }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
                 .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
@@ -94,7 +100,8 @@ public class ComponentImpl {
     }
 
     private TypeSpec createFactory(
-            FactoryElement factory) {
+            FactoryElement factory,
+            Function<Key, ParameterSpec> names) {
         Collection<ParameterBinding> parameterBindings = component.parameterBindings();
         TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
         spec.addModifiers(PRIVATE, STATIC, FINAL);
@@ -106,10 +113,10 @@ public class ComponentImpl {
                 .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
         method.returns(TypeName.get(component.element().asType()));
         method.addStatement("return new $T($L)", component.generatedClass(), parameterBindings.stream()
-                .map(b -> CodeBlock.of("$N", b.parameterSpec()))
+                .map(b -> CodeBlock.of("$N", names.apply(b.key())))
                 .collect(CodeBlock.joining(", ")));
         for (ParameterBinding b : parameterBindings) {
-            method.addParameter(b.parameterSpec());
+            method.addParameter(names.apply(b.key()));
         }
         spec.addMethod(method.build());
         return spec.build();

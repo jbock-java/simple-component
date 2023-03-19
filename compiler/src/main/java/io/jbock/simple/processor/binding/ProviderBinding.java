@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.CodeBlock;
+import io.jbock.javapoet.ParameterSpec;
 import io.jbock.simple.processor.util.ProviderType;
 
 import javax.lang.model.element.Element;
@@ -32,7 +33,7 @@ public class ProviderBinding extends Binding {
     }
 
     @Override
-    public CodeBlock invocation(Function<Key, String> names) {
+    public CodeBlock invocation(Function<Key, ParameterSpec> names) {
         return CodeBlock.of("() -> $L", sourceBinding.invocation(names));
     }
 

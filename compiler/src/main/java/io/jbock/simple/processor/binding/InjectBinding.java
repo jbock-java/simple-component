@@ -1,6 +1,7 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.CodeBlock;
+import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.ParameterizedTypeName;
 import io.jbock.javapoet.TypeName;
 import io.jbock.simple.Provides;
@@ -121,9 +122,9 @@ public final class InjectBinding extends Binding {
     }
 
     @Override
-    public CodeBlock invocation(Function<Key, String> names) {
+    public CodeBlock invocation(Function<Key, ParameterSpec> names) {
         CodeBlock params = requests().stream()
-                .map(d -> CodeBlock.of("$L", names.apply(d.key())))
+                .map(d -> CodeBlock.of("$N", names.apply(d.key())))
                 .collect(CodeBlock.joining(", "));
         if (bindingElement.getKind() == ElementKind.CONSTRUCTOR) {
             return CodeBlock.of("new $T($L)", bindingElement.getEnclosingElement().asType(), params);
