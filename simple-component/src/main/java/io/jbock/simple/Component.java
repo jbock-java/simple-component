@@ -12,13 +12,13 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * have the name of the type annotated, appended with {@code _Impl}. For
  * example, {@code @Component interface MyComponent {...}} will produce an implementation named
  * {@code MyComponent_Impl}.
- * 
+ *
  * <h2>Component methods</h2>
  *
  * <p>Every type annotated with {@code @Component} must contain at least one abstract component
  * method. Component methods may have any name, but must have no parameters and return a bound type.
  * A bound type is one of the following:
- * 
+ *
  * <ul>
  *     <li>an {@link Inject injected} type
  *     <li>a {@link Provides provided} type
@@ -34,20 +34,26 @@ public @interface Component {
      * A factory for a component. Components <em>may</em> have a single nested {@code interface}
      * annotated with {@code @Component.Factory}.
      *
-     * <p>A factory is a type with a single method that returns a new component instance each time it
-     * is called. The parameters of that method allow the caller to provide the bound instances
+     * <p>A factory is an interface with a single method that returns a new component instance each time it
+     * is called. The parameters of that method provide the bound instances
      * required by the component.
-     *
-     * <p>Components may have a single nested {@code interface}
-     * annotated with {@code @Component.Factory}. Factory types must follow some rules:
-     *
-     * <ul>
-     *   <li>There must be exactly one abstract method, which must return the component type.
-     *   <li>The method parameters bind the instance passed for that parameter within the component.
-     * </ul>
      */
     @Target(TYPE)
     @Retention(SOURCE)
     @interface Factory {
+    }
+
+    /**
+     * A builder for a component. Components <em>may</em> have a single nested {@code interface}
+     * annotated with {@code @Component.Builder}.
+     *
+     * <p>The builder is an interface with zero or more setter methods that return the builder type.
+     * Additionally, there must be exactly one abstract no-argument method that returns the component
+     * type, called the "build method". The setter methods provide the bound instances
+     * required by the component.
+     */
+    @Retention(SOURCE)
+    @Target(TYPE)
+    @interface Builder {
     }
 }

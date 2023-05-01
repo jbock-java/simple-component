@@ -4,19 +4,20 @@ import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.ParameterSpec;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.List;
 import java.util.function.Function;
 
 public final class ParameterBinding extends Binding {
 
-    private final VariableElement parameter;
+    private final Element element; // VariableElement or ExecutableElement (setter)
 
     private ParameterBinding(
             Key key,
-            VariableElement parameter) {
+            Element element) {
         super(key);
-        this.parameter = parameter;
+        this.element = element;
     }
 
     public static ParameterBinding create(VariableElement parameter, KeyFactory keyFactory) {
@@ -24,8 +25,9 @@ public final class ParameterBinding extends Binding {
         return new ParameterBinding(key, parameter);
     }
 
-    public VariableElement parameter() {
-        return parameter;
+    public static ParameterBinding create(ExecutableElement setter, KeyFactory keyFactory) {
+        Key key = keyFactory.getKey(setter.getParameters().get(0));
+        return new ParameterBinding(key, setter);
     }
 
     @Override
@@ -40,7 +42,7 @@ public final class ParameterBinding extends Binding {
 
     @Override
     public Element element() {
-        return parameter;
+        return element;
     }
 
     @Override
@@ -50,6 +52,6 @@ public final class ParameterBinding extends Binding {
 
     @Override
     public String suggestedVariableName() {
-        return parameter.getSimpleName().toString();
+        return element.getSimpleName().toString();
     }
 }

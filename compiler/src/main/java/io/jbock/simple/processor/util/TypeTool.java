@@ -46,6 +46,10 @@ public final class TypeTool {
         return types.isSameType(mirror, typeElement.asType());
     }
 
+    public boolean isSameType(TypeMirror mirror, TypeMirror other) {
+        return types.isSameType(mirror, other);
+    }
+
     public boolean hasInjectAnnotation(Element m) {
         if (m.getKind() != ElementKind.CONSTRUCTOR && m.getKind() != ElementKind.METHOD) {
             return false;

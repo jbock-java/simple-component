@@ -78,6 +78,10 @@ public class KeyFactory implements ClearableCache {
         return tool.hasQualifierAnnotation(element);
     }
 
+    TypeTool tool() {
+        return tool;
+    }
+
     @Override
     public void clearCache() {
         keyCache.clear();

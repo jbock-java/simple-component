@@ -36,7 +36,9 @@ public class ComponentFactoryStep implements Step {
 
     @Override
     public Set<String> annotations() {
-        return Set.of(Component.Factory.class.getCanonicalName());
+        return Set.of(
+                Component.Factory.class.getCanonicalName(),
+                Component.Builder.class.getCanonicalName());
     }
 
     @Override
@@ -52,11 +54,12 @@ public class ComponentFactoryStep implements Step {
                 if (enclosing.getAnnotation(Component.class) == null) {
                     throw new ValidationFailure("The @Factory must be nested inside a @Component", typeElement);
                 }
-                if (enclosing.getEnclosedElements().stream()
-                        .filter(enclosed -> enclosed.getKind().isInterface())
-                        .filter(enclosed -> enclosed.getAnnotation(Component.Factory.class) != null)
+                List<? extends Element> siblings = enclosing.getEnclosedElements();
+                if (siblings.stream()
+                        .filter(sibling -> sibling.getAnnotation(Component.Factory.class) != null
+                                || sibling.getAnnotation(Component.Builder.class) != null)
                         .count() >= 2) {
-                    throw new ValidationFailure("Found more than one @Factory", enclosing);
+                    throw new ValidationFailure("Only one @Factory or @Builder allowed", enclosing);
                 }
                 for (ExecutableElement m : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
                     if (m.getModifiers().contains(Modifier.ABSTRACT)) {

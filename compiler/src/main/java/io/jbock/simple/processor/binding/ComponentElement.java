@@ -10,7 +10,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -38,13 +37,29 @@ public final class ComponentElement {
         for (Element el : element().getEnclosedElements()) {
             boolean hasFactoryAnnotation = el.getAnnotation(Component.Factory.class) != null;
             if (!hasFactoryAnnotation) {
-                return Optional.empty();
+                continue;
             }
             TypeElement tel = Visitors.TYPE_ELEMENT_VISITOR.visit(el);
             if (tel == null) {
-                return Optional.empty();
+                continue;
             }
             return Optional.of(new FactoryElement(tel, generatedClass(), keyFactory()));
+        }
+        return Optional.empty();
+    });
+
+
+    private final Supplier<Optional<BuilderElement>> builderElement = memoize(() -> {
+        for (Element el : element().getEnclosedElements()) {
+            boolean hasBuilderAnnotation = el.getAnnotation(Component.Builder.class) != null;
+            if (!hasBuilderAnnotation) {
+                continue;
+            }
+            TypeElement tel = Visitors.TYPE_ELEMENT_VISITOR.visit(el);
+            if (tel == null) {
+                continue;
+            }
+            return Optional.of(new BuilderElement(tel, generatedClass(), keyFactory()));
         }
         return Optional.empty();
     });
@@ -91,14 +106,15 @@ public final class ComponentElement {
     private final Supplier<Map<Key, ParameterBinding>> parameterBindings = memoize(() -> {
         List<ParameterBinding> pBindings = factoryElement()
                 .map(FactoryElement::parameterBindings)
+                .or(() -> builderElement().map(BuilderElement::parameterBindings))
                 .orElse(List.of());
         Map<Key, ParameterBinding> result = new LinkedHashMap<>();
         for (ParameterBinding b : pBindings) {
             ParameterBinding previousBinding = result.put(b.key(), b);
             if (previousBinding != null) {
-                VariableElement p = previousBinding.parameter();
+                Element p = previousBinding.element();
                 throw new ValidationFailure("The binding is in conflict with another parameter: " +
-                        p.asType() + ' ' + p.getSimpleName(), b.parameter());
+                        p.asType() + ' ' + p.getSimpleName(), b.element());
             }
         }
         return result;
@@ -123,6 +139,10 @@ public final class ComponentElement {
 
     public Optional<FactoryElement> factoryElement() {
         return factoryElement.get();
+    }
+
+    public Optional<BuilderElement> builderElement() {
+        return builderElement.get();
     }
 
     public boolean isComponentRequest(Binding binding) {
