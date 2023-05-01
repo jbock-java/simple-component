@@ -10,6 +10,7 @@ import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.SimpleComponentProcessor;
 import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.BuilderElement;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.FactoryElement;
@@ -18,6 +19,7 @@ import io.jbock.simple.processor.binding.ParameterBinding;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.TypeMirror;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
@@ -73,20 +75,29 @@ public class ComponentImpl {
                     .collect(Collectors.toList()));
             spec.addMethod(method.build());
         }
-        component.factoryElement().ifPresentOrElse(factory -> {
+        component.factoryElement().ifPresent(factory -> {
             spec.addMethod(MethodSpec.methodBuilder("factory")
                     .addModifiers(STATIC)
                     .returns(TypeName.get(factory.element().asType()))
                     .addStatement("return new $T()", factory.generatedClass())
                     .build());
-            spec.addType(createFactory(factory, names));
-        }, () -> {
+            spec.addType(createFactoryImpl(factory));
+        });
+        component.builderElement().ifPresent(builder -> {
+            spec.addMethod(MethodSpec.methodBuilder("builder")
+                    .addModifiers(STATIC)
+                    .returns(TypeName.get(builder.element().asType()))
+                    .addStatement("return new $T()", builder.generatedClass())
+                    .build());
+            spec.addType(createBuilderImpl(builder));
+        });
+        if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
             spec.addMethod(MethodSpec.methodBuilder("create")
                     .addModifiers(STATIC)
                     .returns(TypeName.get(component.element().asType()))
                     .addStatement("return new $T()", component.generatedClass())
                     .build());
-        });
+        }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
                 .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
@@ -97,9 +108,7 @@ public class ComponentImpl {
         return spec.build();
     }
 
-    private TypeSpec createFactory(
-            FactoryElement factory,
-            Function<Key, ParameterSpec> names) {
+    private TypeSpec createFactoryImpl(FactoryElement factory) {
         Collection<ParameterBinding> parameterBindings = component.parameterBindings();
         TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
         spec.addModifiers(PRIVATE, STATIC, FINAL);
@@ -117,6 +126,36 @@ public class ComponentImpl {
             method.addParameter(names.apply(b.key()));
         }
         spec.addMethod(method.build());
+        return spec.build();
+    }
+
+    private TypeSpec createBuilderImpl(BuilderElement builder) {
+        Collection<ParameterBinding> parameterBindings = component.parameterBindings();
+        TypeMirror builderType = builder.element().asType();
+        TypeSpec.Builder spec = TypeSpec.classBuilder(builder.generatedClass());
+        for (ParameterBinding b : parameterBindings) {
+            spec.addField(FieldSpec.builder(b.key().typeName(), names.apply(b.key()).name).build());
+            MethodSpec.Builder setterMethod = MethodSpec.methodBuilder(b.element().getSimpleName().toString());
+            setterMethod.addAnnotation(Override.class);
+            setterMethod.addParameter(names.apply(b.key()));
+            setterMethod.addStatement("this.$N = $N", names.apply(b.key()), names.apply(b.key()));
+            setterMethod.addStatement("return this");
+            setterMethod.returns(TypeName.get(builderType));
+            setterMethod.addModifiers(b.element().getModifiers().stream()
+                    .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
+            spec.addMethod(setterMethod.build());
+        }
+        spec.addModifiers(PRIVATE, STATIC, FINAL);
+        spec.addSuperinterface(builderType);
+        MethodSpec.Builder buildMethod = MethodSpec.methodBuilder(builder.buildMethod().getSimpleName().toString());
+        buildMethod.addAnnotation(Override.class);
+        buildMethod.addModifiers(builder.buildMethod().getModifiers().stream()
+                .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
+        buildMethod.returns(TypeName.get(component.element().asType()));
+        buildMethod.addStatement("return new $T($L)", component.generatedClass(), parameterBindings.stream()
+                .map(b -> CodeBlock.of("$N", names.apply(b.key())))
+                .collect(CodeBlock.joining(", ")));
+        spec.addMethod(buildMethod.build());
         return spec.build();
     }
 

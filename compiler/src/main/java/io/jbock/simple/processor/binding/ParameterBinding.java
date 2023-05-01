@@ -12,22 +12,26 @@ import java.util.function.Function;
 public final class ParameterBinding extends Binding {
 
     private final Element element; // VariableElement or ExecutableElement (setter)
+    private final String suggestedVariableName;
 
     private ParameterBinding(
             Key key,
-            Element element) {
+            Element element,
+            String suggestedVariableName) {
         super(key);
         this.element = element;
+        this.suggestedVariableName = suggestedVariableName;
     }
 
     public static ParameterBinding create(VariableElement parameter, KeyFactory keyFactory) {
         Key key = keyFactory.getKey(parameter);
-        return new ParameterBinding(key, parameter);
+        return new ParameterBinding(key, parameter, parameter.getSimpleName().toString());
     }
 
     public static ParameterBinding create(ExecutableElement setter, KeyFactory keyFactory) {
-        Key key = keyFactory.getKey(setter.getParameters().get(0));
-        return new ParameterBinding(key, setter);
+        VariableElement parameter = setter.getParameters().get(0);
+        Key key = keyFactory.getKey(parameter);
+        return new ParameterBinding(key, setter, parameter.getSimpleName().toString());
     }
 
     @Override
@@ -52,6 +56,6 @@ public final class ParameterBinding extends Binding {
 
     @Override
     public String suggestedVariableName() {
-        return element.getSimpleName().toString();
+        return suggestedVariableName;
     }
 }
