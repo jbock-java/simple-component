@@ -5,7 +5,7 @@ A minimalistic approach to dependency injection. Basically the idea is that you 
 
 1. `@Inject` declares an injection point, similarly `@Provides` declares an injection point within the component
 2. `@Qualifier` and `@Named`
-3. `@Component` along with `@Component.Factory`
+3. `@Component` along with `@Component.Factory` and `@Component.Builder`
 
 ### The `@Scope` and `@Singleton` annotations are ignored.
 
