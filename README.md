@@ -14,7 +14,7 @@ Instead, you have the "same key, same bean" rule:
 > If two beans of the same *key* are injected by the same component, then they are the same bean instance.
 
 Here, "same key" means "same type" or, if a qualifier is used, "same key and same qualifier".
-The SKSB-rule may seem restrictive at first, but please note that you can always inject `Provider<TheBean> theBeanProvider`, and calling `theBeanProvider.get()` will give you a freshly wired "distinct" bean instance every time.
+This may seem restrictive at first, but please note that you can always inject `Provider<TheBean> theBeanProvider`, and calling `theBeanProvider.get()` will give you a freshly wired "distinct" bean instance every time.
 
 ### Note to dagger users
 
