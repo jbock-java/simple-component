@@ -48,9 +48,11 @@ public class ComponentImpl {
     }
 
     TypeSpec generate() {
-        TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass()).addSuperinterface(component.element().asType());
-        spec.addModifiers(component.element().getModifiers().stream()
-                .filter(m -> m == PUBLIC || m == PROTECTED).toArray(Modifier[]::new));
+        Modifier[] modifiers = component.element().getModifiers().stream()
+                .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
+        TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass())
+                .addModifiers(modifiers)
+                .addSuperinterface(component.element().asType());
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
@@ -73,16 +75,13 @@ public class ComponentImpl {
             method.addStatement("return $L", sorted.get(r.key()).name());
             method.returns(r.key().typeName());
             method.addAnnotation(Override.class);
-            method.addModifiers(r.requestingElement().getModifiers().stream()
-                    .filter(m -> m == PUBLIC || m == PROTECTED)
-                    .collect(Collectors.toList()));
+            method.addModifiers(PUBLIC);
             spec.addMethod(method.build());
         }
         component.factoryElement().ifPresent(factory -> {
             spec.addMethod(MethodSpec.methodBuilder("factory")
                     .addModifiers(STATIC)
-                    .addModifiers(component.element().getModifiers().stream()
-                            .filter(m -> m == PUBLIC).toArray(Modifier[]::new))
+                    .addModifiers(modifiers)
                     .returns(TypeName.get(factory.element().asType()))
                     .addStatement("return new $T()", factory.generatedClass())
                     .build());
@@ -91,8 +90,7 @@ public class ComponentImpl {
         component.builderElement().ifPresent(builder -> {
             spec.addMethod(MethodSpec.methodBuilder("builder")
                     .addModifiers(STATIC)
-                    .addModifiers(component.element().getModifiers().stream()
-                            .filter(m -> m == PUBLIC).toArray(Modifier[]::new))
+                    .addModifiers(modifiers)
                     .returns(TypeName.get(builder.element().asType()))
                     .addStatement("return new $T()", builder.generatedClass())
                     .build());
@@ -101,6 +99,7 @@ public class ComponentImpl {
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
             spec.addMethod(MethodSpec.methodBuilder("create")
                     .addModifiers(STATIC)
+                    .addModifiers(modifiers)
                     .returns(TypeName.get(component.element().asType()))
                     .addStatement("return new $T()", component.generatedClass())
                     .build());

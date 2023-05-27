@@ -37,7 +37,7 @@ class ProcessorComponentTest {
                 "  }",
                 "",
                 "  @Component",
-                "  interface AComponent {",
+                "  public interface AComponent {",
                 "    A getA();",
                 "  }",
                 "}");
@@ -48,7 +48,7 @@ class ProcessorComponentTest {
                 .containsLines(
                         "package test;",
                         "",
-                        "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
+                        "public final class TestClass_AComponent_Impl implements TestClass.AComponent {",
                         "  private final TestClass.A a;",
                         "",
                         "  private TestClass_AComponent_Impl() {",
@@ -60,6 +60,10 @@ class ProcessorComponentTest {
                         "  @Override",
                         "  public TestClass.A getA() {",
                         "    return a;",
+                        "  }",
+                        "",
+                        "  public static TestClass.AComponent create() {",
+                        "    return new TestClass_AComponent_Impl();",
                         "  }",
                         "}");
     }
