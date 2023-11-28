@@ -57,7 +57,10 @@ class StaticInjectionTest {
                         "  }",
                         "",
                         "  static TestClass.AComponent create() {",
-                        "    return new TestClass_AComponent_Impl();",
+                        "    TestClass.B b = TestClass.B.create1();",
+                        "    TestClass.B b2 = TestClass.B.create2();",
+                        "    TestClass.A a = new TestClass.A(b, b2);",
+                        "    return new TestClass_AComponent_Impl(a);",
                         "  }",
                         "}");
     }
