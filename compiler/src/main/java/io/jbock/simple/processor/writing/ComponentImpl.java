@@ -53,22 +53,13 @@ public class ComponentImpl {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass())
                 .addModifiers(modifiers)
                 .addSuperinterface(component.element().asType());
-        MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
+        MethodSpec constructor = generateConstructor();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
-            Key key = b.key();
-            String name = namedBinding.name();
-            if (namedBinding.isComponentRequest()) {
-                FieldSpec field = FieldSpec.builder(key.typeName(), name, PRIVATE, FINAL).build();
-                spec.addField(field);
-                constructor.addStatement("this.$N = $L", field, b.invocation(names));
-            } else if (!(b instanceof ParameterBinding)) {
-                ParameterSpec param = names.apply(key);
-                constructor.addStatement("$T $N = $L", b.key().typeName(), param, b.invocation(names));
+            if (!namedBinding.isComponentRequest()) {
+                continue;
             }
-            if (b instanceof ParameterBinding) {
-                constructor.addParameter(names.apply(key));
-            }
+            TypeName type = namedBinding.binding().key().typeName();
+            spec.addField(FieldSpec.builder(type, namedBinding.name(), PRIVATE, FINAL).build());
         }
         for (DependencyRequest r : component.requests()) {
             MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestingElement().getSimpleName().toString());
@@ -109,9 +100,29 @@ public class ComponentImpl {
                 .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
                 .build());
         spec.addModifiers(FINAL);
-        spec.addMethod(constructor.build());
+        spec.addMethod(constructor);
         spec.addOriginatingElement(component.element());
         return spec.build();
+    }
+
+    private MethodSpec generateConstructor() {
+        MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
+        for (NamedBinding namedBinding : sorted.values()) {
+            Binding b = namedBinding.binding();
+            Key key = b.key();
+            String name = namedBinding.name();
+            if (namedBinding.isComponentRequest()) {
+                FieldSpec field = FieldSpec.builder(key.typeName(), name, PRIVATE, FINAL).build();
+                constructor.addStatement("this.$N = $L", field, b.invocation(names));
+            } else if (!(b instanceof ParameterBinding)) {
+                ParameterSpec param = names.apply(key);
+                constructor.addStatement("$T $N = $L", b.key().typeName(), param, b.invocation(names));
+            }
+            if (b instanceof ParameterBinding) {
+                constructor.addParameter(names.apply(key));
+            }
+        }
+        return constructor.build();
     }
 
     private TypeSpec createFactoryImpl(FactoryElement factory) {
