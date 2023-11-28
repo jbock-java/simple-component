@@ -21,7 +21,9 @@ import javax.annotation.processing.Generated;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -53,14 +55,7 @@ public class ComponentImpl {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass())
                 .addModifiers(modifiers)
                 .addSuperinterface(component.element().asType());
-        MethodSpec constructor = generateConstructor();
-        for (NamedBinding namedBinding : sorted.values()) {
-            if (!namedBinding.isComponentRequest()) {
-                continue;
-            }
-            TypeName type = namedBinding.binding().key().typeName();
-            spec.addField(FieldSpec.builder(type, namedBinding.name(), PRIVATE, FINAL).build());
-        }
+        spec.addFields(getFields());
         for (DependencyRequest r : component.requests()) {
             MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestingElement().getSimpleName().toString());
             method.addStatement("return $L", sorted.get(r.key()).name());
@@ -100,7 +95,10 @@ public class ComponentImpl {
                 .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
                 .build());
         spec.addModifiers(FINAL);
-        spec.addMethod(constructor);
+        spec.addMethod(generateConstructor());
+        if (sorted.values().stream().anyMatch(binding -> !(binding.binding() instanceof ParameterBinding))) {
+            spec.addMethod(generateAllParametersConstructor());
+        }
         spec.addOriginatingElement(component.element());
         return spec.build();
     }
@@ -116,11 +114,37 @@ public class ComponentImpl {
                 constructor.addStatement("this.$N = $L", field, b.invocation(names));
             } else if (!(b instanceof ParameterBinding)) {
                 ParameterSpec param = names.apply(key);
-                constructor.addStatement("$T $N = $L", b.key().typeName(), param, b.invocation(names));
+                constructor.addStatement("$T $N = $L", key.typeName(), param, b.invocation(names));
             }
             if (b instanceof ParameterBinding) {
                 constructor.addParameter(names.apply(key));
             }
+        }
+        return constructor.build();
+    }
+
+    private List<FieldSpec> getFields() {
+        List<FieldSpec> fields = new ArrayList<>();
+        for (NamedBinding namedBinding : sorted.values()) {
+            if (!namedBinding.isComponentRequest()) {
+                continue;
+            }
+            TypeName type = namedBinding.binding().key().typeName();
+            FieldSpec field = FieldSpec.builder(type, namedBinding.name(), PRIVATE, FINAL).build();
+            fields.add(field);
+        }
+        return fields;
+    }
+
+    private MethodSpec generateAllParametersConstructor() {
+        MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
+        for (NamedBinding namedBinding : sorted.values()) {
+            if (!namedBinding.isComponentRequest()) {
+                continue;
+            }
+            ParameterSpec param = names.apply(namedBinding.binding().key());
+            constructor.addParameter(param);
+            constructor.addStatement("this.$1N = $1N", param);
         }
         return constructor.build();
     }
