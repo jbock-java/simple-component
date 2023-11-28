@@ -68,6 +68,19 @@ class ProcessorComponentTest {
                         "    TestClass.A a = new TestClass.A(b);",
                         "    return new TestClass_AComponent_Impl(a);",
                         "  }",
+                        "",
+                        "  public MockBuilder mockCreate() {",
+                        "    return new MockBuilder();",
+                        "  }",
+                        "",
+                        "  public static final class MockBuilder {",
+                        "    public TestClass.AComponent build() {",
+                        "      TestClass.C c = TestClass.C.createC();",
+                        "      TestClass.B b = TestClass.B.createB(c);",
+                        "      TestClass.A a = new TestClass.A(b);",
+                        "      return new TestClass_AComponent_Impl(a);",
+                        "    }",
+                        "  }",
                         "}");
     }
 

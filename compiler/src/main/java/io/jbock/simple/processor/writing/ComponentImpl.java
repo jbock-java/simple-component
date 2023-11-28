@@ -39,19 +39,23 @@ public class ComponentImpl {
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
+    private final MockBuilder mockBuilder;
+    private final Modifier[] modifiers;
 
     private ComponentImpl(
             ComponentElement component,
             Map<Key, NamedBinding> sorted,
-            Function<Key, ParameterSpec> names) {
+            Function<Key, ParameterSpec> names,
+            MockBuilder mockBuilder) {
         this.component = component;
         this.sorted = sorted;
         this.names = names;
+        this.mockBuilder = mockBuilder;
+        this.modifiers = component.element().getModifiers().stream()
+                .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
     }
 
     TypeSpec generate() {
-        Modifier[] modifiers = component.element().getModifiers().stream()
-                .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass())
                 .addModifiers(modifiers)
                 .addSuperinterface(component.element().asType());
@@ -83,7 +87,9 @@ public class ComponentImpl {
             spec.addType(createBuilderImpl(builder));
         });
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
-            spec.addMethod(generateCreateMethod(modifiers));
+            spec.addMethod(generateCreateMethod());
+            spec.addMethod(generateMockCreateMethod());
+            spec.addType(mockBuilder.generate());
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
@@ -98,7 +104,7 @@ public class ComponentImpl {
         return spec.build();
     }
 
-    private MethodSpec generateCreateMethod(Modifier[] modifiers) {
+    private MethodSpec generateCreateMethod() {
         List<CodeBlock> constructorParameters = new ArrayList<>();
         MethodSpec.Builder method = MethodSpec.methodBuilder("create");
         for (NamedBinding namedBinding : sorted.values()) {
@@ -119,6 +125,14 @@ public class ComponentImpl {
                         component.generatedClass(),
                         constructorParameters.stream().collect(CodeBlock.joining(", ")))
                 .build();
+    }
+
+    MethodSpec generateMockCreateMethod() {
+        MethodSpec.Builder method = MethodSpec.methodBuilder("mockCreate");
+        method.addModifiers(modifiers);
+        method.addStatement("return new $T()", mockBuilder.getClassName());
+        method.returns(mockBuilder.getClassName());
+        return method.build();
     }
 
     private MethodSpec generateConstructor() {
@@ -220,16 +234,22 @@ public class ComponentImpl {
 
     public static final class Factory {
         private final ComponentElement component;
+        private final MockBuilder.Factory mockBuilderFactory;
 
         @Inject
-        public Factory(ComponentElement component) {
+        public Factory(ComponentElement component, MockBuilder.Factory mockBuilderFactory) {
             this.component = component;
+            this.mockBuilderFactory = mockBuilderFactory;
         }
 
         ComponentImpl create(
                 Map<Key, NamedBinding> sorted,
                 Function<Key, ParameterSpec> names) {
-            return new ComponentImpl(component, sorted, names);
+            return new ComponentImpl(
+                    component,
+                    sorted,
+                    names,
+                    mockBuilderFactory.create(sorted, names));
         }
     }
 }
