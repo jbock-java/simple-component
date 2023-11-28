@@ -83,12 +83,7 @@ public class ComponentImpl {
             spec.addType(createBuilderImpl(builder));
         });
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
-            spec.addMethod(MethodSpec.methodBuilder("create")
-                    .addModifiers(STATIC)
-                    .addModifiers(modifiers)
-                    .returns(TypeName.get(component.element().asType()))
-                    .addStatement("return new $T()", component.generatedClass())
-                    .build());
+            spec.addMethod(generateCreateMethod(modifiers));
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
@@ -101,6 +96,29 @@ public class ComponentImpl {
         }
         spec.addOriginatingElement(component.element());
         return spec.build();
+    }
+
+    private MethodSpec generateCreateMethod(Modifier[] modifiers) {
+        List<CodeBlock> constructorParameters = new ArrayList<>();
+        MethodSpec.Builder method = MethodSpec.methodBuilder("create");
+        for (NamedBinding namedBinding : sorted.values()) {
+            Binding b = namedBinding.binding();
+            Key key = b.key();
+            CodeBlock invocation = b.invocation(names);
+            ParameterSpec param = names.apply(key);
+            if (namedBinding.isComponentRequest()) {
+                constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
+            }
+            method.addStatement("$T $N = $L", key.typeName(), param, invocation);
+        }
+        return method
+                .addModifiers(STATIC)
+                .addModifiers(modifiers)
+                .returns(TypeName.get(component.element().asType()))
+                .addStatement("return new $T($L)",
+                        component.generatedClass(),
+                        constructorParameters.stream().collect(CodeBlock.joining(", ")))
+                .build();
     }
 
     private MethodSpec generateConstructor() {

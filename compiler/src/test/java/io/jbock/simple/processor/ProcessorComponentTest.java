@@ -63,7 +63,10 @@ class ProcessorComponentTest {
                         "  }",
                         "",
                         "  public static TestClass.AComponent create() {",
-                        "    return new TestClass_AComponent_Impl();",
+                        "    TestClass.C c = TestClass.C.createC();",
+                        "    TestClass.B b = TestClass.B.createB(c);",
+                        "    TestClass.A a = new TestClass.A(b);",
+                        "    return new TestClass_AComponent_Impl(a);",
                         "  }",
                         "}");
     }
@@ -125,7 +128,11 @@ class ProcessorComponentTest {
                         "  }",
                         "",
                         "  static TestClass.AComponent create() {",
-                        "    return new TestClass_AComponent_Impl();",
+                        "    TestClass.E e = new TestClass.E();",
+                        "    TestClass.C c = new TestClass.C(e);",
+                        "    TestClass.B b = new TestClass.B(e);",
+                        "    TestClass.A a = new TestClass.A(b, c);",
+                        "    return new TestClass_AComponent_Impl(a);",
                         "  }",
                         "}");
     }
