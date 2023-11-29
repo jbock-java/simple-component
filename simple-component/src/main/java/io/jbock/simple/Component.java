@@ -12,8 +12,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * have the name of the type annotated, appended with {@code _Impl}. For
  * example, {@code @Component interface MyComponent {...}} will produce an implementation named
  * {@code MyComponent_Impl}.
- *
- * <h2>Component methods</h2>
+ * <h2>Component methods
  *
  * <p>Every type annotated with {@code @Component} must contain at least one abstract component
  * method. Component methods may have any name, but must have no parameters and return a bound type.
@@ -56,4 +55,21 @@ public @interface Component {
     @Target(TYPE)
     @interface Builder {
     }
+
+    /**
+     * By default, the {@code mockBuilder} method is only package-private. This
+     * should make it less prone to accidental invocation from production code.
+     *
+     * <p>In test code, this restriction can be circumvented by placing a public delegate class
+     * in the component package.
+     *
+     * @return {@code true} if the {@code mockBuilder} method should have the same visibility
+     * as the component.
+     */
+    boolean generatePublicMockBuilder() default false;
+
+    /**
+     * @return {@code true} if the {@code mockBuilder} method should not be generated.
+     */
+    boolean omitMockBuilder() default false;
 }
