@@ -35,6 +35,7 @@ public class Generator {
 
     private Map<Key, NamedBinding> addNames(List<Binding> bindings) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
+        uniqueNameSet.claim("build");
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
         for (Binding b : bindings) {
             String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));

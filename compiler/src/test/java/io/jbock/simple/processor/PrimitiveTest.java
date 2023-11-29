@@ -39,8 +39,8 @@ class PrimitiveTest {
         assertThat(compilation).succeeded();
         assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
                 .containsLines(
-                        "  private TestClass_AComponent_Impl(int i) {",
-                        "    this.a = new TestClass.A(i);",
+                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
+                        "    this.a = a;",
                         "  }");
     }
 
@@ -77,9 +77,8 @@ class PrimitiveTest {
         assertThat(compilation).succeeded();
         assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
                 .containsLines(
-                        "  private TestClass_AComponent_Impl(int i) {",
-                        "    int b = TestClass.AComponent.getB(i);",
-                        "    this.a = new TestClass.A(b);",
+                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
+                        "    this.a = a;",
                         "  }");
     }
 }

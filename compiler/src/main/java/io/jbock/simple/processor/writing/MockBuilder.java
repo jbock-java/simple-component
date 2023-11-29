@@ -2,6 +2,7 @@ package io.jbock.simple.processor.writing;
 
 import io.jbock.javapoet.ClassName;
 import io.jbock.javapoet.CodeBlock;
+import io.jbock.javapoet.FieldSpec;
 import io.jbock.javapoet.MethodSpec;
 import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.TypeName;
@@ -10,6 +11,7 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.binding.ParameterBinding;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
@@ -28,7 +31,7 @@ public class MockBuilder {
     private final Function<Key, ParameterSpec> names;
     private final Modifier[] modifiers;
 
-    public MockBuilder(
+    MockBuilder(
             ComponentElement component,
             Map<Key, NamedBinding> sorted,
             Function<Key, ParameterSpec> names) {
@@ -44,6 +47,8 @@ public class MockBuilder {
                 .addModifiers(modifiers)
                 .addModifiers(STATIC, FINAL);
         spec.addMethod(buildMethod());
+        spec.addFields(getFields());
+        spec.addMethods(getMethods());
         return spec.build();
     }
 
@@ -62,7 +67,14 @@ public class MockBuilder {
             if (namedBinding.isComponentRequest()) {
                 constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
             }
-            method.addStatement("$T $N = $L", key.typeName(), param, invocation);
+            if (namedBinding.binding() instanceof ParameterBinding) {
+                method.addParameter(names.apply(b.key()));
+            } else if (!key.typeName().isPrimitive()) {
+                method.addStatement("$1T $2N = this.$2N != null ? this.$2N : $3L", key.typeName(), param, invocation);
+            } else {
+                // TODO allow mocking primitives
+                method.addStatement("$T $N = $L", key.typeName(), param, invocation);
+            }
         }
         return method
                 .addModifiers(modifiers)
@@ -73,6 +85,37 @@ public class MockBuilder {
                 .build();
     }
 
+    private List<FieldSpec> getFields() {
+        List<FieldSpec> fields = new ArrayList<>();
+        for (NamedBinding namedBinding : sorted.values()) {
+            if (namedBinding.binding() instanceof ParameterBinding) {
+                continue;
+            }
+            TypeName type = namedBinding.binding().key().typeName();
+            FieldSpec field = FieldSpec.builder(type, namedBinding.name(), PRIVATE).build();
+            fields.add(field);
+        }
+        return fields;
+    }
+
+    private List<MethodSpec> getMethods() {
+        List<MethodSpec> methods = new ArrayList<>();
+        for (NamedBinding namedBinding : sorted.values()) {
+            if (namedBinding.binding() instanceof ParameterBinding) {
+                continue;
+            }
+            Binding b = namedBinding.binding();
+            Key key = b.key();
+            ParameterSpec param = names.apply(key);
+            MethodSpec method = MethodSpec.methodBuilder(param.name)
+                    .addModifiers(modifiers)
+                    .addParameter(param)
+                    .addStatement("this.$1N = $1N", param)
+                    .build();
+            methods.add(method);
+        }
+        return methods;
+    }
 
     public static final class Factory {
         private final ComponentElement component;
