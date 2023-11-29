@@ -72,8 +72,8 @@ public class MockBuilder {
             } else if (!key.typeName().isPrimitive()) {
                 method.addStatement("$1T $2N = this.$2N != null ? this.$2N : $3L", key.typeName(), param, invocation);
             } else {
-                // TODO allow mocking primitives
-                method.addStatement("$T $N = $L", key.typeName(), param, invocation);
+                FieldSpec auxField = FieldSpec.builder(TypeName.BOOLEAN, namedBinding.auxName(), PRIVATE).build();
+                method.addStatement("$1T $2N = this.$3N ? this.$2N : $4L", key.typeName(), param, auxField, invocation);
             }
         }
         return method
@@ -94,6 +94,10 @@ public class MockBuilder {
             TypeName type = namedBinding.binding().key().typeName();
             FieldSpec field = FieldSpec.builder(type, namedBinding.name(), PRIVATE).build();
             fields.add(field);
+            if (namedBinding.binding().key().typeName().isPrimitive()) {
+                FieldSpec auxField = FieldSpec.builder(TypeName.BOOLEAN, namedBinding.auxName(), PRIVATE).build();
+                fields.add(auxField);
+            }
         }
         return fields;
     }
@@ -107,12 +111,15 @@ public class MockBuilder {
             Binding b = namedBinding.binding();
             Key key = b.key();
             ParameterSpec param = names.apply(key);
-            MethodSpec method = MethodSpec.methodBuilder(param.name)
+            MethodSpec.Builder method = MethodSpec.methodBuilder(param.name)
                     .addModifiers(modifiers)
                     .addParameter(param)
-                    .addStatement("this.$1N = $1N", param)
-                    .build();
-            methods.add(method);
+                    .addStatement("this.$1N = $1N", param);
+            if (namedBinding.binding().key().typeName().isPrimitive()) {
+                FieldSpec auxField = FieldSpec.builder(TypeName.BOOLEAN, namedBinding.auxName(), PRIVATE).build();
+                method.addStatement("this.$N = $L", auxField, true);
+            }
+            methods.add(method.build());
         }
         return methods;
     }
