@@ -44,8 +44,8 @@ class BuilderTest {
                         "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
                         "  private final TestClass.A a;",
                         "",
-                        "  private TestClass_AComponent_Impl() {",
-                        "    this.a = new TestClass.A();",
+                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
+                        "    this.a = a;",
                         "  }",
                         "",
                         "  @Override",
@@ -60,14 +60,15 @@ class BuilderTest {
                         "  private static final class Builder_Impl implements TestClass.AComponent.Builder {",
                         "    @Override",
                         "    public TestClass.AComponent build() {",
-                        "      return new TestClass_AComponent_Impl();",
+                        "      TestClass.A a = new TestClass.A();",
+                        "      return new TestClass_AComponent_Impl(a);",
                         "    }",
                         "  }",
                         "}");
     }
 
     @Test
-    void factoryParameterIdentity() {
+    void builderParameterIdentity() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",
                 "",
@@ -128,7 +129,7 @@ class BuilderTest {
 
 
     @Test
-    void factoryParameter() {
+    void builderParameter() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",
                 "",
@@ -161,8 +162,8 @@ class BuilderTest {
                         "public final class TestClass_AComponent_Impl implements TestClass.AComponent {",
                         "  private final TestClass.A a;",
                         "",
-                        "  private TestClass_AComponent_Impl(String s) {",
-                        "    this.a = new TestClass.A(s);",
+                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
+                        "    this.a = a;",
                         "  }",
                         "",
                         "  @Override",
@@ -185,7 +186,8 @@ class BuilderTest {
                         "",
                         "    @Override",
                         "    public TestClass.AComponent build() {",
-                        "      return new TestClass_AComponent_Impl(s);",
+                        "      TestClass.A a = new TestClass.A(s);",
+                        "      return new TestClass_AComponent_Impl(a);",
                         "    }",
                         "  }",
                         "}");

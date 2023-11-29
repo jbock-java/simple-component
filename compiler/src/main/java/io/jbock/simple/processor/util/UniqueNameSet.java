@@ -34,4 +34,12 @@ public final class UniqueNameSet {
     }
     return name;
   }
+
+  /**
+   * Adds {@code name} without any modification to the name set. Has no effect if {@code name} is
+   * already present in the set.
+   */
+  public void claim(CharSequence name) {
+    uniqueNames.add(name.toString());
+  }
 }

@@ -41,7 +41,7 @@ class JavaxQualifierTest {
                         "final class TestClass_AComponent_Impl implements TestClass.AComponent {",
                         "  private final String a;",
                         "",
-                        "  private TestClass_AComponent_Impl(String a, String b) {",
+                        "  private TestClass_AComponent_Impl(String a) {",
                         "    this.a = a;",
                         "  }",
                         "",
@@ -57,7 +57,7 @@ class JavaxQualifierTest {
                         "  private static final class Factory_Impl implements TestClass.AComponent.Factory {",
                         "    @Override",
                         "    public TestClass.AComponent create(String a, String b) {",
-                        "      return new TestClass_AComponent_Impl(a, b);",
+                        "      return new TestClass_AComponent_Impl(a);",
                         "    }",
                         "  }",
                         "}");

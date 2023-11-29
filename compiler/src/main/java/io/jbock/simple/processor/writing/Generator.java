@@ -35,10 +35,12 @@ public class Generator {
 
     private Map<Key, NamedBinding> addNames(List<Binding> bindings) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
+        uniqueNameSet.claim("build");
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
         for (Binding b : bindings) {
             String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));
-            result.put(b.key(), new NamedBinding(b, name, component.isComponentRequest(b)));
+            String auxName = uniqueNameSet.getUniqueName(name + "_isSet");
+            result.put(b.key(), new NamedBinding(b, name, auxName, component.isComponentRequest(b)));
         }
         return result;
     }

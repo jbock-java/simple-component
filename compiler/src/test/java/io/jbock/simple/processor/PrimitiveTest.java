@@ -39,8 +39,8 @@ class PrimitiveTest {
         assertThat(compilation).succeeded();
         assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
                 .containsLines(
-                        "  private TestClass_AComponent_Impl(int i) {",
-                        "    this.a = new TestClass.A(i);",
+                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
+                        "    this.a = a;",
                         "  }");
     }
 
@@ -77,9 +77,48 @@ class PrimitiveTest {
         assertThat(compilation).succeeded();
         assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
                 .containsLines(
-                        "  private TestClass_AComponent_Impl(int i) {",
-                        "    int b = TestClass.AComponent.getB(i);",
-                        "    this.a = new TestClass.A(b);",
-                        "  }");
+                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
+                        "    this.a = a;",
+                        "  }",
+                        "",
+                        "  @Override",
+                        "  public TestClass.A getA() {",
+                        "    return a;",
+                        "  }",
+                        "",
+                        "  static TestClass.AComponent.Factory factory() {",
+                        "    return new Factory_Impl();",
+                        "  }",
+                        "",
+                        "  private static final class Factory_Impl implements TestClass.AComponent.Factory {",
+                        "    @Override",
+                        "    public TestClass.AComponent create(int i) {",
+                        "      int b = TestClass.AComponent.getB(i);",
+                        "      TestClass.A a = new TestClass.A(b);",
+                        "      return new TestClass_AComponent_Impl(a);",
+                        "    }",
+                        "  }",
+                        "",
+                        "  static final class MockBuilder {",
+                        "    private int b;",
+                        "    private boolean b_isSet;",
+                        "    private TestClass.A a;",
+                        "",
+                        "    TestClass.AComponent build(int i) {",
+                        "      int b = this.b_isSet ? this.b : TestClass.AComponent.getB(i);",
+                        "      TestClass.A a = this.a != null ? this.a : new TestClass.A(b);",
+                        "      return new TestClass_AComponent_Impl(a);",
+                        "    }",
+                        "",
+                        "    void b(int b) {",
+                        "      this.b = b;",
+                        "      this.b_isSet = true;",
+                        "    }",
+                        "",
+                        "    void a(TestClass.A a) {",
+                        "      this.a = a;",
+                        "    }",
+                        "  }",
+                        "}");
     }
 }
