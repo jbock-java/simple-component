@@ -7,16 +7,17 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Annotates an interface for which a dependency-injected
+ * <p>Annotates an interface for which a dependency-injected
  * implementation is to be generated. The generated class will
  * have the name of the type annotated, appended with {@code _Impl}. For
  * example, {@code @Component interface MyComponent {...}} will produce an implementation named
- * {@code MyComponent_Impl}.
- * <h2>Component methods
+ * {@code MyComponent_Impl}.</p>
+ *
+ * <h2>Component methods</h2>
  *
  * <p>Every type annotated with {@code @Component} must contain at least one abstract component
  * method. Component methods may have any name, but must have no parameters and return a bound type.
- * A bound type is one of the following:
+ * A bound type is one of the following:</p>
  *
  * <ul>
  *     <li>an {@link Inject injected} type
