@@ -35,6 +35,11 @@ import static javax.lang.model.element.Modifier.STATIC;
 
 public class ComponentImpl {
 
+    private static final String FACTORY_METHOD = "factory";
+    private static final String BUILDER_METHOD = "builder";
+    private static final String CREATE_METHOD = "create";
+    private static final String MOCK_BUILDER_METHOD = "mockBuilder";
+
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
@@ -68,7 +73,7 @@ public class ComponentImpl {
             spec.addMethod(method.build());
         }
         component.factoryElement().ifPresent(factory -> {
-            spec.addMethod(MethodSpec.methodBuilder("factory")
+            spec.addMethod(MethodSpec.methodBuilder(FACTORY_METHOD)
                     .addModifiers(STATIC)
                     .addModifiers(modifiers)
                     .returns(TypeName.get(factory.element().asType()))
@@ -77,7 +82,7 @@ public class ComponentImpl {
             spec.addType(createFactoryImpl(factory));
         });
         component.builderElement().ifPresent(builder -> {
-            spec.addMethod(MethodSpec.methodBuilder("builder")
+            spec.addMethod(MethodSpec.methodBuilder(BUILDER_METHOD)
                     .addModifiers(STATIC)
                     .addModifiers(modifiers)
                     .returns(TypeName.get(builder.element().asType()))
@@ -87,9 +92,11 @@ public class ComponentImpl {
         });
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
             spec.addMethod(generateCreateMethod());
-            spec.addMethod(generateMockCreateMethod());
         }
-        spec.addType(mockBuilder.generate());
+        if (!component.omitMockBuilder()) {
+            spec.addMethod(generateMockBuilderMethod());
+            spec.addType(mockBuilder.generate());
+        }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
                 .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
@@ -102,7 +109,7 @@ public class ComponentImpl {
 
     private MethodSpec generateCreateMethod() {
         List<CodeBlock> constructorParameters = new ArrayList<>();
-        MethodSpec.Builder method = MethodSpec.methodBuilder("create");
+        MethodSpec.Builder method = MethodSpec.methodBuilder(CREATE_METHOD);
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
@@ -123,12 +130,15 @@ public class ComponentImpl {
                 .build();
     }
 
-    MethodSpec generateMockCreateMethod() {
-        MethodSpec.Builder method = MethodSpec.methodBuilder("mockBuilder");
+    MethodSpec generateMockBuilderMethod() {
+        MethodSpec.Builder method = MethodSpec.methodBuilder(MOCK_BUILDER_METHOD);
         method.addJavadoc("Visible for testing. Do not call this method from production code.");
         method.addStatement("return new $T()", mockBuilder.getClassName());
         method.returns(mockBuilder.getClassName());
         method.addModifiers(STATIC);
+        if (component.generatePublicMockBuilder()) {
+            method.addModifiers(modifiers);
+        }
         return method.build();
     }
 

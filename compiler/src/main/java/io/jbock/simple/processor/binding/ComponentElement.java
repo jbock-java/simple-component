@@ -172,4 +172,20 @@ public final class ComponentElement {
     public Collection<ParameterBinding> parameterBindings() {
         return parameterBindings.get().values();
     }
+
+    public boolean generatePublicMockBuilder() {
+        Component annotation = element.getAnnotation(Component.class);
+        if (annotation == null) {
+            return false;
+        }
+        return annotation.generatePublicMockBuilder();
+    }
+
+    public boolean omitMockBuilder() {
+        Component annotation = element.getAnnotation(Component.class);
+        if (annotation == null) {
+            return false;
+        }
+        return annotation.omitMockBuilder();
+    }
 }
