@@ -62,32 +62,39 @@ public class MockBuilder {
     }
 
     private MethodSpec buildMethod() {
-        List<CodeBlock> constructorParameters = new ArrayList<>();
         MethodSpec.Builder method = MethodSpec.methodBuilder("build");
-        for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
-            Key key = b.key();
-            CodeBlock invocation = b.invocation(names);
-            ParameterSpec param = names.apply(key);
-            if (namedBinding.isComponentRequest()) {
-                constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
+        method.addModifiers(modifiers);
+        component.factoryElement().ifPresent(factory -> {
+            method.returns(TypeName.get(factory.element().asType()));
+            method.addStatement("return new $T(this)", factory.generatedClass());
+        });
+        component.builderElement().ifPresent(builder -> {
+            method.returns(TypeName.get(builder.element().asType()));
+            method.addStatement("return new $T(this)", builder.generatedClass());
+        });
+        if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
+            method.returns(TypeName.get(component.element().asType()));
+            List<CodeBlock> constructorParameters = new ArrayList<>();
+            for (NamedBinding namedBinding : sorted.values()) {
+                Binding b = namedBinding.binding();
+                Key key = b.key();
+                CodeBlock invocation = b.invocation(names);
+                ParameterSpec param = names.apply(key);
+                if (namedBinding.isComponentRequest()) {
+                    constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
+                }
+                if (!key.typeName().isPrimitive()) {
+                    method.addStatement("$1T $2N = this.$2N != null ? this.$2N : $3L", key.typeName(), param, invocation);
+                } else {
+                    FieldSpec auxField = FieldSpec.builder(TypeName.BOOLEAN, namedBinding.auxName(), PRIVATE).build();
+                    method.addStatement("$1T $2N = this.$3N ? this.$2N : $4L", key.typeName(), param, auxField, invocation);
+                }
             }
-            if (b instanceof ParameterBinding) {
-                method.addParameter(names.apply(b.key()));
-            } else if (!key.typeName().isPrimitive()) {
-                method.addStatement("$1T $2N = this.$2N != null ? this.$2N : $3L", key.typeName(), param, invocation);
-            } else {
-                FieldSpec auxField = FieldSpec.builder(TypeName.BOOLEAN, namedBinding.auxName(), PRIVATE).build();
-                method.addStatement("$1T $2N = this.$3N ? this.$2N : $4L", key.typeName(), param, auxField, invocation);
-            }
+            method.addStatement("return new $T($L)",
+                    component.generatedClass(),
+                    constructorParameters.stream().collect(CodeBlock.joining(", ")));
         }
-        return method
-                .addModifiers(modifiers)
-                .returns(TypeName.get(component.element().asType()))
-                .addStatement("return new $T($L)",
-                        component.generatedClass(),
-                        constructorParameters.stream().collect(CodeBlock.joining(", ")))
-                .build();
+        return method.build();
     }
 
     private List<FieldSpec> getFields() {

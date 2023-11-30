@@ -62,8 +62,8 @@ class JakartaQualifierTest {
                         "  }",
                         "",
                         "  static final class MockBuilder {",
-                        "    TestClass.AComponent build(String a, String b) {",
-                        "      return new TestClass_AComponent_Impl(a);",
+                        "    TestClass.AComponent.Factory build() {",
+                        "      return new Factory_Impl(this);",
                         "    }",
                         "  }",
                         "}");
