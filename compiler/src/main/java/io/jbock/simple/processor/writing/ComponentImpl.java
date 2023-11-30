@@ -76,7 +76,7 @@ public class ComponentImpl {
         }
         component.factoryElement().ifPresent(factory -> {
             spec.addMethod(generateFactoryMethod(factory));
-            spec.addType(factoryImpl.generate(factory));
+            spec.addType(factoryImpl.generate(factory, mockBuilder));
         });
         component.builderElement().ifPresent(builder -> {
             spec.addMethod(generateBuilderMethod(builder));
@@ -99,12 +99,16 @@ public class ComponentImpl {
     }
 
     private MethodSpec generateFactoryMethod(FactoryElement factory) {
-        return MethodSpec.methodBuilder(FACTORY_METHOD)
+        MethodSpec.Builder spec = MethodSpec.methodBuilder(FACTORY_METHOD)
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
-                .returns(TypeName.get(factory.element().asType()))
-                .addStatement("return new $T()", factory.generatedClass())
-                .build();
+                .returns(TypeName.get(factory.element().asType()));
+        if (component.omitMockBuilder()) {
+            spec.addStatement("return new $T()", factory.generatedClass());
+        } else {
+            spec.addStatement("return new $T(null)", factory.generatedClass());
+        }
+        return spec.build();
     }
 
     private MethodSpec generateBuilderMethod(BuilderElement builder) {
