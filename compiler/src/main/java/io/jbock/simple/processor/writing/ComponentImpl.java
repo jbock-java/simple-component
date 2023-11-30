@@ -10,8 +10,10 @@ import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.SimpleComponentProcessor;
 import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.BuilderElement;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
+import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
 
 import javax.annotation.processing.Generated;
@@ -61,6 +63,7 @@ public class ComponentImpl {
     TypeSpec generate() {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass())
                 .addModifiers(modifiers)
+                .addModifiers(FINAL)
                 .addSuperinterface(component.element().asType());
         spec.addFields(getFields());
         for (DependencyRequest r : component.requests()) {
@@ -72,40 +75,44 @@ public class ComponentImpl {
             spec.addMethod(method.build());
         }
         component.factoryElement().ifPresent(factory -> {
-            spec.addMethod(MethodSpec.methodBuilder(FACTORY_METHOD)
-                    .addModifiers(STATIC)
-                    .addModifiers(modifiers)
-                    .returns(TypeName.get(factory.element().asType()))
-                    .addStatement("return new $T()", factory.generatedClass())
-                    .build());
+            spec.addMethod(generateFactoryMethod(factory));
             spec.addType(factoryImpl.generate(factory));
         });
         component.builderElement().ifPresent(builder -> {
-            spec.addMethod(MethodSpec.methodBuilder(BUILDER_METHOD)
-                    .addModifiers(STATIC)
-                    .addModifiers(modifiers)
-                    .returns(TypeName.get(builder.element().asType()))
-                    .addStatement("return new $T()", builder.generatedClass())
-                    .build());
-            spec.addType(builderImpl.generate(builder));
+            spec.addMethod(generateBuilderMethod(builder));
+            spec.addType(builderImpl.generate(builder, mockBuilder));
         });
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
             spec.addMethod(generateCreateMethod());
-            if (!component.omitMockBuilder()) {
-                spec.addMethod(generateMockBuilderMethod());
-            }
         }
         if (!component.omitMockBuilder()) {
+            spec.addMethod(generateMockBuilderMethod());
             spec.addType(mockBuilder.generate());
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
                 .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
                 .build());
-        spec.addModifiers(FINAL);
         spec.addMethod(generateAllParametersConstructor());
         spec.addOriginatingElement(component.element());
         return spec.build();
+    }
+
+    private MethodSpec generateFactoryMethod(FactoryElement factory) {
+        return MethodSpec.methodBuilder(FACTORY_METHOD)
+                .addModifiers(STATIC)
+                .addModifiers(modifiers)
+                .returns(TypeName.get(factory.element().asType()))
+                .addStatement("return new $T()", factory.generatedClass())
+                .build();
+    }
+
+    private MethodSpec generateBuilderMethod(BuilderElement builder) {
+        return MethodSpec.methodBuilder(BUILDER_METHOD)
+                .addModifiers(STATIC)
+                .addModifiers(modifiers)
+                .addStatement("return new $T(null)", builder.generatedClass())
+                .returns(TypeName.get(builder.element().asType())).build();
     }
 
     private MethodSpec generateCreateMethod() {

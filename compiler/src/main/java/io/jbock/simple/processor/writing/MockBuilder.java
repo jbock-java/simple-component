@@ -54,16 +54,7 @@ public class MockBuilder {
     }
 
     private MethodSpec generateConstructor() {
-        MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
-        for (NamedBinding namedBinding : sorted.values()) {
-            if (!(namedBinding.binding() instanceof ParameterBinding)) {
-                continue;
-            }
-            ParameterSpec param = names.apply(namedBinding.binding().key());
-            constructor.addParameter(param);
-            constructor.addStatement("this.$1N = $1N", param);
-        }
-        return constructor.build();
+        return MethodSpec.constructorBuilder().addModifiers(PRIVATE).build();
     }
 
     ClassName getClassName() {
@@ -102,11 +93,10 @@ public class MockBuilder {
     private List<FieldSpec> getFields() {
         List<FieldSpec> fields = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            TypeName type = namedBinding.binding().key().typeName();
             if (namedBinding.binding() instanceof ParameterBinding) {
-                fields.add(FieldSpec.builder(type, namedBinding.name(), PRIVATE, FINAL).build());
                 continue;
             }
+            TypeName type = namedBinding.binding().key().typeName();
             FieldSpec field = FieldSpec.builder(type, namedBinding.name(), PRIVATE).build();
             fields.add(field);
             if (namedBinding.binding().key().typeName().isPrimitive()) {
