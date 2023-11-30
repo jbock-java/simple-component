@@ -72,7 +72,7 @@ public class MockBuilder {
             if (namedBinding.isComponentRequest()) {
                 constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
             }
-            if (namedBinding.binding() instanceof ParameterBinding) {
+            if (b instanceof ParameterBinding) {
                 method.addParameter(names.apply(b.key()));
             } else if (!key.typeName().isPrimitive()) {
                 method.addStatement("$1T $2N = this.$2N != null ? this.$2N : $3L", key.typeName(), param, invocation);

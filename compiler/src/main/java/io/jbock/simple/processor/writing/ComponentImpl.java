@@ -108,11 +108,16 @@ public class ComponentImpl {
     }
 
     private MethodSpec generateBuilderMethod(BuilderElement builder) {
-        return MethodSpec.methodBuilder(BUILDER_METHOD)
+        MethodSpec.Builder spec = MethodSpec.methodBuilder(BUILDER_METHOD)
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
-                .addStatement("return new $T(null)", builder.generatedClass())
-                .returns(TypeName.get(builder.element().asType())).build();
+                .returns(TypeName.get(builder.element().asType()));
+        if (component.omitMockBuilder()) {
+            spec.addStatement("return new $T()", builder.generatedClass());
+        } else {
+            spec.addStatement("return new $T(null)", builder.generatedClass());
+        }
+        return spec.build();
     }
 
     private MethodSpec generateCreateMethod() {
