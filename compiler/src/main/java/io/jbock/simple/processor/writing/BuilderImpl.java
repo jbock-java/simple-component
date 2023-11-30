@@ -41,9 +41,18 @@ public class BuilderImpl {
         this.names = names;
     }
 
-    TypeSpec generate(BuilderElement builder) {
+    TypeSpec generate(BuilderElement builder, MockBuilder mockBuilder) {
         TypeMirror builderType = builder.element().asType();
         TypeSpec.Builder spec = TypeSpec.classBuilder(builder.generatedClass());
+        if (!component.omitMockBuilder()) {
+            FieldSpec field = FieldSpec.builder(mockBuilder.getClassName(), "mockBuilder", FINAL).build();
+            spec.addField(field);
+            ParameterSpec param = ParameterSpec.builder(mockBuilder.getClassName(), "mockBuilder").build();
+            spec.addMethod(MethodSpec.constructorBuilder()
+                    .addParameter(param)
+                    .addStatement("this.$N = $N", field, param)
+                    .build());
+        }
         MethodSpec.Builder buildMethod = MethodSpec.methodBuilder(builder.buildMethod().getSimpleName().toString());
         List<CodeBlock> constructorParameters = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
