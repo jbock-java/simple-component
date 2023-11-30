@@ -80,7 +80,7 @@ class QualifierTest {
                         "  }",
                         "",
                         "  static TestClass.AComponent.Factory factory() {",
-                        "    return new Factory_Impl();",
+                        "    return new Factory_Impl(null);",
                         "  }",
                         "",
                         "  private static final class Factory_Impl implements TestClass.AComponent.Factory {",

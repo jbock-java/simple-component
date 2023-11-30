@@ -50,7 +50,6 @@ public class BuilderImpl {
     }
 
     private TypeSpec generateMock(BuilderElement builder, MockBuilder mockBuilder) {
-        TypeMirror builderType = builder.element().asType();
         TypeSpec.Builder spec = TypeSpec.classBuilder(builder.generatedClass());
         FieldSpec mockBuilderField = FieldSpec.builder(mockBuilder.getClassName(), "mockBuilder", FINAL).build();
         spec.addField(mockBuilderField);
@@ -80,7 +79,7 @@ public class BuilderImpl {
         spec.addFields(fields());
         spec.addMethods(setterMethods(builder));
         spec.addModifiers(PRIVATE, STATIC, FINAL);
-        spec.addSuperinterface(builderType);
+        spec.addSuperinterface(builder.element().asType());
         buildMethod.addAnnotation(Override.class);
         buildMethod.addModifiers(builder.buildMethod().getModifiers().stream()
                 .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
