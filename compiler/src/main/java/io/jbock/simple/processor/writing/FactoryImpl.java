@@ -66,11 +66,19 @@ public class FactoryImpl {
         method.returns(TypeName.get(component.element().asType()));
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
+            if (b instanceof ParameterBinding) {
+                continue;
+            }
             Key key = b.key();
             CodeBlock invocation = b.invocation(names);
             ParameterSpec param = names.apply(key);
-            if (!(b instanceof ParameterBinding)) {
-                method.addStatement("$T $N = $L", key.typeName(), param, invocation);
+            if (!key.typeName().isPrimitive()) {
+                method.addStatement("$1T $2N = this.$3N != null && this.$3N.$2N != null ? this.$3N.$2N : $4L",
+                        key.typeName(), param, mockBuilderField, invocation);
+            } else {
+                FieldSpec auxField = FieldSpec.builder(TypeName.BOOLEAN, namedBinding.auxName(), PRIVATE).build();
+                method.addStatement("$1T $2N = this.$3N != null && this.$3N.$4N ? this.$3N.$2N : $5L",
+                        key.typeName(), param, mockBuilderField, auxField, invocation);
             }
         }
         method.addParameters(parameters());
