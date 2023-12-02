@@ -95,18 +95,6 @@ public final class InjectBinding extends Binding {
         this.keyFactory = keyFactory;
     }
 
-    static InjectBinding create(
-            KeyFactory keyFactory,
-            ExecutableElement m) {
-        Key key = keyFactory.getKey(m);
-        if (m.getKind() == ElementKind.CONSTRUCTOR) {
-            if (key.qualifier().isPresent()) {
-                throw new ValidationFailure("Constructors can't have qualifiers", m);
-            }
-        }
-        return new InjectBinding(key, keyFactory, m);
-    }
-
     @Override
     public String suggestedVariableName() {
         return suggestedVariableName.get();
@@ -142,7 +130,7 @@ public final class InjectBinding extends Binding {
     private KeyFactory keyFactory() {
         return keyFactory;
     }
-    
+
     public static final class Factory {
         private final KeyFactory keyFactory;
 
