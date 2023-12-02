@@ -8,7 +8,6 @@ import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
 
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -37,13 +36,39 @@ public final class InjectBindingValidator {
         validate(element);
     }
 
-    public void validateStaticMethod(ExecutableElement element) {
-        validate(element);
-        if (!tool.types().isSameType(element.getReturnType(), element.getEnclosingElement().asType())) {
-            throw new ValidationFailure("Static method binding must return the enclosing type",
-                    element);
+    public void validateStaticMethod(ExecutableElement method) {
+        validate(method);
+        TypeElement typeElement = Visitors.TYPE_ELEMENT_VISITOR.visit(method.getEnclosingElement());
+//        List<TypeElement> hierarchyMethod = getEnclosingElements(typeElement);
+//        List<TypeElement> hierarchyRt = tool.types().asElement(method.getReturnType())
+//                .map(Visitors.TYPE_ELEMENT_VISITOR::visit)
+//                .map(this::getEnclosingElements)
+//                .orElse(List.of());
+        if (!method.getModifiers().contains(Modifier.STATIC)) {
+            throw new ValidationFailure("The factory method must be static", method);
+        }
+        if (method.getReturnType().getKind() == TypeKind.VOID) {
+            throw new ValidationFailure("The factory method may not return void", method);
+        }
+        if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
+            throw new ValidationFailure("The factory method must return the type of its enclosing class", method);
         }
     }
+
+/*
+    private List<TypeElement> getEnclosingElements(TypeElement typeElement) {
+        if (typeElement == null) {
+            return List.of();
+        }
+        List<TypeElement> acc = new ArrayList<>(2);
+        acc.add(typeElement);
+        TypeElement el = typeElement;
+        if ((el = Visitors.TYPE_ELEMENT_VISITOR.visit(el.getEnclosingElement())) != null) {
+            acc.add(el);
+        }
+        return acc;
+    }
+*/
 
     private void validate(ExecutableElement element) {
         TypeElement typeElement = Visitors.TYPE_ELEMENT_VISITOR.visit(element.getEnclosingElement());
@@ -52,17 +77,6 @@ public final class InjectBindingValidator {
         }
         Map<Key, InjectBinding> m = injectBindingFactory.injectBindings(typeElement);
         for (InjectBinding b : m.values()) {
-            if (b.element().getKind() == ElementKind.METHOD) {
-                if (!b.element().getModifiers().contains(Modifier.STATIC)) {
-                    throw new ValidationFailure("The factory method must be static", b.element());
-                }
-                if (b.element().getReturnType().getKind() == TypeKind.VOID) {
-                    throw new ValidationFailure("The factory method may not return void", b.element());
-                }
-                if (!tool.types().isSameType(b.element().getReturnType(), typeElement.asType())) {
-                    throw new ValidationFailure("The factory method must return the type of its enclosing class", b.element());
-                }
-            }
             if (b.element().getAnnotationMirrors().stream().filter(mirror -> {
                 DeclaredType annotationType = mirror.getAnnotationType();
                 return tool.isSameType(annotationType, JAVAX_INJECT)

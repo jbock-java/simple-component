@@ -20,11 +20,14 @@ import java.util.stream.Collectors;
 public class ProvidesStep implements Step {
 
     private final Messager messager;
+    private final BindingRegistry bindingRegistry;
 
     @Inject
     public ProvidesStep(
-            Messager messager) {
+            Messager messager,
+            BindingRegistry bindingRegistry) {
         this.messager = messager;
+        this.bindingRegistry = bindingRegistry;
     }
 
     @Override
@@ -50,6 +53,7 @@ public class ProvidesStep implements Step {
                 if (enclosing.getAnnotation(Component.class) == null) {
                     throw new ValidationFailure("The @Provides method must be nested inside a @Component", m);
                 }
+                bindingRegistry.register(m);
             }
         } catch (ValidationFailure f) {
             f.writeTo(messager);

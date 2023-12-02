@@ -79,4 +79,55 @@ class DuplicateBindingTest {
                         "  }",
                         "}");
     }
+
+    @Test
+    void staticMethodConflict() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "",
+                "import io.jbock.simple.Component;",
+                "import io.jbock.simple.Inject;",
+                "import io.jbock.simple.Named;",
+                "",
+                "final class TestClass {",
+                "",
+                "  static class A {",
+                "    @Inject static A a() { return null; }",
+                "    @Inject static A b() { return null; }",
+                "  }",
+                "",
+                "  @Component",
+                "  interface AComponent {",
+                "    A getA();",
+                "  }",
+                "}");
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).failed();
+        assertThat(compilation).hadErrorContaining("Duplicate binding for test.TestClass.A");
+    }
+
+    @Test
+    void staticMethodNoConflict() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "",
+                "import io.jbock.simple.Component;",
+                "import io.jbock.simple.Inject;",
+                "import io.jbock.simple.Named;",
+                "",
+                "final class TestClass {",
+                "",
+                "  static class A {",
+                "    @Inject static A a() { return null; }",
+                "    @Inject static @Named(\"b\") A b() { return null; }",
+                "  }",
+                "",
+                "  @Component",
+                "  interface AComponent {",
+                "    A getA();",
+                "  }",
+                "}");
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
+    }
 }

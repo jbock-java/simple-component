@@ -3,7 +3,6 @@ package io.jbock.simple.processor.binding;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.ClearableCache;
 import io.jbock.simple.processor.util.TypeTool;
-import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -15,8 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static io.jbock.simple.processor.util.Printing.INDENT;
-import static io.jbock.simple.processor.util.Printing.bindingElementToString;
 import static io.jbock.simple.processor.util.Visitors.EXECUTABLE_ELEMENT_VISITOR;
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
@@ -26,11 +23,16 @@ public final class InjectBindingFactory implements ClearableCache {
 
     private final TypeTool tool;
     private final KeyFactory keyFactory;
+    private final InjectBinding.Factory injectBindingFactory;
 
     @Inject
-    public InjectBindingFactory(TypeTool tool, KeyFactory keyFactory) {
+    public InjectBindingFactory(
+            TypeTool tool,
+            KeyFactory keyFactory,
+            InjectBinding.Factory injectBindingFactory) {
         this.tool = tool;
         this.keyFactory = keyFactory;
+        this.injectBindingFactory = injectBindingFactory;
     }
 
     public Map<Key, InjectBinding> injectBindings(TypeElement typeElement) {
@@ -47,18 +49,11 @@ public final class InjectBindingFactory implements ClearableCache {
             return Map.of();
         }
         result = new LinkedHashMap<>();
-        for (ExecutableElement m : allMembers) {
-            InjectBinding b = InjectBinding.create(keyFactory, m);
-            InjectBinding previous = result.put(b.key(), b);
-            if (previous != null) {
-                throw new ValidationFailure("This binding clashes with:\n"
-                        + INDENT
-                        + bindingElementToString(previous.element())
-                        + ".\n"
-                        + "Consider a (different) qualifier", b.element());
-            }
-            injectBindingCache.put(typeElement, result);
+        for (ExecutableElement method : allMembers) {
+            InjectBinding b = injectBindingFactory.create(method);
+            result.put(b.key(), b); // duplicates handled elsewhere
         }
+        injectBindingCache.put(typeElement, result);
         return result;
     }
 

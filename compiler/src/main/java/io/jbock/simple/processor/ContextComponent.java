@@ -1,6 +1,7 @@
 package io.jbock.simple.processor;
 
 import io.jbock.simple.Component;
+import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.KeyFactory;
@@ -40,4 +41,29 @@ public interface ContextComponent {
     Generator generator();
 
     TopologicalSorter topologicalSorter();
+
+    final class Factory {
+        private final TypeTool tool;
+        private final InjectBindingFactory injectBindingFactory;
+        private final KeyFactory keyFactory;
+
+        @Inject
+        public Factory(
+                TypeTool tool,
+                InjectBindingFactory injectBindingFactory,
+                KeyFactory keyFactory) {
+            this.tool = tool;
+            this.injectBindingFactory = injectBindingFactory;
+            this.keyFactory = keyFactory;
+        }
+
+        public ContextComponent create(ComponentElement component) {
+            return ContextComponent_Impl.builder()
+                    .componentElement(component)
+                    .tool(tool)
+                    .injectBindingFactory(injectBindingFactory)
+                    .keyFactory(keyFactory)
+                    .build();
+        }
+    }
 }
