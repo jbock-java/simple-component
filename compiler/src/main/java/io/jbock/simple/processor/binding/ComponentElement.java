@@ -2,6 +2,7 @@ package io.jbock.simple.processor.binding;
 
 import io.jbock.javapoet.ClassName;
 import io.jbock.simple.Component;
+import io.jbock.simple.Inject;
 import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
@@ -25,6 +26,7 @@ public final class ComponentElement {
 
     private final TypeElement element;
     private final KeyFactory keyFactory;
+    private final InjectBinding.Factory injectBindingFactory;
 
     private final Supplier<ClassName> generatedClass = memoize(() -> {
         ClassName className = ClassName.get(element());
@@ -72,7 +74,7 @@ public final class ComponentElement {
                 continue; // ignore
             }
             Key key = keyFactory().getKey(method);
-            InjectBinding b = InjectBinding.create(keyFactory(), method);
+            InjectBinding b = injectBindingFactory().create(method);
             result.put(key, b);
         }
         return result;
@@ -122,15 +124,11 @@ public final class ComponentElement {
 
     private ComponentElement(
             TypeElement element,
-            KeyFactory keyFactory) {
+            KeyFactory keyFactory,
+            InjectBinding.Factory injectBindingFactory) {
         this.element = element;
         this.keyFactory = keyFactory;
-    }
-
-    public static ComponentElement create(
-            TypeElement element,
-            KeyFactory keyFactory) {
-        return new ComponentElement(element, keyFactory);
+        this.injectBindingFactory = injectBindingFactory;
     }
 
     public TypeElement element() {
@@ -165,6 +163,10 @@ public final class ComponentElement {
         return keyFactory;
     }
 
+    private InjectBinding.Factory injectBindingFactory() {
+        return injectBindingFactory;
+    }
+
     public Optional<Binding> parameterBinding(Key key) {
         return Optional.ofNullable(parameterBindings.get().get(key));
     }
@@ -187,5 +189,21 @@ public final class ComponentElement {
             return false;
         }
         return annotation.omitMockBuilder();
+    }
+
+    public static final class Factory {
+        private final KeyFactory keyFactory;
+        private final InjectBinding.Factory injectBindingFactory;
+
+        @Inject
+        public Factory(KeyFactory keyFactory, InjectBinding.Factory injectBindingFactory) {
+            this.keyFactory = keyFactory;
+            this.injectBindingFactory = injectBindingFactory;
+        }
+
+        public ComponentElement create(
+                TypeElement element) {
+            return new ComponentElement(element, keyFactory, injectBindingFactory);
+        }
     }
 }

@@ -26,7 +26,7 @@ class BindingValidationTest {
                 "}");
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("Consider a (different) qualifier");
+        assertThat(compilation).hadErrorContaining("Duplicate binding for test.TestClass");
     }
 
     @Test

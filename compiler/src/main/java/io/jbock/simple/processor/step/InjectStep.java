@@ -25,15 +25,18 @@ public class InjectStep implements Step {
     private final InjectBindingValidator validator;
     private final ExecutableElementValidator executableElementValidator;
     private final Messager messager;
+    private final BindingRegistry bindingRegistry;
 
     @Inject
     public InjectStep(
             InjectBindingValidator validator,
             ExecutableElementValidator executableElementValidator,
-            Messager messager) {
+            Messager messager,
+            BindingRegistry bindingRegistry) {
         this.validator = validator;
         this.executableElementValidator = executableElementValidator;
         this.messager = messager;
+        this.bindingRegistry = bindingRegistry;
     }
 
     @Override
@@ -55,10 +58,12 @@ public class InjectStep implements Step {
             for (ExecutableElement constructor : constructors) {
                 executableElementValidator.validate(constructor);
                 validator.validateConstructor(constructor);
+                bindingRegistry.register(constructor);
             }
             for (ExecutableElement method : methods) {
                 executableElementValidator.validate(method);
                 validator.validateStaticMethod(method);
+                bindingRegistry.register(method);
             }
             checkFields(elements);
         } catch (ValidationFailure f) {

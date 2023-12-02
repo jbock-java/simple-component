@@ -7,8 +7,6 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.ContextComponent;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
-import io.jbock.simple.processor.binding.InjectBindingFactory;
-import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
@@ -31,28 +29,28 @@ public class ComponentStep implements Step {
 
     private final Messager messager;
     private final TypeTool tool;
-    private final KeyFactory keyFactory;
     private final TypeElementValidator typeElementValidator;
     private final ExecutableElementValidator executableElementValidator;
     private final SpecWriter specWriter;
-    private final InjectBindingFactory injectBindingFactory;
+    private final ComponentElement.Factory componentElementFactory;
+    private final ContextComponent.Factory contextComponentFactory;
 
     @Inject
     public ComponentStep(
             Messager messager,
             TypeTool tool,
-            KeyFactory keyFactory,
             TypeElementValidator typeElementValidator,
             ExecutableElementValidator executableElementValidator,
             SpecWriter specWriter,
-            InjectBindingFactory injectBindingFactory) {
+            ComponentElement.Factory componentElementFactory,
+            ContextComponent.Factory contextComponentFactory) {
         this.messager = messager;
         this.tool = tool;
-        this.keyFactory = keyFactory;
         this.typeElementValidator = typeElementValidator;
         this.executableElementValidator = executableElementValidator;
         this.specWriter = specWriter;
-        this.injectBindingFactory = injectBindingFactory;
+        this.componentElementFactory = componentElementFactory;
+        this.contextComponentFactory = contextComponentFactory;
     }
 
     @Override
@@ -76,7 +74,7 @@ public class ComponentStep implements Step {
 
     private void process(TypeElement typeElement) {
         typeElementValidator.validate(typeElement);
-        ComponentElement component = ComponentElement.create(typeElement, keyFactory);
+        ComponentElement component = componentElementFactory.create(typeElement);
         component.factoryElement().ifPresent(factory -> {
             ExecutableElement method = factory.singleAbstractMethod();
             if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
@@ -88,8 +86,7 @@ public class ComponentStep implements Step {
                 executableElementValidator.validate(m);
             }
         }
-        ContextComponent componentComponent = ContextComponent.create(
-                component, tool, injectBindingFactory, keyFactory);
+        ContextComponent componentComponent = contextComponentFactory.create(component);
         Generator generator = componentComponent.generator();
         List<Binding> bindings = componentComponent.topologicalSorter().sortedBindings();
         TypeSpec typeSpec = generator.generate(bindings);
