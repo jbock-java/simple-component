@@ -18,7 +18,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.List;
 
-@Component
+@Component(omitMockBuilder = true)
 interface ProcessorComponent {
 
     @Component.Factory

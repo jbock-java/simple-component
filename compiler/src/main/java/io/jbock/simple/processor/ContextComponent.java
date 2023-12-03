@@ -9,7 +9,7 @@ import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.writing.Generator;
 
-@Component
+@Component(omitMockBuilder = true)
 public interface ContextComponent {
 
     @Component.Builder
