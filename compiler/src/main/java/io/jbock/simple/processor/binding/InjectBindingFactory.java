@@ -48,14 +48,12 @@ public final class InjectBindingFactory implements ClearableCache {
     }
 
     public Optional<Binding> binding(Key key) {
-        return tool.types().asElement(key.type()).flatMap(element -> {
-            TypeElement typeElement = TYPE_ELEMENT_VISITOR.visit(element);
-            if (typeElement == null) {
-                return Optional.empty();
-            }
-            Map<Key, InjectBinding> m = injectBindings(typeElement);
-            return Optional.ofNullable(m.get(key));
-        });
+        return tool.types().asElement(key.type())
+                .map(TYPE_ELEMENT_VISITOR::visit)
+                .flatMap(typeElement -> {
+                    Map<Key, InjectBinding> m = injectBindings(typeElement);
+                    return Optional.ofNullable(m.get(key));
+                });
     }
 
     @Override
