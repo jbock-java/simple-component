@@ -21,6 +21,7 @@ import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import static javax.lang.model.element.Modifier.FINAL;
@@ -91,7 +92,8 @@ public class ComponentImpl {
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
-                .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component"))
+                .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component " +
+                        Objects.toString(getClass().getPackage().getImplementationVersion(), "")))
                 .build());
         spec.addMethod(generateAllParametersConstructor());
         spec.addOriginatingElement(component.element());

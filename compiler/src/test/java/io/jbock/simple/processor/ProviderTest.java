@@ -38,7 +38,7 @@ class ProviderTest {
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("io.jbock.simple.Provider<test.TestClass.B> with qualifier @Named(\"b\") cannot be provided.")
+        assertThat(compilation).hadErrorContaining("No binding found for io.jbock.simple.Provider<test.TestClass.B> with qualifier @Named(\"b\").")
                 .inFile(component)
                 .onLineContaining("interface AComponent");
     }
