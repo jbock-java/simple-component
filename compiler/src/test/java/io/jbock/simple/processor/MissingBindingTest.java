@@ -33,7 +33,7 @@ class MissingBindingTest {
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContainingMatch("java.lang.String cannot be provided.")
+        assertThat(compilation).hadErrorContainingMatch("No binding found for java.lang.String.")
                 .inFile(component)
                 .onLineContaining("interface AComponent");
     }
@@ -77,7 +77,7 @@ class MissingBindingTest {
         assertThat(compilation)
                 .hadErrorContaining(
                         TestUtils.message(
-                                "java.lang.String cannot be provided.",
+                                "No binding found for java.lang.String.",
                                 "    java.lang.String is injected at",
                                 "        TestImplementation(java.lang.String)",
                                 "    p.TestImplementation is injected at",
