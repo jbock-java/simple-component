@@ -133,6 +133,6 @@ class CycleTest {
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("io.jbock.simple.Provider<io.jbock.simple.Provider<test.TestClass.B>> cannot be provided.");
+        assertThat(compilation).hadErrorContaining("No binding found for io.jbock.simple.Provider<io.jbock.simple.Provider<test.TestClass.B>>");
     }
 }
