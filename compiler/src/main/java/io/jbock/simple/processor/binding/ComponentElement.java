@@ -175,20 +175,20 @@ public final class ComponentElement {
         return parameterBindings.get().values();
     }
 
-    public boolean generatePublicMockBuilder() {
+    public boolean publicMockBuilder() {
         Component annotation = element.getAnnotation(Component.class);
         if (annotation == null) {
             return false;
         }
-        return annotation.generatePublicMockBuilder();
+        return annotation.publicMockBuilder();
     }
 
-    public boolean omitMockBuilder() {
+    public boolean mockBuilder() {
         Component annotation = element.getAnnotation(Component.class);
         if (annotation == null) {
             return false;
         }
-        return annotation.omitMockBuilder();
+        return annotation.mockBuilder();
     }
 
     public static final class Factory {

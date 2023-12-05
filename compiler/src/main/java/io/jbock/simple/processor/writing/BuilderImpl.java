@@ -42,10 +42,10 @@ public class BuilderImpl {
     }
 
     TypeSpec generate(BuilderElement builder, MockBuilder mockBuilder) {
-        if (component.omitMockBuilder()) {
-            return generateNoMock(builder);
-        } else {
+        if (component.mockBuilder()) {
             return generateMock(builder, mockBuilder);
+        } else {
+            return generateNoMock(builder);
         }
     }
 

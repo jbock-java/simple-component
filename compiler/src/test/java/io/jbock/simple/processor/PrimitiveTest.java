@@ -59,7 +59,7 @@ class PrimitiveTest {
                 "    @Inject A(@Named(\"b\") int i) {}",
                 "  }",
                 "",
-                "  @Component",
+                "  @Component(mockBuilder = true)",
                 "  public interface AComponent {",
                 "    A getA();",
                 "",

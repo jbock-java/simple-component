@@ -59,18 +59,30 @@ public @interface Component {
 
     /**
      * By default, the {@code mockBuilder} method is only package-private. This
-     * should make it less prone to accidental invocation from production code.
+     * makes it harder to invoke from production code, which is probably unintentional anyway.
      *
-     * <p>In test code, this restriction can be circumvented by placing a public delegate class
-     * in the component package.
+     * <p>In test code, {@code mockBuilder} can always be invoked, even if it is only package-visible,
+     * by placing a forwarding delegate class in the correct package.
+     * For example, if {@code MyComponent} is defined in package {@code com.my.component},
+     * the forwarding delegate class could live in {@code src/test/java/com/my/component} and look
+     * like this:
+     *
+     * <pre>
+     * {@code
+     * public class MockBuilderAccess {
+     *   public static MyComponent_Impl.MockBuilder mockBuilder() {
+     *       return MyComponent_Impl.mockBuilder();
+     *   }
+     * }
+     * </pre>
      *
      * @return {@code true} if the {@code mockBuilder} method should have the same visibility
      * as the component.
      */
-    boolean generatePublicMockBuilder() default false;
+    boolean publicMockBuilder() default false;
 
     /**
-     * @return {@code true} if the {@code mockBuilder} method should not be generated.
+     * @return {@code true} if the {@code mockBuilder} method should be generated.
      */
-    boolean omitMockBuilder() default false;
+    boolean mockBuilder() default false;
 }

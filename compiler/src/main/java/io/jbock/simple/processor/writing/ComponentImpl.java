@@ -86,7 +86,7 @@ public class ComponentImpl {
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
             spec.addMethod(generateCreateMethod());
         }
-        if (!component.omitMockBuilder()) {
+        if (component.mockBuilder()) {
             spec.addMethod(generateMockBuilderMethod());
             spec.addType(mockBuilder.generate());
         }
@@ -105,10 +105,10 @@ public class ComponentImpl {
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
                 .returns(TypeName.get(factory.element().asType()));
-        if (component.omitMockBuilder()) {
-            spec.addStatement("return new $T()", factory.generatedClass());
-        } else {
+        if (component.mockBuilder()) {
             spec.addStatement("return new $T(null)", factory.generatedClass());
+        } else {
+            spec.addStatement("return new $T()", factory.generatedClass());
         }
         return spec.build();
     }
@@ -118,10 +118,10 @@ public class ComponentImpl {
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
                 .returns(TypeName.get(builder.element().asType()));
-        if (component.omitMockBuilder()) {
-            spec.addStatement("return new $T()", builder.generatedClass());
-        } else {
+        if (component.mockBuilder()) {
             spec.addStatement("return new $T(null)", builder.generatedClass());
+        } else {
+            spec.addStatement("return new $T()", builder.generatedClass());
         }
         return spec.build();
     }
@@ -155,7 +155,7 @@ public class ComponentImpl {
         method.addStatement("return new $T()", mockBuilder.getClassName());
         method.returns(mockBuilder.getClassName());
         method.addModifiers(STATIC);
-        if (component.generatePublicMockBuilder()) {
+        if (component.publicMockBuilder()) {
             method.addModifiers(modifiers);
         }
         return method.build();
