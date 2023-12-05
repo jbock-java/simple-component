@@ -42,10 +42,10 @@ public class FactoryImpl {
     }
 
     TypeSpec generate(FactoryElement factory, MockBuilder mockBuilder) {
-        if (component.omitMockBuilder()) {
-            return generateNoMock(factory);
-        } else {
+        if (component.mockBuilder()) {
             return generateMock(factory, mockBuilder);
+        } else {
+            return generateNoMock(factory);
         }
     }
 

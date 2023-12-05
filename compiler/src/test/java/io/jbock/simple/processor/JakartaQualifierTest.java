@@ -22,7 +22,7 @@ class JakartaQualifierTest {
                 "",
                 "final class TestClass {",
                 "",
-                "  @Component",
+                "  @Component(mockBuilder = true)",
                 "  interface AComponent {",
                 "    @Named(\"a\") String getS();",
                 "",
