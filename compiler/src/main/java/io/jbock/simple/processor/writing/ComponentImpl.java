@@ -92,12 +92,16 @@ public class ComponentImpl {
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
-                .addMember("comments", CodeBlock.of("$S", "https://github.com/jbock-java/simple-component " +
-                        Objects.toString(getClass().getPackage().getImplementationVersion(), "")))
+                .addMember("comments", CodeBlock.of("$S", getComments()))
                 .build());
         spec.addMethod(generateAllParametersConstructor());
         spec.addOriginatingElement(component.element());
         return spec.build();
+    }
+
+    private String getComments() {
+        String version = Objects.toString(getClass().getPackage().getImplementationVersion(), "");
+        return "https://github.com/jbock-java/simple-component" + (version.isEmpty() ? "" : " " + version);
     }
 
     private MethodSpec generateFactoryMethod(FactoryElement factory) {

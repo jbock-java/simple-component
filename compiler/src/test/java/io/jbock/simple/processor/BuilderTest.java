@@ -127,7 +127,6 @@ class BuilderTest {
                         "}");
     }
 
-
     @Test
     void builderParameter() {
         JavaFileObject component = forSourceLines("test.TestClass",
