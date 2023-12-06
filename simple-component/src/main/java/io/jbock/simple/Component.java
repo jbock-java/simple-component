@@ -67,14 +67,13 @@ public @interface Component {
      * the forwarding delegate class could live in {@code src/test/java/com/my/component} and look
      * like this:
      *
-     * <pre>
-     * {@code
+     * <pre>{@code
      * public class MockBuilderAccess {
      *   public static MyComponent_Impl.MockBuilder mockBuilder() {
      *       return MyComponent_Impl.mockBuilder();
      *   }
      * }
-     * </pre>
+     * }</pre>
      *
      * @return {@code true} if the {@code mockBuilder} method should have the same visibility
      * as the component.
