@@ -13,4 +13,4 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: 20
-    - run: ./gradlew compiler:test 
+    - run: ./gradlew simple-component:javadoc compiler:javadoc compiler:test 
