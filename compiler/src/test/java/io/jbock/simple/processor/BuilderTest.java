@@ -205,8 +205,9 @@ class BuilderTest {
                         "      return new Builder_Impl(this);",
                         "    }",
                         "",
-                        "    public void a(TestClass.A a) {",
+                        "    public MockBuilder a(TestClass.A a) {",
                         "      this.a = a;",
+                        "      return this;",
                         "    }",
                         "  }",
                         "}");
