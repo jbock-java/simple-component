@@ -131,6 +131,8 @@ public class MockBuilder {
                 FieldSpec auxField = FieldSpec.builder(TypeName.BOOLEAN, namedBinding.auxName(), PRIVATE).build();
                 method.addStatement("this.$N = $L", auxField, true);
             }
+            method.addStatement("return this");
+            method.returns(getClassName());
             methods.add(method.build());
         }
         return methods;
