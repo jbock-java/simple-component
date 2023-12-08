@@ -16,7 +16,7 @@ Instead, you have the "same key, same bean" rule:
 
 > If two beans of the same *key* are injected by the same component, then they are the same bean instance.
 
-This means a component contains at most one instance per bean class (unless of course you're using qualifiers).
+This means a component contains at most one instance per bean class (unless of course you're using qualifiers or inject a provider).
 
 If you want to re-use a bean across multiple components, use a `@Factory` or a `@Builder` to pass it.
 If possible, the component will use instance that was passed this way, rather than create a new bean instance.
