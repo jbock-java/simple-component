@@ -19,7 +19,7 @@ Instead, you have the "same key, same bean" rule:
 Intuitively this means a component injects the same bean instance everywhere (unless of course you're using qualifiers or inject a provider).
 
 If you want to re-use a bean across multiple components, or multiple instances of the same component, use a `@Factory` or a `@Builder` to pass it.
-If possible, the component will use instance that was passed this way, rather than create a new bean instance.
+The component will then use the bean instance that was passed this way, and it will not create a new bean instance.
 
 If you inject `Provider<TheBean>`, rather than `TheBean` directly, calling `provider.get()` will create a fresh bean instance every time.
 
