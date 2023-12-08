@@ -14,12 +14,38 @@ Instead, you have the "same key, same bean" rule:
 
 > If two beans of the same *key* are injected by the same component, then they are the same bean instance.
 
-This means every component instance contains only one instance of a given bean class (unless you're using qualifiers).
+This means a component contains at most one instance per bean class (unless of course you're using qualifiers).
 
 If you want to re-use a bean across multiple components, use a `@Factory` or a `@Builder` to pass it.
 If possible, the component will use instance that was passed this way, rather than create a new bean instance.
 
 If you inject `Provider<TheBean>`, rather than `TheBean` directly, calling `provider.get()` will create a fresh bean instance every time.
+
+### Mocking
+
+If you want create a component where some means are swapped for mock instance, use `@Component(mockBuilder = true)`.
+The mocks can then be injected in to the component using the `mockBuilder` method.
+For [example](https://github.com/jbock-java/modular-thermosiphon):
+
+```java
+List<String> messages = new ArrayList<>();
+CoffeeLogger mockLogger = new CoffeeLogger("") {
+    @Override
+    public void log(String msg) {
+        messages.add(msg);
+    }
+};
+CoffeeApp.CoffeeShop app = CoffeeApp_CoffeeShop_Impl.mockBuilder()
+        .coffeeLogger(mockLogger)
+        .build()
+        .create("");
+app.maker().brew();
+assertEquals(List.of(
+                "~ ~ ~ heating ~ ~ ~",
+                "=> => pumping => =>",
+                " [_]P coffee! [_]P "),
+        messages);
+```
 
 ### Note to dagger users
 
