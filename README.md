@@ -12,22 +12,22 @@ Note this is not a complete implementation of `javax.inject` or `jakarta.inject`
 
 ### The `@Scope` and `@Singleton` annotations are ignored.
 
-Instead, you have the "same key, same bean" rule:
+Instead there's a simple rule:
 
-> If two beans of the same *key* are injected by the same component, then they are the same bean instance.
+> If two beans of the *same type* and *same qualifier* are injected by the *same component*, then they are the same bean instance.
 
 Intuitively this means a component injects the same bean instance everywhere (unless of course you're using qualifiers or inject a provider).
 
 If you want to re-use a bean instance across multiple components, or multiple instances of the same component, use a `@Factory` or a `@Builder` to pass it around.
-Component will prefer the bean instance that was passed this way, and it will not create a new bean instance.
+Components will prefer using an existing bean instance over creating a new one.
 
 If you inject `Provider<TheBean>`, rather than `TheBean` directly, calling `provider.get()` will create a fresh bean instance every time.
 
 ### Mocking
 
 If you want create a component where some beans are swapped for mock instances, use `@Component(mockBuilder = true)`.
-The mocks can then be injected into the component using the `mockBuilder` method.
-For [example](https://github.com/jbock-java/modular-thermosiphon):
+A static `mockBuilder` method will be generated, which returns a builder that can be used to register your mocks.
+[Usage example](https://github.com/jbock-java/modular-thermosiphon):
 
 ```java
 List<String> messages = new ArrayList<>();
