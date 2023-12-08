@@ -1,7 +1,7 @@
 [![simple-component-compiler](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component-compiler/badge.svg?color=grey&subject=simple-component-compiler)](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component-compiler)
 [![simple-component](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component/badge.svg?subject=simple-component)](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component)
 
-A minimal dependency injector that uses the following annotations:
+A minimal dependency injector that uses the following annotations (from `javax.inject` or `jakarta.inject`):
 
 1. `@Inject` declares an injection point. It can be a constructor or a static method.
 2. `@Provides` declares an injection point within the component. It must be a static method.
