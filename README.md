@@ -13,8 +13,11 @@ Instead, you have the "same key, same bean" rule:
 
 > If two beans of the same *key* are injected by the same component, then they are the same bean instance.
 
-Here, "same key" means "same type" or, if a qualifier is used, "same key and same qualifier".
-This may seem restrictive at first, but please note that you can always inject `Provider<TheBean> theBeanProvider`, and calling `theBeanProvider.get()` will give you a freshly wired "distinct" bean instance every time.
+This means every component injects the same instance of each bean, unless you're using qualifiers like for instance `@Named("foobar")`.
+
+If you want to re-use a bean across multiple components, use a `@Factory` or a `@Builder` to pass it.
+
+If you inject `Provider<TheBean>`, rather than `TheBean` directly, calling `provider.get()` will create a fresh bean instance every time.
 
 ### Note to dagger users
 
