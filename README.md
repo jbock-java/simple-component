@@ -3,9 +3,10 @@
 
 A minimal dependency injector that uses the following annotations:
 
-1. `@Inject` declares an injection point, similarly `@Provides` declares an injection point within the component
-2. `@Qualifier` and `@Named`
-3. `@Component` along with `@Component.Factory` and `@Component.Builder`
+1. `@Inject` declares an injection point. It can be a constructor or a static method.
+2. `@Provides` declares an injection point within the component. It must be a static method.
+3. `@Qualifier` and its default implementation `@Named`.
+4. And of course, `@Component`, `@Component.Factory` and `@Component.Builder`.
 
 ### The `@Scope` and `@Singleton` annotations are ignored.
 
@@ -13,16 +14,16 @@ Instead, you have the "same key, same bean" rule:
 
 > If two beans of the same *key* are injected by the same component, then they are the same bean instance.
 
-This means every component injects the same instance of each bean, unless you're using qualifiers like for instance `@Named("foobar")`.
+This means every component instance contains only one instance of a given bean class (unless you're using qualifiers).
 
 If you want to re-use a bean across multiple components, use a `@Factory` or a `@Builder` to pass it.
+If possible, the component will use instance that was passed this way, rather than create a new bean instance.
 
 If you inject `Provider<TheBean>`, rather than `TheBean` directly, calling `provider.get()` will create a fresh bean instance every time.
 
 ### Note to dagger users
 
 There are no "subcomponents" or "component dependencies".
-It may not be very elegant, but declaring multiple "normal" components should be "good enough" in most cases.
 
 There is no `@Module`, but you can still have `@Provides` methods, only you declare them directly in your component.
 A `@Provides` method must be `static`.
@@ -30,7 +31,7 @@ A `@Provides` method must be `static`.
 There is no `@Binds`.
 It can be emulated with a `@Provides` method, or, if you control the source code of the interface, a static `@Inject` method.
 
-There is no need for the `@BindsInstance` annotation: *every* factory parameter is a bound instance.
+There is no need for the `@BindsInstance` annotation. Every factory parameter or builder parameter is a bound instance.
 
 There is no `@AssistedInject`, it's a can of worms.
 
