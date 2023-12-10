@@ -1,0 +1,10 @@
+#!/bin/bash
+VERSION=$1
+
+if [[ -z $VERSION ]]; then
+  echo version required
+  exit 1
+fi
+
+./gradlew -Pversion=$VERSION simple-component:publishToMavenLocal
+./gradlew -Pversion=$VERSION compiler:publishToMavenLocal

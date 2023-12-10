@@ -41,15 +41,15 @@ public class BuilderImpl {
         this.names = names;
     }
 
-    TypeSpec generate(BuilderElement builder, MockBuilder mockBuilder) {
+    TypeSpec generate(BuilderElement builder, MockBuilder mockBuilder, MockBuilder2 mockBuilder2) {
         if (component.mockBuilder()) {
-            return generateMock(builder, mockBuilder);
+            return generateMock(builder, mockBuilder, mockBuilder2);
         } else {
             return generateNoMock(builder);
         }
     }
 
-    private TypeSpec generateMock(BuilderElement builder, MockBuilder mockBuilder) {
+    private TypeSpec generateMock(BuilderElement builder, MockBuilder mockBuilder, MockBuilder2 mockBuilder2) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(builder.generatedClass());
         FieldSpec mockBuilderField = FieldSpec.builder(mockBuilder.getClassName(), "mockBuilder", FINAL).build();
         spec.addField(mockBuilderField);
@@ -58,6 +58,16 @@ public class BuilderImpl {
                 .addParameter(mockBuilderParam)
                 .addStatement("this.$N = $N", mockBuilderField, mockBuilderParam)
                 .build());
+        spec.addMethod(generateBuildMethod(builder, mockBuilderField));
+        spec.addMethod(generateWithMocksMethod(mockBuilder2));
+        spec.addFields(fields());
+        spec.addMethods(setterMethods(builder));
+        spec.addModifiers(PUBLIC, STATIC, FINAL);
+        spec.addSuperinterface(builder.element().asType());
+        return spec.build();
+    }
+
+    private MethodSpec generateBuildMethod(BuilderElement builder, FieldSpec mockBuilderField) {
         MethodSpec.Builder buildMethod = MethodSpec.methodBuilder(builder.buildMethod().getSimpleName().toString());
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
@@ -65,7 +75,7 @@ public class BuilderImpl {
                 continue;
             }
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names);
+            CodeBlock invocation = b.invocation(names, true, sorted);
             ParameterSpec param = names.apply(key);
             if (!key.typeName().isPrimitive()) {
                 buildMethod.addStatement("$1T $2N = this.$3N != null && this.$3N.$2N != null ? this.$3N.$2N : $4L",
@@ -76,18 +86,33 @@ public class BuilderImpl {
                         key.typeName(), param, mockBuilderField, auxField, invocation);
             }
         }
-        spec.addFields(fields());
-        spec.addMethods(setterMethods(builder));
-        spec.addModifiers(PRIVATE, STATIC, FINAL);
-        spec.addSuperinterface(builder.element().asType());
         buildMethod.addAnnotation(Override.class);
         buildMethod.addModifiers(builder.buildMethod().getModifiers().stream()
                 .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
         buildMethod.returns(TypeName.get(component.element().asType()));
         buildMethod.addStatement("return new $T($L)", component.generatedClass(), constructorParameters().stream()
                 .collect(CodeBlock.joining(", ")));
-        spec.addMethod(buildMethod.build());
-        return spec.build();
+        return buildMethod.build();
+    }
+
+    private MethodSpec generateWithMocksMethod(MockBuilder2 mockBuilder2) {
+        MethodSpec.Builder method = MethodSpec.methodBuilder("withMocks");
+        List<CodeBlock> constructorParameters = new ArrayList<>();
+        for (NamedBinding namedBinding : sorted.values()) {
+            Binding b = namedBinding.binding();
+            if (!(b instanceof ParameterBinding)) {
+                continue;
+            }
+            ParameterSpec param = names.apply(b.key());
+            constructorParameters.add(CodeBlock.of("this.$N", param));
+        }
+        if (component.publicMockBuilder()) {
+            method.addModifiers(PUBLIC);
+        }
+        method.returns(mockBuilder2.getClassName());
+        method.addStatement("return new $T($L)", mockBuilder2.getClassName(),
+                constructorParameters.stream().collect(CodeBlock.joining(", ")));
+        return method.build();
     }
 
     private TypeSpec generateNoMock(BuilderElement builder) {
@@ -105,7 +130,7 @@ public class BuilderImpl {
         }
         spec.addFields(fields());
         spec.addMethods(setterMethods(builder));
-        spec.addModifiers(PRIVATE, STATIC, FINAL);
+        spec.addModifiers(PUBLIC, STATIC, FINAL);
         spec.addSuperinterface(builderType);
         buildMethod.addAnnotation(Override.class);
         buildMethod.addModifiers(builder.buildMethod().getModifiers().stream()
@@ -129,21 +154,21 @@ public class BuilderImpl {
     }
 
     private List<MethodSpec> setterMethods(BuilderElement builder) {
-        TypeMirror builderType = builder.element().asType();
         List<MethodSpec> result = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
-            if (b instanceof ParameterBinding) {
-                MethodSpec.Builder setterMethod = MethodSpec.methodBuilder(b.element().getSimpleName().toString());
-                setterMethod.addAnnotation(Override.class);
-                setterMethod.addParameter(names.apply(b.key()));
-                setterMethod.addStatement("this.$N = $N", names.apply(b.key()), names.apply(b.key()));
-                setterMethod.addStatement("return this");
-                setterMethod.returns(TypeName.get(builderType));
-                setterMethod.addModifiers(b.element().getModifiers().stream()
-                        .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
-                result.add(setterMethod.build());
+            if (!(b instanceof ParameterBinding)) {
+                continue;
             }
+            MethodSpec.Builder setterMethod = MethodSpec.methodBuilder(b.element().getSimpleName().toString());
+            setterMethod.addAnnotation(Override.class);
+            setterMethod.addParameter(names.apply(b.key()));
+            setterMethod.addStatement("this.$1N = $1N", names.apply(b.key()));
+            setterMethod.addStatement("return this");
+            setterMethod.returns(builder.generatedClass());
+            setterMethod.addModifiers(b.element().getModifiers().stream()
+                    .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
+            result.add(setterMethod.build());
         }
         return result;
     }
