@@ -15,7 +15,6 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
-import io.jbock.simple.processor.binding.ParameterBinding;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.Modifier;
@@ -81,10 +80,7 @@ public class ComponentImpl {
         }
         component.factoryElement().ifPresent(factory -> {
             spec.addMethod(generateFactoryMethod(factory));
-            spec.addType(factoryImpl.generate(factory, mockBuilder));
-            if (component.mockBuilder()) {
-                spec.addMethod(generateMockBuilderMethodFactory());
-            }
+            spec.addType(factoryImpl.generate(factory, mockBuilder, mockBuilder2));
         });
         component.builderElement().ifPresent(builder -> {
             spec.addMethod(generateBuilderMethod(builder));
@@ -118,7 +114,7 @@ public class ComponentImpl {
         MethodSpec.Builder spec = MethodSpec.methodBuilder(FACTORY_METHOD)
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
-                .returns(TypeName.get(factory.element().asType()));
+                .returns(factory.generatedClass());
         if (component.mockBuilder()) {
             spec.addStatement("return new $T(null)", factory.generatedClass());
         } else {
@@ -172,31 +168,6 @@ public class ComponentImpl {
         if (component.publicMockBuilder()) {
             method.addModifiers(modifiers);
         }
-        return method.build();
-    }
-
-    MethodSpec generateMockBuilderMethodFactory() {
-        MethodSpec.Builder method = MethodSpec.methodBuilder(MOCK_BUILDER_METHOD);
-        method.addModifiers(STATIC);
-        method.addJavadoc("Visible for testing. Do not call this method from production code.");
-        method.returns(mockBuilder2.getClassName());
-        List<CodeBlock> constructorParameters = new ArrayList<>();
-        for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
-            if (!(b instanceof ParameterBinding)) {
-                continue;
-            }
-            Key key = b.key();
-            ParameterSpec param = names.apply(key);
-            method.addParameter(param);
-            constructorParameters.add(CodeBlock.of("$N", param));
-        }
-        if (component.publicMockBuilder()) {
-            method.addModifiers(modifiers);
-        }
-        method.addStatement("return new $T($L)",
-                mockBuilder2.getClassName(),
-                constructorParameters.stream().collect(CodeBlock.joining(", ")));
         return method.build();
     }
 
