@@ -40,6 +40,7 @@ public class ComponentImpl {
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
     private final MockBuilder mockBuilder;
+    private final MockBuilder2 mockBuilder2;
     private final BuilderImpl builderImpl;
     private final FactoryImpl factoryImpl;
     private final Modifier[] modifiers;
@@ -49,6 +50,7 @@ public class ComponentImpl {
             Map<Key, NamedBinding> sorted,
             Function<Key, ParameterSpec> names,
             MockBuilder mockBuilder,
+            MockBuilder2 mockBuilder2,
             BuilderImpl builderImpl,
             FactoryImpl factoryImpl) {
         this.component = component;
@@ -57,6 +59,7 @@ public class ComponentImpl {
         this.mockBuilder = mockBuilder;
         this.modifiers = component.element().getModifiers().stream()
                 .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
+        this.mockBuilder2 = mockBuilder2;
         this.builderImpl = builderImpl;
         this.factoryImpl = factoryImpl;
     }
@@ -81,7 +84,7 @@ public class ComponentImpl {
         });
         component.builderElement().ifPresent(builder -> {
             spec.addMethod(generateBuilderMethod(builder));
-            spec.addType(builderImpl.generate(builder, mockBuilder));
+            spec.addType(builderImpl.generate(builder, mockBuilder, mockBuilder2));
         });
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
             spec.addMethod(generateCreateMethod());
@@ -89,6 +92,7 @@ public class ComponentImpl {
         if (component.mockBuilder()) {
             spec.addMethod(generateMockBuilderMethod());
             spec.addType(mockBuilder.generate());
+            spec.addType(mockBuilder2.generate());
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
@@ -121,7 +125,7 @@ public class ComponentImpl {
         MethodSpec.Builder spec = MethodSpec.methodBuilder(BUILDER_METHOD)
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
-                .returns(TypeName.get(builder.element().asType()));
+                .returns(builder.generatedClass());
         if (component.mockBuilder()) {
             spec.addStatement("return new $T(null)", builder.generatedClass());
         } else {
@@ -194,6 +198,7 @@ public class ComponentImpl {
     public static final class Factory {
         private final ComponentElement component;
         private final MockBuilder.Factory mockBuilderFactory;
+        private final MockBuilder2.Factory mockBuilder2Factory;
         private final BuilderImpl.Factory builderImplFactory;
         private final FactoryImpl.Factory factoryImplFactory;
 
@@ -201,10 +206,12 @@ public class ComponentImpl {
         public Factory(
                 ComponentElement component,
                 MockBuilder.Factory mockBuilderFactory,
+                MockBuilder2.Factory mockBuilder2Factory,
                 BuilderImpl.Factory builderImplFactory,
                 FactoryImpl.Factory factoryImplFactory) {
             this.component = component;
             this.mockBuilderFactory = mockBuilderFactory;
+            this.mockBuilder2Factory = mockBuilder2Factory;
             this.builderImplFactory = builderImplFactory;
             this.factoryImplFactory = factoryImplFactory;
         }
@@ -217,6 +224,7 @@ public class ComponentImpl {
                     sorted,
                     names,
                     mockBuilderFactory.create(sorted, names),
+                    mockBuilder2Factory.create(sorted, names),
                     builderImplFactory.create(sorted, names),
                     factoryImplFactory.create(sorted, names));
         }

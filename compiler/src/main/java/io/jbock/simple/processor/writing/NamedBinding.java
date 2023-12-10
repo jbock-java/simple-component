@@ -2,7 +2,7 @@ package io.jbock.simple.processor.writing;
 
 import io.jbock.simple.processor.binding.Binding;
 
-final class NamedBinding {
+public final class NamedBinding {
 
     private final Binding binding;
     private final String name;
@@ -20,7 +20,7 @@ final class NamedBinding {
         this.componentRequest = componentRequest;
     }
 
-    Binding binding() {
+    public Binding binding() {
         return binding;
     }
 

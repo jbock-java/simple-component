@@ -36,6 +36,7 @@ public class Generator {
     private Map<Key, NamedBinding> addNames(List<Binding> bindings) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
         uniqueNameSet.claim("mockBuilder");
+        uniqueNameSet.claim("withMocks");
         uniqueNameSet.claim("build");
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
         for (Binding b : bindings) {

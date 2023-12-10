@@ -7,10 +7,12 @@ import io.jbock.javapoet.TypeName;
 import io.jbock.simple.Inject;
 import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.writing.NamedBinding;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -111,9 +113,19 @@ public final class InjectBinding extends Binding {
     }
 
     @Override
-    public CodeBlock invocation(Function<Key, ParameterSpec> names) {
+    public CodeBlock invocation(
+            Function<Key, ParameterSpec> names,
+            boolean thisForNames,
+            Map<Key, NamedBinding> bindings) {
         CodeBlock params = requests().stream()
-                .map(d -> CodeBlock.of("$N", names.apply(d.key())))
+                .map(d -> {
+                    NamedBinding namedBinding = bindings.get(d.key());
+                    ParameterSpec param = names.apply(d.key());
+                    boolean isParameterBinding = namedBinding != null && namedBinding.binding() instanceof ParameterBinding;
+                    return (isParameterBinding && thisForNames) ? 
+                            CodeBlock.of("this.$N", param) :
+                            CodeBlock.of("$N", param);
+                })
                 .collect(CodeBlock.joining(", "));
         if (bindingElement.getKind() == ElementKind.CONSTRUCTOR) {
             return CodeBlock.of("new $T($L)", bindingElement.getEnclosingElement().asType(), params);

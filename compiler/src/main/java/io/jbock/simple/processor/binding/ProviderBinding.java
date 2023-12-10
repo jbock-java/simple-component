@@ -3,9 +3,11 @@ package io.jbock.simple.processor.binding;
 import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.ParameterSpec;
 import io.jbock.simple.processor.util.ProviderType;
+import io.jbock.simple.processor.writing.NamedBinding;
 
 import javax.lang.model.element.Element;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class ProviderBinding extends Binding {
@@ -33,8 +35,11 @@ public class ProviderBinding extends Binding {
     }
 
     @Override
-    public CodeBlock invocation(Function<Key, ParameterSpec> names) {
-        return CodeBlock.of("() -> $L", sourceBinding.invocation(names));
+    public CodeBlock invocation(
+            Function<Key, ParameterSpec> names,
+            boolean thisForNames,
+            Map<Key, NamedBinding> bindings) {
+        return CodeBlock.of("() -> $L", sourceBinding.invocation(names, thisForNames, bindings));
     }
 
     public Binding sourceBinding() {
