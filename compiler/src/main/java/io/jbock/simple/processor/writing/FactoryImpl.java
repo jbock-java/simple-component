@@ -41,15 +41,15 @@ public class FactoryImpl {
         this.names = names;
     }
 
-    TypeSpec generate(FactoryElement factory, MockBuilder mockBuilder) {
+    TypeSpec generate(FactoryElement factory, MockBuilder mockBuilder, MockBuilder2 mockBuilder2) {
         if (component.mockBuilder()) {
-            return generateMock(factory, mockBuilder);
+            return generateMock(factory, mockBuilder, mockBuilder2);
         } else {
             return generateNoMock(factory);
         }
     }
 
-    private TypeSpec generateMock(FactoryElement factory, MockBuilder mockBuilder) {
+    private TypeSpec generateMock(FactoryElement factory, MockBuilder mockBuilder, MockBuilder2 mockBuilder2) {
         TypeSpec.Builder spec = TypeSpec.classBuilder(factory.generatedClass());
         FieldSpec mockBuilderField = FieldSpec.builder(mockBuilder.getClassName(), "mockBuilder", FINAL).build();
         spec.addField(mockBuilderField);
@@ -59,6 +59,14 @@ public class FactoryImpl {
                 .addStatement("this.$N = $N", mockBuilderField, mockBuilderParam)
                 .build());
         ExecutableElement abstractMethod = factory.singleAbstractMethod();
+        spec.addMethod(generateBuildMethod(abstractMethod, mockBuilderField));
+        spec.addMethod(generateWithMocksMethod(mockBuilder2));
+        spec.addModifiers(PUBLIC, STATIC, FINAL);
+        spec.addSuperinterface(factory.element().asType());
+        return spec.build();
+    }
+
+    private MethodSpec generateBuildMethod(ExecutableElement abstractMethod, FieldSpec mockBuilderField) {
         MethodSpec.Builder method = MethodSpec.methodBuilder(abstractMethod.getSimpleName().toString());
         method.addAnnotation(Override.class);
         method.addModifiers(abstractMethod.getModifiers().stream()
@@ -82,12 +90,30 @@ public class FactoryImpl {
             }
         }
         method.addParameters(parameters());
-        spec.addModifiers(PRIVATE, STATIC, FINAL);
-        spec.addSuperinterface(factory.element().asType());
         method.addStatement("return new $T($L)", component.generatedClass(), constructorParameters().stream()
                 .collect(CodeBlock.joining(", ")));
-        spec.addMethod(method.build());
-        return spec.build();
+        return method.build();
+    }
+
+    private MethodSpec generateWithMocksMethod(MockBuilder2 mockBuilder2) {
+        MethodSpec.Builder method = MethodSpec.methodBuilder("withMocks");
+        List<CodeBlock> constructorParameters = new ArrayList<>();
+        for (NamedBinding namedBinding : sorted.values()) {
+            Binding b = namedBinding.binding();
+            if (!(b instanceof ParameterBinding)) {
+                continue;
+            }
+            ParameterSpec param = names.apply(b.key());
+            constructorParameters.add(CodeBlock.of("$N", param));
+        }
+        if (component.publicMockBuilder()) {
+            method.addModifiers(PUBLIC);
+        }
+        method.addParameters(parameters());
+        method.returns(mockBuilder2.getClassName());
+        method.addStatement("return new $T($L)", mockBuilder2.getClassName(),
+                constructorParameters.stream().collect(CodeBlock.joining(", ")));
+        return method.build();
     }
 
     private TypeSpec generateNoMock(FactoryElement factory) {
