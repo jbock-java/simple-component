@@ -37,6 +37,8 @@ public @interface Component {
      * <p>A factory is an interface with a single method that returns a new component instance each time it
      * is called. The parameters of that method provide the bound instances
      * required by the component.
+     *
+     * <p>The generated implementation of the factory will be immutable.
      */
     @Target(TYPE)
     @Retention(SOURCE)
@@ -51,6 +53,10 @@ public @interface Component {
      * Additionally, there must be exactly one abstract no-argument method that returns the component
      * type, called the "build method". The setter methods provide the bound instances
      * required by the component.
+     *
+     * <p>If the {@code mockBuilder} attribute is {@code true}, then the generated implementation
+     * of the builder will contain an additional method called {@code withMocks} which
+     * returns a new {@code MockBuilder}.
      */
     @Retention(SOURCE)
     @Target(TYPE)
@@ -58,8 +64,17 @@ public @interface Component {
     }
 
     /**
-     * By default, the {@code mockBuilder} method is only package-private. This
-     * makes it harder to invoke from production code, which is probably unintentional anyway.
+     * If {@code true}, the generated component implementation will contain
+     * a static {@code mockBuilder} method. However, if this component uses a {@code Builder},
+     * the {@code mockBuilder} method will not be generated; see {@linkplain Builder}.
+     *
+     * @return {@code true} if the {@code mockBuilder} method should be generated.
+     */
+    boolean mockBuilder() default false;
+
+    /**
+     * By default, the {@code mockBuilder} (or {@code withMocks}) method is only package-private.
+     * This makes it harder to accidentally invoke from production code.
      *
      * <p>In test code, {@code mockBuilder} can always be invoked, even if it is only package-visible,
      * by placing a forwarding delegate class in the correct package.
@@ -68,20 +83,15 @@ public @interface Component {
      * like this:
      *
      * <pre>{@code
-     * public class MockBuilderAccess {
+     * public class MyComponentAccess {
      *   public static MyComponent_Impl.MockBuilder mockBuilder() {
      *       return MyComponent_Impl.mockBuilder();
      *   }
      * }
      * }</pre>
      *
-     * @return {@code true} if the {@code mockBuilder} method should have the same visibility
-     * as the component.
+     * @return {@code true} if the {@code mockBuilder} (or {@code withMocks}) method
+     * should have the same visibility as the component.
      */
     boolean publicMockBuilder() default false;
-
-    /**
-     * @return {@code true} if the {@code mockBuilder} method should be generated.
-     */
-    boolean mockBuilder() default false;
 }
