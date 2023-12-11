@@ -26,7 +26,8 @@ If you inject `Provider<TheBean>`, rather than `TheBean` directly, calling `prov
 ### Mocking
 
 If you want create a component where some beans are swapped for mock instances, use `@Component(mockBuilder = true)`.
-A static `mockBuilder` method will be generated, which returns a builder that can be used to register your mocks.
+A static `mockBuilder` method will be generated, which returns a MockBuilder that can be used to register your mocks.
+(If your component uses `@Component.Builder`, the generated builder will have a `withMocks` method that returns the MockBuilder.)
 [Usage example](https://github.com/jbock-java/modular-thermosiphon):
 
 ```java
@@ -37,10 +38,11 @@ CoffeeLogger mockLogger = new CoffeeLogger("") {
         messages.add(msg);
     }
 };
-CoffeeApp.CoffeeShop app = CoffeeApp_CoffeeShop_Impl.mockBuilder()
+CoffeeApp.CoffeeShop app = CoffeeApp_CoffeeShop_Impl.builder()
+        .logLevel("")
+        .withMocks()
         .coffeeLogger(mockLogger)
-        .build()
-        .create("");
+        .build();
 app.maker().brew();
 assertEquals(List.of(
                 "~ ~ ~ heating ~ ~ ~",
