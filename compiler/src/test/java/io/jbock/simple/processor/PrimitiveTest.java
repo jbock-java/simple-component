@@ -86,7 +86,7 @@ class PrimitiveTest {
                         "    return a;",
                         "  }",
                         "",
-                        "  public static Factory_Impl factory() {",
+                        "  public static TestClass.AComponent.Factory factory() {",
                         "    return new Factory_Impl();",
                         "  }",
                         "",

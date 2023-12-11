@@ -68,14 +68,7 @@ public class ComponentImpl {
                 .addModifiers(FINAL)
                 .addSuperinterface(component.element().asType());
         spec.addFields(getFields());
-        for (DependencyRequest r : component.requests()) {
-            MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestingElement().getSimpleName().toString());
-            method.addStatement("return $L", sorted.get(r.key()).name());
-            method.returns(r.key().typeName());
-            method.addAnnotation(Override.class);
-            method.addModifiers(PUBLIC);
-            spec.addMethod(method.build());
-        }
+        spec.addMethods(generateGetters());
         component.factoryElement().ifPresent(factory -> {
             spec.addMethod(generateFactoryMethod(factory));
             spec.addType(factoryImpl.generate(factory));
@@ -105,6 +98,19 @@ public class ComponentImpl {
         return spec.build();
     }
 
+    private List<MethodSpec> generateGetters() {
+        List<MethodSpec> result = new ArrayList<>(component.requests().size());
+        for (DependencyRequest r : component.requests()) {
+            MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestingElement().getSimpleName().toString());
+            method.addStatement("return $L", sorted.get(r.key()).name());
+            method.returns(r.key().typeName());
+            method.addAnnotation(Override.class);
+            method.addModifiers(PUBLIC);
+            result.add(method.build());
+        }
+        return result;
+    }
+
     private String getComments() {
         String version = Objects.toString(getClass().getPackage().getImplementationVersion(), "");
         return "https://github.com/jbock-java/simple-component" + (version.isEmpty() ? "" : " " + version);
@@ -114,7 +120,7 @@ public class ComponentImpl {
         MethodSpec.Builder spec = MethodSpec.methodBuilder(FACTORY_METHOD)
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
-                .returns(factory.generatedClass());
+                .returns(TypeName.get(factory.element().asType()));
         spec.addStatement("return new $T()", factory.generatedClass());
         return spec.build();
     }
