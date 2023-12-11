@@ -79,7 +79,7 @@ class QualifierTest {
                         "    return a;",
                         "  }",
                         "",
-                        "  static Factory_Impl factory() {",
+                        "  static TestClass.AComponent.Factory factory() {",
                         "    return new Factory_Impl();",
                         "  }",
                         "",
