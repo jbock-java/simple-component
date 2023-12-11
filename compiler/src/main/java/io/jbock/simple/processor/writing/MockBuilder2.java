@@ -73,7 +73,7 @@ public class MockBuilder2 {
     }
 
     ClassName getClassName() {
-        return component.generatedClass().nestedClass("MockBuilder2");
+        return component.generatedClass().nestedClass("MockBuilder");
     }
 
     private MethodSpec buildMethod() {

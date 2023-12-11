@@ -15,6 +15,7 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.binding.ParameterBinding;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.Modifier;
@@ -39,7 +40,6 @@ public class ComponentImpl {
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
-    private final MockBuilder mockBuilder;
     private final MockBuilder2 mockBuilder2;
     private final BuilderImpl builderImpl;
     private final FactoryImpl factoryImpl;
@@ -49,14 +49,12 @@ public class ComponentImpl {
             ComponentElement component,
             Map<Key, NamedBinding> sorted,
             Function<Key, ParameterSpec> names,
-            MockBuilder mockBuilder,
             MockBuilder2 mockBuilder2,
             BuilderImpl builderImpl,
             FactoryImpl factoryImpl) {
         this.component = component;
         this.sorted = sorted;
         this.names = names;
-        this.mockBuilder = mockBuilder;
         this.modifiers = component.element().getModifiers().stream()
                 .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
         this.mockBuilder2 = mockBuilder2;
@@ -80,11 +78,14 @@ public class ComponentImpl {
         }
         component.factoryElement().ifPresent(factory -> {
             spec.addMethod(generateFactoryMethod(factory));
-            spec.addType(factoryImpl.generate(factory, mockBuilder, mockBuilder2));
+            spec.addType(factoryImpl.generate(factory));
+            if (component.mockBuilder()) {
+                spec.addMethod(generateMockBuilderMethodFactory());
+            }
         });
         component.builderElement().ifPresent(builder -> {
             spec.addMethod(generateBuilderMethod(builder));
-            spec.addType(builderImpl.generate(builder, mockBuilder, mockBuilder2));
+            spec.addType(builderImpl.generate(builder, mockBuilder2));
         });
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
             spec.addMethod(generateCreateMethod());
@@ -93,7 +94,6 @@ public class ComponentImpl {
             }
         }
         if (component.mockBuilder()) {
-            spec.addType(mockBuilder.generate());
             spec.addType(mockBuilder2.generate());
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
@@ -115,11 +115,7 @@ public class ComponentImpl {
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
                 .returns(factory.generatedClass());
-        if (component.mockBuilder()) {
-            spec.addStatement("return new $T(null)", factory.generatedClass());
-        } else {
-            spec.addStatement("return new $T()", factory.generatedClass());
-        }
+        spec.addStatement("return new $T()", factory.generatedClass());
         return spec.build();
     }
 
@@ -128,11 +124,7 @@ public class ComponentImpl {
                 .addModifiers(STATIC)
                 .addModifiers(modifiers)
                 .returns(builder.generatedClass());
-        if (component.mockBuilder()) {
-            spec.addStatement("return new $T(null)", builder.generatedClass());
-        } else {
-            spec.addStatement("return new $T()", builder.generatedClass());
-        }
+        spec.addStatement("return new $T()", builder.generatedClass());
         return spec.build();
     }
 
@@ -171,6 +163,27 @@ public class ComponentImpl {
         return method.build();
     }
 
+    MethodSpec generateMockBuilderMethodFactory() {
+        MethodSpec.Builder method = MethodSpec.methodBuilder(MOCK_BUILDER_METHOD);
+        List<CodeBlock> constructorParameters = new ArrayList<>();
+        for (NamedBinding namedBinding : sorted.values()) {
+            Binding b = namedBinding.binding();
+            if (!(b instanceof ParameterBinding)) {
+                continue;
+            }
+            ParameterSpec param = names.apply(b.key());
+            constructorParameters.add(CodeBlock.of("$N", param));
+        }
+        if (component.publicMockBuilder()) {
+            method.addModifiers(PUBLIC);
+        }
+        method.addParameters(factoryImpl.parameters());
+        method.returns(mockBuilder2.getClassName());
+        method.addStatement("return new $T($L)", mockBuilder2.getClassName(),
+                constructorParameters.stream().collect(CodeBlock.joining(", ")));
+        return method.build();
+    }
+
     private List<FieldSpec> getFields() {
         List<FieldSpec> fields = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
@@ -199,21 +212,18 @@ public class ComponentImpl {
 
     public static final class Factory {
         private final ComponentElement component;
-        private final MockBuilder.Factory mockBuilderFactory;
-        private final MockBuilder2.Factory mockBuilder2Factory;
+        private final MockBuilder2.Factory mockBuilderFactory;
         private final BuilderImpl.Factory builderImplFactory;
         private final FactoryImpl.Factory factoryImplFactory;
 
         @Inject
         public Factory(
                 ComponentElement component,
-                MockBuilder.Factory mockBuilderFactory,
-                MockBuilder2.Factory mockBuilder2Factory,
+                MockBuilder2.Factory mockBuilderFactory,
                 BuilderImpl.Factory builderImplFactory,
                 FactoryImpl.Factory factoryImplFactory) {
             this.component = component;
             this.mockBuilderFactory = mockBuilderFactory;
-            this.mockBuilder2Factory = mockBuilder2Factory;
             this.builderImplFactory = builderImplFactory;
             this.factoryImplFactory = factoryImplFactory;
         }
@@ -226,7 +236,6 @@ public class ComponentImpl {
                     sorted,
                     names,
                     mockBuilderFactory.create(sorted, names),
-                    mockBuilder2Factory.create(sorted, names),
                     builderImplFactory.create(sorted, names),
                     factoryImplFactory.create(sorted, names));
         }
