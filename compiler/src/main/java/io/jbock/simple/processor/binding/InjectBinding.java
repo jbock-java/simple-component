@@ -7,10 +7,13 @@ import io.jbock.javapoet.TypeName;
 import io.jbock.simple.Inject;
 import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.ValidationFailure;
+import io.jbock.simple.processor.util.Visitors;
 import io.jbock.simple.processor.writing.NamedBinding;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -39,12 +42,26 @@ public final class InjectBinding extends Binding {
         if (element().getAnnotation(Provides.class) != null) {
             return lowerFirst(removeMethodNamePrefix(element().getSimpleName().toString()));
         }
-        TypeName typeName = key().typeName();
-        if (typeName instanceof ParameterizedTypeName) {
-            return lowerFirst(simpleTypeName((ParameterizedTypeName) typeName));
+        Element enclosing = element().getEnclosingElement();
+        if (enclosing != null) {
+            if (keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
+                TypeElement enclosingOuter = Visitors.TYPE_ELEMENT_VISITOR.visit(enclosing.getEnclosingElement());
+                if (enclosingOuter != null && keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
+                    return lowerFirst(enclosingOuter.getSimpleName().toString() + simpleName(key().typeName()));
+                }
+            } else {
+                return lowerFirst(enclosing.getSimpleName().toString() + simpleName(key().typeName()));
+            }
         }
-        return lowerFirst(verySimpleTypeName(typeName.toString()));
+        return lowerFirst(simpleName(key().typeName()));
     });
+
+    private String simpleName(TypeName typeName) {
+        if (typeName instanceof ParameterizedTypeName) {
+            return simpleTypeName((ParameterizedTypeName) typeName);
+        }
+        return verySimpleTypeName(typeName.toString());
+    }
 
     private static String removeMethodNamePrefix(String s) {
         for (String p : PROVIDES_METHOD_COMMON_PREFIXES) {
