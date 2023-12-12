@@ -39,10 +39,10 @@ public final class ParameterBinding extends Binding {
     @Override
     public CodeBlock invocation(
             Function<Key, ParameterSpec> names, 
-            boolean thisForNames,
-            Map<Key, NamedBinding> bindings) {
+            Map<Key, NamedBinding> bindings,
+            boolean paramsAreFields) {
         ParameterSpec param = names.apply(key());
-        return thisForNames ? CodeBlock.of("this.$N", param) : CodeBlock.of("$N", param);
+        return paramsAreFields ? CodeBlock.of("this.$N", param) : CodeBlock.of("$N", param);
     }
 
     @Override

@@ -115,14 +115,14 @@ public final class InjectBinding extends Binding {
     @Override
     public CodeBlock invocation(
             Function<Key, ParameterSpec> names,
-            boolean thisForNames,
-            Map<Key, NamedBinding> bindings) {
+            Map<Key, NamedBinding> bindings,
+            boolean paramsAreFields) {
         CodeBlock params = requests().stream()
                 .map(d -> {
                     NamedBinding namedBinding = bindings.get(d.key());
                     ParameterSpec param = names.apply(d.key());
-                    boolean isParameterBinding = namedBinding != null && namedBinding.binding() instanceof ParameterBinding;
-                    return (isParameterBinding && thisForNames) ? 
+                    boolean isParameter = namedBinding != null && namedBinding.binding() instanceof ParameterBinding;
+                    return isParameter && paramsAreFields ?
                             CodeBlock.of("this.$N", param) :
                             CodeBlock.of("$N", param);
                 })

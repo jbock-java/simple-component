@@ -53,7 +53,7 @@ public class FactoryImpl {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names);
+            CodeBlock invocation = b.invocation(names, sorted, false);
             ParameterSpec param = names.apply(key);
             if (!(b instanceof ParameterBinding)) {
                 method.addStatement("$T $N = $L", key.typeName(), param, invocation);
