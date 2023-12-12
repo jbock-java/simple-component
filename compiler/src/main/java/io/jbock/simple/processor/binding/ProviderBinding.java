@@ -37,9 +37,9 @@ public class ProviderBinding extends Binding {
     @Override
     public CodeBlock invocation(
             Function<Key, ParameterSpec> names,
-            boolean thisForNames,
-            Map<Key, NamedBinding> bindings) {
-        return CodeBlock.of("() -> $L", sourceBinding.invocation(names, thisForNames, bindings));
+            Map<Key, NamedBinding> bindings,
+            boolean paramsAreFields) {
+        return CodeBlock.of("() -> $L", sourceBinding.invocation(names, bindings, paramsAreFields));
     }
 
     public Binding sourceBinding() {

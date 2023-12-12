@@ -24,14 +24,14 @@ import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
-public class MockBuilder2 {
+public class MockBuilder {
 
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
     private final Modifier[] modifiers;
 
-    MockBuilder2(
+    MockBuilder(
             ComponentElement component,
             Map<Key, NamedBinding> sorted,
             Function<Key, ParameterSpec> names) {
@@ -84,7 +84,7 @@ public class MockBuilder2 {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names, true, sorted);
+            CodeBlock invocation = b.invocation(names, sorted, true);
             ParameterSpec param = names.apply(key);
             if (namedBinding.isComponentRequest()) {
                 constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
@@ -167,10 +167,10 @@ public class MockBuilder2 {
             this.component = component;
         }
 
-        MockBuilder2 create(
+        MockBuilder create(
                 Map<Key, NamedBinding> sorted,
                 Function<Key, ParameterSpec> names) {
-            return new MockBuilder2(component, sorted, names);
+            return new MockBuilder(component, sorted, names);
         }
     }
 }

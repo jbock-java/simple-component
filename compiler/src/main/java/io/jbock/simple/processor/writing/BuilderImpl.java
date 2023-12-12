@@ -40,13 +40,13 @@ public class BuilderImpl {
         this.names = names;
     }
 
-    TypeSpec generate(BuilderElement builder, MockBuilder2 mockBuilder2) {
+    TypeSpec generate(BuilderElement builder, MockBuilder mockBuilder) {
         TypeMirror builderType = builder.element().asType();
         TypeSpec.Builder spec = TypeSpec.classBuilder(builder.generatedClass());
         spec.addFields(fields());
         spec.addMethods(setterMethods(builder));
         if (component.mockBuilder()) {
-            spec.addMethod(generateWithMocksMethod(mockBuilder2));
+            spec.addMethod(generateWithMocksMethod(mockBuilder));
         }
         spec.addModifiers(PUBLIC, STATIC, FINAL);
         spec.addSuperinterface(builderType);
@@ -59,7 +59,7 @@ public class BuilderImpl {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names);
+            CodeBlock invocation = b.invocation(names, sorted, true);
             ParameterSpec param = names.apply(key);
             if (!(b instanceof ParameterBinding)) {
                 buildMethod.addStatement("$T $N = $L", key.typeName(), param, invocation);
@@ -74,7 +74,7 @@ public class BuilderImpl {
         return buildMethod.build();
     }
 
-    private MethodSpec generateWithMocksMethod(MockBuilder2 mockBuilder2) {
+    private MethodSpec generateWithMocksMethod(MockBuilder mockBuilder) {
         MethodSpec.Builder method = MethodSpec.methodBuilder("withMocks");
         List<CodeBlock> constructorParameters = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
@@ -88,8 +88,8 @@ public class BuilderImpl {
         if (component.publicMockBuilder()) {
             method.addModifiers(PUBLIC);
         }
-        method.returns(mockBuilder2.getClassName());
-        method.addStatement("return new $T($L)", mockBuilder2.getClassName(),
+        method.returns(mockBuilder.getClassName());
+        method.addStatement("return new $T($L)", mockBuilder.getClassName(),
                 constructorParameters.stream().collect(CodeBlock.joining(", ")));
         return method.build();
     }

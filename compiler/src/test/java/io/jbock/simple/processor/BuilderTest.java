@@ -193,7 +193,7 @@ class BuilderTest {
                         "",
                         "    @Override",
                         "    public TestClass.AComponent build() {",
-                        "      TestClass.A a = new TestClass.A(s);",
+                        "      TestClass.A a = new TestClass.A(this.s);",
                         "      TestClass.B b = new TestClass.B(a);",
                         "      return new TestClass_AComponent_Impl(b);",
                         "    }",

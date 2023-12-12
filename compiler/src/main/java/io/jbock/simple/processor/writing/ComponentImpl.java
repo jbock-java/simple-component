@@ -40,7 +40,7 @@ public class ComponentImpl {
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
-    private final MockBuilder2 mockBuilder2;
+    private final MockBuilder mockBuilder;
     private final BuilderImpl builderImpl;
     private final FactoryImpl factoryImpl;
     private final Modifier[] modifiers;
@@ -49,7 +49,7 @@ public class ComponentImpl {
             ComponentElement component,
             Map<Key, NamedBinding> sorted,
             Function<Key, ParameterSpec> names,
-            MockBuilder2 mockBuilder2,
+            MockBuilder mockBuilder,
             BuilderImpl builderImpl,
             FactoryImpl factoryImpl) {
         this.component = component;
@@ -57,7 +57,7 @@ public class ComponentImpl {
         this.names = names;
         this.modifiers = component.element().getModifiers().stream()
                 .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
-        this.mockBuilder2 = mockBuilder2;
+        this.mockBuilder = mockBuilder;
         this.builderImpl = builderImpl;
         this.factoryImpl = factoryImpl;
     }
@@ -78,7 +78,7 @@ public class ComponentImpl {
         });
         component.builderElement().ifPresent(builder -> {
             spec.addMethod(generateBuilderMethod(builder));
-            spec.addType(builderImpl.generate(builder, mockBuilder2));
+            spec.addType(builderImpl.generate(builder, mockBuilder));
         });
         if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
             spec.addMethod(generateCreateMethod());
@@ -87,7 +87,7 @@ public class ComponentImpl {
             }
         }
         if (component.mockBuilder()) {
-            spec.addType(mockBuilder2.generate());
+            spec.addType(mockBuilder.generate());
         }
         spec.addAnnotation(AnnotationSpec.builder(Generated.class)
                 .addMember("value", CodeBlock.of("$S", SimpleComponentProcessor.class.getCanonicalName()))
@@ -140,7 +140,7 @@ public class ComponentImpl {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names);
+            CodeBlock invocation = b.invocation(names, sorted, true);
             ParameterSpec param = names.apply(key);
             if (namedBinding.isComponentRequest()) {
                 constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
@@ -160,8 +160,8 @@ public class ComponentImpl {
     MethodSpec generateMockBuilderMethod() {
         MethodSpec.Builder method = MethodSpec.methodBuilder(MOCK_BUILDER_METHOD);
         method.addJavadoc("Visible for testing. Do not call this method from production code.");
-        method.addStatement("return new $T()", mockBuilder2.getClassName());
-        method.returns(mockBuilder2.getClassName());
+        method.addStatement("return new $T()", mockBuilder.getClassName());
+        method.returns(mockBuilder.getClassName());
         method.addModifiers(STATIC);
         if (component.publicMockBuilder()) {
             method.addModifiers(modifiers);
@@ -184,8 +184,8 @@ public class ComponentImpl {
             method.addModifiers(PUBLIC);
         }
         method.addParameters(factoryImpl.parameters());
-        method.returns(mockBuilder2.getClassName());
-        method.addStatement("return new $T($L)", mockBuilder2.getClassName(),
+        method.returns(mockBuilder.getClassName());
+        method.addStatement("return new $T($L)", mockBuilder.getClassName(),
                 constructorParameters.stream().collect(CodeBlock.joining(", ")));
         return method.build();
     }
@@ -218,14 +218,14 @@ public class ComponentImpl {
 
     public static final class Factory {
         private final ComponentElement component;
-        private final MockBuilder2.Factory mockBuilderFactory;
+        private final MockBuilder.Factory mockBuilderFactory;
         private final BuilderImpl.Factory builderImplFactory;
         private final FactoryImpl.Factory factoryImplFactory;
 
         @Inject
         public Factory(
                 ComponentElement component,
-                MockBuilder2.Factory mockBuilderFactory,
+                MockBuilder.Factory mockBuilderFactory,
                 BuilderImpl.Factory builderImplFactory,
                 FactoryImpl.Factory factoryImplFactory) {
             this.component = component;

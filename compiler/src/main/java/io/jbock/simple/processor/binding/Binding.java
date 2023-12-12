@@ -48,12 +48,8 @@ public abstract class Binding {
 
     public abstract CodeBlock invocation(
             Function<Key, ParameterSpec> names,
-            boolean thisForParams,
-            Map<Key, NamedBinding> bindings);
-
-    public final CodeBlock invocation(Function<Key, ParameterSpec> names) {
-        return invocation(names, false, Map.of());
-    }
+            Map<Key, NamedBinding> bindings,
+            boolean paramsAreFields);
 
     public abstract String suggestedVariableName();
 }
