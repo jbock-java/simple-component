@@ -12,9 +12,9 @@ Note this is not a complete implementation of `javax.inject` or `jakarta.inject`
 
 ### The `@Scope` and `@Singleton` annotations are ignored.
 
-Instead there's a simple rule:
+Instead there's the following rule:
 
-> If two beans of the *same type* and *same qualifier* are injected by the *same component*, then they are the same bean instance.
+> If two beans of the *same type* and *same qualifier* are injected by the *same component*, then they are the *same instance*.
 
 Intuitively this means a component injects the same bean instance everywhere (unless of course you're using qualifiers or inject a provider).
 
