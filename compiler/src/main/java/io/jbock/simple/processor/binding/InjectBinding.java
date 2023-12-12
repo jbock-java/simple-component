@@ -43,10 +43,14 @@ public final class InjectBinding extends Binding {
             return lowerFirst(removeMethodNamePrefix(element().getSimpleName().toString()));
         }
         Element enclosing = element().getEnclosingElement();
-        if (enclosing != null && keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
-            TypeElement enclosingOuter = Visitors.TYPE_ELEMENT_VISITOR.visit(enclosing.getEnclosingElement());
-            if (enclosingOuter != null && keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
-                return lowerFirst(enclosingOuter.getSimpleName().toString() + simpleName(key().typeName()));
+        if (enclosing != null) {
+            if (keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
+                TypeElement enclosingOuter = Visitors.TYPE_ELEMENT_VISITOR.visit(enclosing.getEnclosingElement());
+                if (enclosingOuter != null && keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
+                    return lowerFirst(enclosingOuter.getSimpleName().toString() + simpleName(key().typeName()));
+                }
+            } else {
+                return lowerFirst(enclosing.getSimpleName().toString() + simpleName(key().typeName()));
             }
         }
         return lowerFirst(simpleName(key().typeName()));

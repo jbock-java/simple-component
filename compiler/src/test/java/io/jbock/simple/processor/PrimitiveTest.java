@@ -39,8 +39,8 @@ class PrimitiveTest {
         assertThat(compilation).succeeded();
         assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
                 .containsLines(
-                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
-                        "    this.a = a;",
+                        "  private TestClass_AComponent_Impl(TestClass.A testClassA) {",
+                        "    this.testClassA = testClassA;",
                         "  }");
     }
 
@@ -56,7 +56,7 @@ class PrimitiveTest {
                 "",
                 "final class TestClass {",
                 "  static class A {",
-                "    @Inject A(@Named(\"b\") int i) {}",
+                "    @Inject A(@Named(\"miku\") int i) {}",
                 "  }",
                 "",
                 "  @Component(mockBuilder = true)",
@@ -68,7 +68,7 @@ class PrimitiveTest {
                 "      AComponent create(@Named(\"a\") int i);",
                 "    }",
                 "",
-                "    @Named(\"b\")",
+                "    @Named(\"miku\")",
                 "    @Provides",
                 "    static int getB(@Named(\"a\") int i) { return i; }",
                 "  }",
@@ -77,13 +77,13 @@ class PrimitiveTest {
         assertThat(compilation).succeeded();
         assertThat(compilation).generatedSourceFile("test.TestClass_AComponent_Impl")
                 .containsLines(
-                        "  private TestClass_AComponent_Impl(TestClass.A a) {",
-                        "    this.a = a;",
+                        "  private TestClass_AComponent_Impl(TestClass.A testClassA) {",
+                        "    this.testClassA = testClassA;",
                         "  }",
                         "",
                         "  @Override",
                         "  public TestClass.A getA() {",
-                        "    return a;",
+                        "    return testClassA;",
                         "  }",
                         "",
                         "  public static TestClass.AComponent.Factory factory() {",
@@ -94,8 +94,8 @@ class PrimitiveTest {
                         "    @Override",
                         "    public TestClass.AComponent create(int i) {",
                         "      int b = TestClass.AComponent.getB(i);",
-                        "      TestClass.A a = new TestClass.A(b);",
-                        "      return new TestClass_AComponent_Impl(a);",
+                        "      TestClass.A testClassA = new TestClass.A(b);",
+                        "      return new TestClass_AComponent_Impl(testClassA);",
                         "    }",
                         "  }",
                         "",
@@ -103,12 +103,12 @@ class PrimitiveTest {
                         "    private final int i;",
                         "    private int b;",
                         "    private boolean b_isSet;",
-                        "    private TestClass.A a;",
+                        "    private TestClass.A testClassA;",
                         "",
                         "    public TestClass.AComponent build() {",
                         "      int b = this.b_isSet ? this.b : TestClass.AComponent.getB(this.i);",
-                        "      TestClass.A a = this.a != null ? this.a : new TestClass.A(b);",
-                        "      return new TestClass_AComponent_Impl(a);",
+                        "      TestClass.A testClassA = this.testClassA != null ? this.testClassA : new TestClass.A(b);",
+                        "      return new TestClass_AComponent_Impl(testClassA);",
                         "    }",
                         "",
                         "    public MockBuilder b(int b) {",
@@ -117,8 +117,8 @@ class PrimitiveTest {
                         "      return this;",
                         "    }",
                         "",
-                        "    public MockBuilder a(TestClass.A a) {",
-                        "      this.a = a;",
+                        "    public MockBuilder testClassA(TestClass.A testClassA) {",
+                        "      this.testClassA = testClassA;",
                         "      return this;",
                         "    }",
                         "  }",
