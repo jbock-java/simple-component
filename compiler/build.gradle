@@ -55,7 +55,7 @@ dependencies {
     implementation('io.github.jbock-java:javapoet:1.15')
     implementation('io.github.jbock-java:auto-common:1.2.3')
     shadow(simple_component)
-    annotationProcessor('io.github.jbock-java:simple-component-compiler:1.022')
+    annotationProcessor('io.github.jbock-java:simple-component-compiler:1.023')
     testImplementation('io.github.jbock-java:compile-testing:0.19.12')
     testImplementation('org.junit.jupiter:junit-jupiter:5.10.1')
     testImplementation(simple_component)
