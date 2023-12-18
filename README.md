@@ -54,6 +54,7 @@ Instead there's the following rule:
 > If two beans of the *same type* and *same qualifier* are injected by the *same component*, then they are the *same instance*.
 
 Intuitively this means a component injects the same bean instance everywhere (unless of course you're using qualifiers or inject a provider).
+For example in the `CoffeeApp`, if there were more beans that request the logger, they would get the same logger instance as `CoffeeMaker`.
 
 If you want to re-use a bean instance across multiple components, or multiple instances of the same component, use a `@Factory` or a `@Builder` to pass it around.
 Components will prefer using an existing bean instance over creating a new one.
