@@ -1,8 +1,45 @@
 [![simple-component-compiler](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component-compiler/badge.svg?color=grey&subject=simple-component-compiler)](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component-compiler)
 [![simple-component](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component/badge.svg?subject=simple-component)](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component)
 
-A minimal dependency injector that uses the following annotations:
+tl;dr minimal example:
 
+```java
+class CoffeeApp {
+
+    @Component interface CoffeeComponent {
+        CoffeeMaker coffeeMaker();
+
+        @Component.Builder interface Builder {
+            Builder logLevel(String logLevel);
+            CoffeeComponent buildComponent();
+        }
+    }
+
+    interface Logger {
+        void log(String msg);
+    }
+
+    static class CoffeeMaker {
+        private final Logger logger;
+
+        @Inject CoffeeMaker(Logger logger) {
+            this.logger = logger;
+        }
+
+        void brew() {
+            logger.log("~ ~ ~ heating ~ ~ ~");
+            logger.log("=> => pumping => =>");
+            logger.log(" [_]P coffee! [_]P ");
+        }
+    }
+
+    @Inject static Logger createLogger(String level) {
+        return msg -> System.out.println(level + " " + msg);
+    }
+}
+```
+
+This dependency injector uses the following annotations:
 1. `@Inject` declares an injection point. It can be a constructor or a static method.
 2. `@Provides` declares an injection point within the component. It must be a static method.
 3. `@Qualifier` and its default implementation `@Named`.
@@ -32,18 +69,13 @@ A static `mockBuilder` method will be generated, which returns a MockBuilder tha
 
 ```java
 List<String> messages = new ArrayList<>();
-CoffeeLogger mockLogger = new CoffeeLogger("") {
-    @Override
-    public void log(String msg) {
-        messages.add(msg);
-    }
-};
-CoffeeApp.CoffeeShop app = CoffeeApp_CoffeeShop_Impl.builder()
+CoffeeApp.Logger mockLogger = messages::add;
+CoffeeApp.CoffeeComponent app = CoffeeApp_CoffeeComponent_Impl.builder()
         .logLevel("")
         .withMocks()
-        .coffeeLogger(mockLogger)
+        .coffeeAppLogger(mockLogger)
         .build();
-app.maker().brew();
+app.coffeeMaker().brew();
 assertEquals(List.of(
                 "~ ~ ~ heating ~ ~ ~",
                 "=> => pumping => =>",
