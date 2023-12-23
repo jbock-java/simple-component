@@ -25,19 +25,6 @@ public interface ContextComponent {
         ContextComponent build();
     }
 
-    static ContextComponent create(
-            ComponentElement component,
-            TypeTool tool,
-            InjectBindingFactory injectBindingFactory,
-            KeyFactory keyFactory) {
-        return ContextComponent_Impl.builder()
-                .componentElement(component)
-                .tool(tool)
-                .injectBindingFactory(injectBindingFactory)
-                .keyFactory(keyFactory)
-                .build();
-    }
-
     Generator generator();
 
     TopologicalSorter topologicalSorter();
