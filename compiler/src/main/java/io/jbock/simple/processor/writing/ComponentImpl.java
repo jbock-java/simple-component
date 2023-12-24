@@ -15,6 +15,7 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ParameterBinding;
 
 import javax.annotation.processing.Generated;
@@ -37,6 +38,7 @@ public class ComponentImpl {
     private static final String CREATE_METHOD = "create";
     private static final String MOCK_BUILDER_METHOD = "mockBuilder";
 
+    private final KeyFactory keyFactory;
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
@@ -46,12 +48,14 @@ public class ComponentImpl {
     private final Modifier[] modifiers;
 
     private ComponentImpl(
+            KeyFactory keyFactory,
             ComponentElement component,
             Map<Key, NamedBinding> sorted,
             Function<Key, ParameterSpec> names,
             MockBuilder mockBuilder,
             BuilderImpl builderImpl,
             FactoryImpl factoryImpl) {
+        this.keyFactory = keyFactory;
         this.component = component;
         this.sorted = sorted;
         this.names = names;
@@ -69,18 +73,18 @@ public class ComponentImpl {
                 .addSuperinterface(component.element().asType());
         spec.addFields(getFields());
         spec.addMethods(generateGetters());
-        component.factoryElement().ifPresent(factory -> {
+        keyFactory.factoryElement().ifPresent(factory -> {
             spec.addMethod(generateFactoryMethod(factory));
             spec.addType(factoryImpl.generate(factory));
             if (component.mockBuilder()) {
                 spec.addMethod(generateMockBuilderMethodFactory());
             }
         });
-        component.builderElement().ifPresent(builder -> {
+        keyFactory.builderElement().ifPresent(builder -> {
             spec.addMethod(generateBuilderMethod(builder));
             spec.addType(builderImpl.generate(builder, mockBuilder));
         });
-        if (component.factoryElement().isEmpty() && component.builderElement().isEmpty()) {
+        if (keyFactory.factoryElement().isEmpty() && keyFactory.builderElement().isEmpty()) {
             spec.addMethod(generateCreateMethod());
             if (component.mockBuilder()) {
                 spec.addMethod(generateMockBuilderMethod());
@@ -99,8 +103,8 @@ public class ComponentImpl {
     }
 
     private List<MethodSpec> generateGetters() {
-        List<MethodSpec> result = new ArrayList<>(component.requests().size());
-        for (DependencyRequest r : component.requests()) {
+        List<MethodSpec> result = new ArrayList<>(keyFactory.requests().size());
+        for (DependencyRequest r : keyFactory.requests()) {
             MethodSpec.Builder method = MethodSpec.methodBuilder(r.requestingElement().getSimpleName().toString());
             method.addStatement("return $L", sorted.get(r.key()).name());
             method.returns(r.key().typeName());
@@ -217,6 +221,7 @@ public class ComponentImpl {
     }
 
     public static final class Factory {
+        private final KeyFactory keyFactory;
         private final ComponentElement component;
         private final MockBuilder.Factory mockBuilderFactory;
         private final BuilderImpl.Factory builderImplFactory;
@@ -224,10 +229,12 @@ public class ComponentImpl {
 
         @Inject
         public Factory(
+                KeyFactory keyFactory,
                 ComponentElement component,
                 MockBuilder.Factory mockBuilderFactory,
                 BuilderImpl.Factory builderImplFactory,
                 FactoryImpl.Factory factoryImplFactory) {
+            this.keyFactory = keyFactory;
             this.component = component;
             this.mockBuilderFactory = mockBuilderFactory;
             this.builderImplFactory = builderImplFactory;
@@ -238,7 +245,7 @@ public class ComponentImpl {
                 Map<Key, NamedBinding> sorted,
                 Function<Key, ParameterSpec> names) {
             return new ComponentImpl(
-                    component,
+                    keyFactory, component,
                     sorted,
                     names,
                     mockBuilderFactory.create(sorted, names),

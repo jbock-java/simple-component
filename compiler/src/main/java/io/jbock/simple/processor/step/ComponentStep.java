@@ -6,7 +6,7 @@ import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.ContextComponent;
 import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.ComponentElement;
+import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
@@ -72,8 +72,8 @@ public class ComponentStep implements Step {
     private void process(TypeElement typeElement) {
         typeElementValidator.validate(typeElement);
         ContextComponent context = contextComponentFactory.create(typeElement);
-        ComponentElement component = context.componentElement();
-        component.factoryElement().ifPresent(factory -> {
+        KeyFactory keyFactory = context.keyFactory();
+        keyFactory.factoryElement().ifPresent(factory -> {
             ExecutableElement method = factory.singleAbstractMethod();
             if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
                 throw new ValidationFailure("Factory method must return the component type", method);
@@ -87,6 +87,6 @@ public class ComponentStep implements Step {
         Generator generator = context.generator();
         List<Binding> bindings = context.topologicalSorter().sortedBindings();
         TypeSpec typeSpec = generator.generate(bindings);
-        specWriter.write(component.generatedClass(), typeSpec);
+        specWriter.write(context.componentElement().generatedClass(), typeSpec);
     }
 }
