@@ -19,16 +19,16 @@ public final class InjectBindingFactory implements ClearableCache {
     private final Map<TypeElement, Map<Key, InjectBinding>> injectBindingCache = new HashMap<>();
 
     private final TypeTool tool;
-    private final InjectBinding.Factory injectBindingFactory;
+    private final KeyFactory keyFactory;
     private final InjectBindingScanner injectBindingScanner;
 
     @Inject
     public InjectBindingFactory(
             TypeTool tool,
-            InjectBinding.Factory injectBindingFactory,
+            KeyFactory keyFactory,
             InjectBindingScanner injectBindingScanner) {
         this.tool = tool;
-        this.injectBindingFactory = injectBindingFactory;
+        this.keyFactory = keyFactory;
         this.injectBindingScanner = injectBindingScanner;
     }
 
@@ -40,7 +40,7 @@ public final class InjectBindingFactory implements ClearableCache {
         Map<Key, InjectBinding> result = new LinkedHashMap<>();
         List<ExecutableElement> methods = injectBindingScanner.scan(typeElement);
         for (ExecutableElement method : methods) {
-            InjectBinding b = injectBindingFactory.create(method);
+            InjectBinding b = keyFactory.createBinding(method);
             result.put(b.key(), b);
         }
         return result;

@@ -4,9 +4,7 @@ import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.ParameterizedTypeName;
 import io.jbock.javapoet.TypeName;
-import io.jbock.simple.Inject;
 import io.jbock.simple.Provides;
-import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
 import io.jbock.simple.processor.writing.NamedBinding;
 
@@ -105,7 +103,7 @@ public final class InjectBinding extends Binding {
             .map(parameter -> new DependencyRequest(keyFactory().getKey(parameter), parameter, element()))
             .collect(Collectors.toList()));
 
-    private InjectBinding(
+    InjectBinding(
             Key key,
             KeyFactory keyFactory,
             ExecutableElement bindingElement) {
@@ -158,24 +156,5 @@ public final class InjectBinding extends Binding {
 
     private KeyFactory keyFactory() {
         return keyFactory;
-    }
-
-    public static final class Factory {
-        private final KeyFactory keyFactory;
-
-        @Inject
-        public Factory(KeyFactory keyFactory) {
-            this.keyFactory = keyFactory;
-        }
-
-        InjectBinding create(ExecutableElement m) {
-            Key key = keyFactory.getKey(m);
-            if (m.getKind() == ElementKind.CONSTRUCTOR) {
-                if (key.qualifier().isPresent()) {
-                    throw new ValidationFailure("Constructors can't have qualifiers", m);
-                }
-            }
-            return new InjectBinding(key, keyFactory, m);
-        }
     }
 }
