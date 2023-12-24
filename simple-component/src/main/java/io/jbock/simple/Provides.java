@@ -7,8 +7,8 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * This is an alternative to the {@code @Inject} annotation
- * which can only be used on static methods directly in the component.
+ * An alternative to the {@code @Inject} annotation that can be used
+ * on static methods which are direct children of the component interface.
  */
 @Target(METHOD)
 @Retention(SOURCE)
