@@ -32,7 +32,6 @@ public class ComponentStep implements Step {
     private final TypeElementValidator typeElementValidator;
     private final ExecutableElementValidator executableElementValidator;
     private final SpecWriter specWriter;
-    private final ComponentElement.Factory componentElementFactory;
     private final ContextComponent.Factory contextComponentFactory;
 
     @Inject
@@ -42,14 +41,12 @@ public class ComponentStep implements Step {
             TypeElementValidator typeElementValidator,
             ExecutableElementValidator executableElementValidator,
             SpecWriter specWriter,
-            ComponentElement.Factory componentElementFactory,
             ContextComponent.Factory contextComponentFactory) {
         this.messager = messager;
         this.tool = tool;
         this.typeElementValidator = typeElementValidator;
         this.executableElementValidator = executableElementValidator;
         this.specWriter = specWriter;
-        this.componentElementFactory = componentElementFactory;
         this.contextComponentFactory = contextComponentFactory;
     }
 
@@ -74,7 +71,8 @@ public class ComponentStep implements Step {
 
     private void process(TypeElement typeElement) {
         typeElementValidator.validate(typeElement);
-        ComponentElement component = componentElementFactory.create(typeElement);
+        ContextComponent context = contextComponentFactory.create(typeElement);
+        ComponentElement component = context.componentElement();
         component.factoryElement().ifPresent(factory -> {
             ExecutableElement method = factory.singleAbstractMethod();
             if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
@@ -86,9 +84,8 @@ public class ComponentStep implements Step {
                 executableElementValidator.validate(m);
             }
         }
-        ContextComponent componentComponent = contextComponentFactory.create(component);
-        Generator generator = componentComponent.generator();
-        List<Binding> bindings = componentComponent.topologicalSorter().sortedBindings();
+        Generator generator = context.generator();
+        List<Binding> bindings = context.topologicalSorter().sortedBindings();
         TypeSpec typeSpec = generator.generate(bindings);
         specWriter.write(component.generatedClass(), typeSpec);
     }
