@@ -26,7 +26,6 @@ public final class ComponentElement {
 
     private final TypeElement element;
     private final KeyFactory keyFactory;
-    private final InjectBinding.Factory injectBindingFactory;
 
     private final Supplier<ClassName> generatedClass = memoize(() -> {
         ClassName className = ClassName.get(element());
@@ -74,7 +73,7 @@ public final class ComponentElement {
                 continue; // ignore
             }
             Key key = keyFactory().getKey(method);
-            InjectBinding b = injectBindingFactory().create(method);
+            InjectBinding b = keyFactory().createBinding(method);
             result.put(key, b);
         }
         return result;
@@ -125,11 +124,9 @@ public final class ComponentElement {
     @Inject
     public ComponentElement(
             TypeElement element,
-            KeyFactory keyFactory,
-            InjectBinding.Factory injectBindingFactory) {
+            KeyFactory keyFactory) {
         this.element = element;
         this.keyFactory = keyFactory;
-        this.injectBindingFactory = injectBindingFactory;
     }
 
     public TypeElement element() {
@@ -162,10 +159,6 @@ public final class ComponentElement {
 
     private KeyFactory keyFactory() {
         return keyFactory;
-    }
-
-    private InjectBinding.Factory injectBindingFactory() {
-        return injectBindingFactory;
     }
 
     public Optional<Binding> parameterBinding(Key key) {

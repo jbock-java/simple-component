@@ -8,6 +8,7 @@ import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -62,7 +63,7 @@ public class KeyFactory implements ClearableCache {
         return key;
     }
 
-    public Key getKey(VariableElement parameter) {
+    Key getKey(VariableElement parameter) {
         Key key = keyCache.get(parameter);
         if (key != null) {
             return key;
@@ -76,6 +77,16 @@ public class KeyFactory implements ClearableCache {
         DeclaredType type = mirror.getAnnotationType();
         TypeElement element = TYPE_ELEMENT_VISITOR.visit(type.asElement());
         return tool.hasQualifierAnnotation(element);
+    }
+
+    InjectBinding createBinding(ExecutableElement m) {
+        Key key = getKey(m);
+        if (m.getKind() == ElementKind.CONSTRUCTOR) {
+            if (key.qualifier().isPresent()) {
+                throw new ValidationFailure("Constructors can't have qualifiers", m);
+            }
+        }
+        return new InjectBinding(key, this, m);
     }
 
     TypeTool tool() {
