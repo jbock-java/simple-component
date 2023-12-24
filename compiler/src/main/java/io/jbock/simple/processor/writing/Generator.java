@@ -4,8 +4,8 @@ import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.UniqueNameSet;
 
 import javax.lang.model.SourceVersion;
@@ -18,14 +18,14 @@ import java.util.function.Function;
 public class Generator {
 
     private final ComponentImpl.Factory componentImpl;
-    private final ComponentElement component;
+    private final KeyFactory keyFactory;
 
     @Inject
     public Generator(
             ComponentImpl.Factory componentImpl,
-            ComponentElement component) {
+            KeyFactory keyFactory) {
         this.componentImpl = componentImpl;
-        this.component = component;
+        this.keyFactory = keyFactory;
     }
 
     public TypeSpec generate(List<Binding> bindings) {
@@ -42,7 +42,7 @@ public class Generator {
         for (Binding b : bindings) {
             String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));
             String auxName = uniqueNameSet.getUniqueName(name + "_isSet");
-            result.put(b.key(), new NamedBinding(b, name, auxName, component.isComponentRequest(b)));
+            result.put(b.key(), new NamedBinding(b, name, auxName, keyFactory.isComponentRequest(b)));
         }
         return result;
     }

@@ -2,8 +2,8 @@ package io.jbock.simple.processor;
 
 import io.jbock.simple.Component;
 import io.jbock.simple.Provides;
-import io.jbock.simple.processor.binding.InjectBindingFactory;
-import io.jbock.simple.processor.binding.KeyFactory;
+import io.jbock.simple.processor.binding.InjectBindingCache;
+import io.jbock.simple.processor.binding.KeyCache;
 import io.jbock.simple.processor.step.ComponentFactoryStep;
 import io.jbock.simple.processor.step.ComponentStep;
 import io.jbock.simple.processor.step.InjectStep;
@@ -48,10 +48,10 @@ interface ProcessorComponent {
 
     @Provides
     static List<ClearableCache> caches(
-            InjectBindingFactory injectBindingFactory,
-            KeyFactory keyFactory,
+            InjectBindingCache injectBindingCache,
+            KeyCache keyCache,
             SafeElements safeElements) {
-        return List.of(injectBindingFactory, keyFactory, safeElements);
+        return List.of(injectBindingCache, keyCache, safeElements);
     }
 
     ComponentStep componentStep();

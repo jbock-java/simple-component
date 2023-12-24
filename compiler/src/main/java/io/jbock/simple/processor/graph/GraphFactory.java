@@ -2,10 +2,10 @@ package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ProviderType;
 import io.jbock.simple.processor.util.TypeTool;
@@ -20,27 +20,27 @@ import java.util.Set;
 
 public class GraphFactory {
 
-    private final ComponentElement component;
     private final TypeTool tool;
+    private final KeyFactory keyFactory;
     private final InjectBindingFactory injectBindingFactory;
     private final Map<Key, Optional<Binding>> bindingCache = new HashMap<>();
     private final MissingBindingPrinter missingBindingPrinter;
 
     @Inject
     public GraphFactory(
-            ComponentElement component,
             TypeTool tool,
+            KeyFactory keyFactory,
             InjectBindingFactory injectBindingFactory,
             MissingBindingPrinter missingBindingPrinter) {
-        this.component = component;
         this.tool = tool;
+        this.keyFactory = keyFactory;
         this.injectBindingFactory = injectBindingFactory;
         this.missingBindingPrinter = missingBindingPrinter;
     }
 
     private Optional<Binding> getBinding(DependencyRequest request) {
-        return bindingCache.computeIfAbsent(request.key(), key -> component.parameterBinding(key)
-                .or(() -> Optional.ofNullable(component.providesBindings().get(key)))
+        return bindingCache.computeIfAbsent(request.key(), key -> keyFactory.parameterBinding(key)
+                .or(() -> Optional.ofNullable(keyFactory.providesBindings().get(key)))
                 .or(() -> injectBindingFactory.binding(key))
                 .or(() -> providerBinding(key)));
     }
@@ -52,8 +52,8 @@ public class GraphFactory {
         }
         ProviderType provider = providerType.orElseThrow();
         Key innerKey = key.changeType(provider.innerType());
-        return component.parameterBinding(innerKey)
-                .or(() -> Optional.ofNullable(component.providesBindings().get(innerKey)))
+        return keyFactory.parameterBinding(innerKey)
+                .or(() -> Optional.ofNullable(keyFactory.providesBindings().get(innerKey)))
                 .or(() -> injectBindingFactory.binding(innerKey))
                 .map(b -> new ProviderBinding(key, b, provider));
     }

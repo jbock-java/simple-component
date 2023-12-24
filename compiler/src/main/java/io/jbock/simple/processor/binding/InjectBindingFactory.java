@@ -1,12 +1,10 @@
 package io.jbock.simple.processor.binding;
 
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.util.ClearableCache;
 import io.jbock.simple.processor.util.TypeTool;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +12,9 @@ import java.util.Optional;
 
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
-public final class InjectBindingFactory implements ClearableCache {
+public final class InjectBindingFactory {
 
-    private final Map<TypeElement, Map<Key, InjectBinding>> injectBindingCache = new HashMap<>();
-
+    private final InjectBindingCache injectBindingCache;
     private final TypeTool tool;
     private final KeyFactory keyFactory;
     private final InjectBindingScanner injectBindingScanner;
@@ -25,9 +22,11 @@ public final class InjectBindingFactory implements ClearableCache {
     @Inject
     public InjectBindingFactory(
             TypeTool tool,
+            InjectBindingCache injectBindingCache,
             KeyFactory keyFactory,
             InjectBindingScanner injectBindingScanner) {
         this.tool = tool;
+        this.injectBindingCache = injectBindingCache;
         this.keyFactory = keyFactory;
         this.injectBindingScanner = injectBindingScanner;
     }
@@ -53,10 +52,5 @@ public final class InjectBindingFactory implements ClearableCache {
                     Map<Key, InjectBinding> m = injectBindings(typeElement);
                     return Optional.ofNullable(m.get(key));
                 });
-    }
-
-    @Override
-    public void clearCache() {
-        injectBindingCache.clear();
     }
 }

@@ -4,6 +4,7 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
+import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ParameterBinding;
 
 import java.util.ArrayDeque;
@@ -15,23 +16,26 @@ public final class TopologicalSorter {
 
     private final GraphFactory graphFactory;
     private final ComponentElement component;
+    private final KeyFactory keyFactory;
 
     @Inject
     public TopologicalSorter(
             GraphFactory graphFactory,
-            ComponentElement component) {
+            ComponentElement component,
+            KeyFactory keyFactory) {
         this.graphFactory = graphFactory;
         this.component = component;
+        this.keyFactory = keyFactory;
     }
 
     public List<Binding> sortedBindings() {
         AccessibilityValidator validator = AccessibilityValidator.create(component);
         Graph graph = Graph.newGraph();
-        for (ParameterBinding request : component.parameterBindings()) {
+        for (ParameterBinding request : keyFactory.parameterBindings()) {
             // preserve parameter order
             graph.nodes().add(request);
         }
-        for (DependencyRequest request : component.requests()) {
+        for (DependencyRequest request : keyFactory.requests()) {
             graph.addAll(graphFactory.getGraph(request));
         }
         for (Binding binding : graph.nodes()) {
