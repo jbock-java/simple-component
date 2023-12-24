@@ -122,7 +122,8 @@ public final class ComponentElement {
         return result;
     });
 
-    private ComponentElement(
+    @Inject
+    public ComponentElement(
             TypeElement element,
             KeyFactory keyFactory,
             InjectBinding.Factory injectBindingFactory) {
@@ -189,21 +190,5 @@ public final class ComponentElement {
             return false;
         }
         return annotation.mockBuilder();
-    }
-
-    public static final class Factory {
-        private final KeyFactory keyFactory;
-        private final InjectBinding.Factory injectBindingFactory;
-
-        @Inject
-        public Factory(KeyFactory keyFactory, InjectBinding.Factory injectBindingFactory) {
-            this.keyFactory = keyFactory;
-            this.injectBindingFactory = injectBindingFactory;
-        }
-
-        public ComponentElement create(
-                TypeElement element) {
-            return new ComponentElement(element, keyFactory, injectBindingFactory);
-        }
     }
 }

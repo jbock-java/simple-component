@@ -9,12 +9,14 @@ import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.writing.Generator;
 
+import javax.lang.model.element.TypeElement;
+
 @Component
 public interface ContextComponent {
 
     @Component.Builder
     interface Builder {
-        Builder componentElement(ComponentElement componentElement);
+        Builder typeElement(TypeElement typeElement);
 
         Builder tool(TypeTool tool);
 
@@ -24,6 +26,8 @@ public interface ContextComponent {
 
         ContextComponent build();
     }
+
+    ComponentElement componentElement();
 
     Generator generator();
 
@@ -44,9 +48,9 @@ public interface ContextComponent {
             this.keyFactory = keyFactory;
         }
 
-        public ContextComponent create(ComponentElement component) {
+        public ContextComponent create(TypeElement typeElement) {
             return ContextComponent_Impl.builder()
-                    .componentElement(component)
+                    .typeElement(typeElement)
                     .tool(tool)
                     .injectBindingFactory(injectBindingFactory)
                     .keyFactory(keyFactory)
