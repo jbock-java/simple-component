@@ -33,7 +33,7 @@ class ProvidesTest {
                 "  interface AComponent {",
                 "    A getA();",
                 "",
-                "    @Provides static String getString(B b) { return null; }",
+                "    @Inject static String getString(B b) { return null; }",
                 "  }",
                 "}");
 
@@ -64,7 +64,6 @@ class ProvidesTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
-                "import io.jbock.simple.Provides;",
                 "import java.util.function.Function;",
                 "import java.util.Map;",
                 "",
@@ -81,7 +80,7 @@ class ProvidesTest {
                 "  interface AComponent {",
                 "    A getA();",
                 "",
-                "    @Provides static Map<String, Function<String, Integer>> provideMyMap(B b) { return null; }",
+                "    @Inject static Map<String, Function<String, Integer>> provideMyMap(B b) { return null; }",
                 "  }",
                 "}");
 
@@ -113,7 +112,6 @@ class ProvidesTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
-                "import io.jbock.simple.Provides;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
@@ -128,12 +126,12 @@ class ProvidesTest {
                 "  interface AComponent {",
                 "    A getA();",
                 "",
-                "    @Provides default String getString() { return null; }",
+                "    @Inject default String getString() { return null; }",
                 "  }",
                 "}");
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("The @Provides method must be static");
+        assertThat(compilation).hadErrorContaining("The factory method must be static");
     }
 }
