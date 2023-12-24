@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.validation;
 
+import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.InjectBindingScanner;
 import io.jbock.simple.processor.util.TypeTool;
@@ -43,9 +44,14 @@ public final class InjectBindingValidator {
         if (method.getReturnType().getKind() == TypeKind.VOID) {
             throw new ValidationFailure("The factory method may not return void", method);
         }
-        if (!isSibling(method)) {
+        if (!isSibling(method) && !isInComponent(method)) {
             throw new ValidationFailure("The factory method must return the type of its enclosing class", method);
         }
+    }
+
+    private boolean isInComponent(ExecutableElement method) {
+        TypeElement typeElement = Visitors.TYPE_ELEMENT_VISITOR.visit(method.getEnclosingElement());
+        return typeElement.getAnnotation(Component.class) != null;
     }
 
     private boolean isSibling(ExecutableElement method) {

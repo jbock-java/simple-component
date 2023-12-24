@@ -122,7 +122,7 @@ public class KeyFactory {
         List<ExecutableElement> methods = methodsIn(componentElement().element().getEnclosedElements());
         Map<Key, InjectBinding> result = new LinkedHashMap<>();
         for (ExecutableElement method : methods) {
-            if (method.getAnnotation(Provides.class) == null) {
+            if (method.getAnnotation(Provides.class) == null && !tool().hasInjectAnnotation(method)) {
                 continue; // ignore
             }
             Key key = keyCache().getKey(method);
@@ -139,7 +139,7 @@ public class KeyFactory {
             if (method.getModifiers().contains(Modifier.STATIC)) {
                 continue; // ignore
             }
-            if (method.getAnnotation(Provides.class) != null) {
+            if (method.getAnnotation(Provides.class) != null || tool().hasInjectAnnotation(method)) {
                 continue; // ignore
             }
             if (!method.getParameters().isEmpty()) {

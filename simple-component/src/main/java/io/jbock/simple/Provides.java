@@ -7,13 +7,8 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Annotates <em>static</em> methods of a {@linkplain Component component}
- * to create a provider method binding.
- * 
- * <p>The method's return type is bound to its returned value.
- * 
- * <p>The {@linkplain Component component}
- * implementation will pass dependencies to the method as parameters.
+ * This is an alternative to the {@code @Inject} annotation
+ * which can only be used on static methods directly in the component.
  */
 @Target(METHOD)
 @Retention(SOURCE)
