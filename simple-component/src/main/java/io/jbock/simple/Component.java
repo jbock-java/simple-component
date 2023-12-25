@@ -11,13 +11,13 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * implementation is to be generated. The generated class will
  * have the name of the type annotated, appended with {@code _Impl}. For
  * example, {@code @Component interface MyComponent {...}} will produce an implementation named
- * {@code MyComponent_Impl}.</p>
+ * {@code MyComponent_Impl}.
  *
  * <h2>Component methods</h2>
  *
  * <p>Every type annotated with {@code @Component} must contain at least one abstract component
  * method. Component methods may have any name, but must have no parameters and return a bound type.
- * A bound type is one of the following:</p>
+ * A bound type is one of the following:
  *
  * <ul>
  *     <li>an {@link Inject injected} type
@@ -29,6 +29,12 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Target(TYPE)
 @Retention(SOURCE)
 public @interface Component {
+
+    /**
+     * A list of classes annotated with {@link Module} whose bindings are used to generate the
+     * component implementation.
+     */
+    Class<?>[] modules() default {};
 
     /**
      * A factory for a component. Components <em>may</em> have a single nested {@code interface}
