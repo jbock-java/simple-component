@@ -4,7 +4,6 @@ import io.jbock.javapoet.CodeBlock;
 import io.jbock.javapoet.ParameterSpec;
 import io.jbock.javapoet.ParameterizedTypeName;
 import io.jbock.javapoet.TypeName;
-import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.Visitors;
 import io.jbock.simple.processor.writing.NamedBinding;
 
@@ -30,26 +29,17 @@ public final class InjectBinding extends Binding {
 
     private final KeyFactory keyFactory;
 
-    private static final List<String> PROVIDES_METHOD_COMMON_PREFIXES = List.of(
-            "get",
-            "provides",
-            "provide",
-            "create");
-
     private final Supplier<String> suggestedVariableName = memoize(() -> {
-        if (element().getAnnotation(Provides.class) != null) {
-            return lowerFirst(removeMethodNamePrefix(element().getSimpleName().toString()));
-        }
         Element enclosing = element().getEnclosingElement();
-        if (enclosing != null) {
-            if (keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
-                TypeElement enclosingOuter = Visitors.TYPE_ELEMENT_VISITOR.visit(enclosing.getEnclosingElement());
-                if (enclosingOuter != null && keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
-                    return lowerFirst(enclosingOuter.getSimpleName().toString() + simpleName(key().typeName()));
-                }
-            } else {
-                return lowerFirst(enclosing.getSimpleName().toString() + simpleName(key().typeName()));
-            }
+        if (enclosing == null) {
+            return lowerFirst(simpleName(key().typeName()));
+        }
+        if (!keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
+            return lowerFirst(enclosing.getSimpleName().toString() + simpleName(key().typeName()));
+        }
+        TypeElement enclosingOuter = Visitors.TYPE_ELEMENT_VISITOR.visit(enclosing.getEnclosingElement());
+        if (enclosingOuter != null && keyFactory().tool().isSameType(key().type(), enclosing.asType())) {
+            return lowerFirst(enclosingOuter.getSimpleName().toString() + simpleName(key().typeName()));
         }
         return lowerFirst(simpleName(key().typeName()));
     });
@@ -59,15 +49,6 @@ public final class InjectBinding extends Binding {
             return simpleTypeName((ParameterizedTypeName) typeName);
         }
         return verySimpleTypeName(typeName.toString());
-    }
-
-    private static String removeMethodNamePrefix(String s) {
-        for (String p : PROVIDES_METHOD_COMMON_PREFIXES) {
-            if (s.startsWith(p) && s.length() > p.length()) {
-                return s.substring(p.length());
-            }
-        }
-        return s;
     }
 
     static String simpleTypeName(ParameterizedTypeName type) {
@@ -91,6 +72,9 @@ public final class InjectBinding extends Binding {
         i = typeName.lastIndexOf('.');
         if (i >= 0) {
             typeName = typeName.substring(i + 1);
+        }
+        if (Character.isLowerCase(typeName.charAt(0))) {
+            typeName = Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
         }
         return typeName;
     }

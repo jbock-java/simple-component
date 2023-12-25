@@ -1,8 +1,7 @@
 package io.jbock.simple.processor.writing;
 
 import io.jbock.javapoet.ParameterSpec;
-import io.jbock.javapoet.TypeSpec;
-import io.jbock.simple.Inject;
+import io.jbock.simple.Modulus;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
@@ -15,25 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Generator {
+@Modulus
+public interface ContextModule {
 
-    private final ComponentImpl.Factory componentImpl;
-    private final KeyFactory keyFactory;
-
-    @Inject
-    public Generator(
-            ComponentImpl.Factory componentImpl,
-            KeyFactory keyFactory) {
-        this.componentImpl = componentImpl;
-        this.keyFactory = keyFactory;
-    }
-
-    public TypeSpec generate(List<Binding> bindings) {
-        Map<Key, NamedBinding> sorted = addNames(bindings);
-        return componentImpl.create(sorted, createNames(sorted)).generate();
-    }
-
-    private Map<Key, NamedBinding> addNames(List<Binding> bindings) {
+    static Map<Key, NamedBinding> addNames(
+            KeyFactory keyFactory,
+            List<Binding> bindings) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
         uniqueNameSet.claim("mockBuilder");
         uniqueNameSet.claim("withMocks");
@@ -47,7 +33,7 @@ public class Generator {
         return result;
     }
 
-    private static Function<Key, ParameterSpec> createNames(
+    static Function<Key, ParameterSpec> createNames(
             Map<Key, NamedBinding> sorted) {
         Map<Key, ParameterSpec> cache = new HashMap<>();
         return key -> {
@@ -98,4 +84,5 @@ public class Generator {
                 return SourceVersion.isKeyword(candidateName) ? candidateName + '_' : candidateName;
         }
     }
+
 }

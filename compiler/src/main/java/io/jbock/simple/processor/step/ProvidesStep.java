@@ -3,6 +3,7 @@ package io.jbock.simple.processor.step;
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
+import io.jbock.simple.Modulus;
 import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.ValidationFailure;
 
@@ -50,8 +51,8 @@ public class ProvidesStep implements Step {
                     throw new ValidationFailure("The @Provides method may not return void", m);
                 }
                 Element enclosing = m.getEnclosingElement();
-                if (enclosing.getAnnotation(Component.class) == null) {
-                    throw new ValidationFailure("The @Provides method must be nested inside a @Component", m);
+                if (enclosing.getAnnotation(Component.class) == null && enclosing.getAnnotation(Modulus.class) == null) {
+                    throw new ValidationFailure("The @Provides method must be nested inside a @Component or @Modulus", m);
                 }
                 bindingRegistry.register(m);
             }

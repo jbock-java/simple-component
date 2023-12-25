@@ -18,6 +18,7 @@ class StaticInjectionTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
+                "import io.jbock.simple.Provides;",
                 "import io.jbock.simple.Named;",
                 "import io.jbock.simple.Modulus;",
                 "",
