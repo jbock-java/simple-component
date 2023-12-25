@@ -1,10 +1,12 @@
 package io.jbock.simple.processor.writing;
 
 import io.jbock.javapoet.ParameterSpec;
+import io.jbock.simple.Inject;
 import io.jbock.simple.Modulus;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
+import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.util.UniqueNameSet;
 
 import javax.lang.model.SourceVersion;
@@ -17,7 +19,16 @@ import java.util.function.Function;
 @Modulus
 public interface ContextModule {
 
-    static Map<Key, NamedBinding> addNames(
+    @Inject
+    static Context createContext(
+            TopologicalSorter topologicalSorter,
+            KeyFactory keyFactory) {
+        List<Binding> bindings = topologicalSorter.sortedBindings();
+        Map<Key, NamedBinding> sorted = ContextModule.addNames(keyFactory, bindings);
+        return new Context(sorted, ContextModule.createNames(sorted));
+    }
+
+    private static Map<Key, NamedBinding> addNames(
             KeyFactory keyFactory,
             List<Binding> bindings) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
@@ -33,7 +44,7 @@ public interface ContextModule {
         return result;
     }
 
-    static Function<Key, ParameterSpec> createNames(
+    private static Function<Key, ParameterSpec> createNames(
             Map<Key, NamedBinding> sorted) {
         Map<Key, ParameterSpec> cache = new HashMap<>();
         return key -> {
@@ -84,5 +95,4 @@ public interface ContextModule {
                 return SourceVersion.isKeyword(candidateName) ? candidateName + '_' : candidateName;
         }
     }
-
 }

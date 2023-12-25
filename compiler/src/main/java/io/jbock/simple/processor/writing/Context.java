@@ -11,7 +11,7 @@ public final class Context {
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
 
-    public Context(Map<Key, NamedBinding> sorted, Function<Key, ParameterSpec> names) {
+    Context(Map<Key, NamedBinding> sorted, Function<Key, ParameterSpec> names) {
         this.sorted = sorted;
         this.names = names;
     }
