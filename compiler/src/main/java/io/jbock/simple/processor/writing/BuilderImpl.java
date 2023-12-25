@@ -25,19 +25,19 @@ import static javax.lang.model.element.Modifier.PROTECTED;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
-public class BuilderImpl {
+public final class BuilderImpl {
 
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
 
-    private BuilderImpl(
+    @Inject
+    public BuilderImpl(
             ComponentElement component,
-            Map<Key, NamedBinding> sorted,
-            Function<Key, ParameterSpec> names) {
+            Context context) {
         this.component = component;
-        this.sorted = sorted;
-        this.names = names;
+        this.sorted = context.sorted();
+        this.names = context.names();
     }
 
     TypeSpec generate(BuilderElement builder, MockBuilder mockBuilder) {
@@ -135,23 +135,5 @@ public class BuilderImpl {
             }
         }
         return result;
-    }
-
-    public static final class Factory {
-        private final ComponentElement component;
-
-        @Inject
-        public Factory(ComponentElement component) {
-            this.component = component;
-        }
-
-        BuilderImpl create(
-                Map<Key, NamedBinding> sorted,
-                Function<Key, ParameterSpec> names) {
-            return new BuilderImpl(
-                    component,
-                    sorted,
-                    names);
-        }
     }
 }

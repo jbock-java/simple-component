@@ -25,19 +25,19 @@ import static javax.lang.model.element.Modifier.PROTECTED;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
-public class FactoryImpl {
+public final class FactoryImpl {
 
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
 
-    private FactoryImpl(
+    @Inject
+    public FactoryImpl(
             ComponentElement component,
-            Map<Key, NamedBinding> sorted,
-            Function<Key, ParameterSpec> names) {
+            Context context) {
         this.component = component;
-        this.sorted = sorted;
-        this.names = names;
+        this.sorted = context.sorted();
+        this.names = context.names();
     }
 
     TypeSpec generate(FactoryElement factory) {
@@ -89,23 +89,5 @@ public class FactoryImpl {
             }
         }
         return result;
-    }
-
-    public static final class Factory {
-        private final ComponentElement component;
-
-        @Inject
-        public Factory(ComponentElement component) {
-            this.component = component;
-        }
-
-        FactoryImpl create(
-                Map<Key, NamedBinding> sorted,
-                Function<Key, ParameterSpec> names) {
-            return new FactoryImpl(
-                    component,
-                    sorted,
-                    names);
-        }
     }
 }

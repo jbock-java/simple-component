@@ -24,20 +24,20 @@ import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
-public class MockBuilder {
+public final class MockBuilder {
 
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
     private final Function<Key, ParameterSpec> names;
     private final Modifier[] modifiers;
 
-    MockBuilder(
+    @Inject
+    public MockBuilder(
             ComponentElement component,
-            Map<Key, NamedBinding> sorted,
-            Function<Key, ParameterSpec> names) {
+            Context context) {
         this.component = component;
-        this.sorted = sorted;
-        this.names = names;
+        this.sorted = context.sorted();
+        this.names = context.names();
         this.modifiers = component.element().getModifiers().stream()
                 .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
     }
@@ -157,20 +157,5 @@ public class MockBuilder {
             methods.add(method.build());
         }
         return methods;
-    }
-
-    public static final class Factory {
-        private final ComponentElement component;
-
-        @Inject
-        public Factory(ComponentElement component) {
-            this.component = component;
-        }
-
-        MockBuilder create(
-                Map<Key, NamedBinding> sorted,
-                Function<Key, ParameterSpec> names) {
-            return new MockBuilder(component, sorted, names);
-        }
     }
 }

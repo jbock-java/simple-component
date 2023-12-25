@@ -4,15 +4,14 @@ import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.javapoet.TypeSpec;
 import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
+import io.jbock.simple.Modulus;
 import io.jbock.simple.processor.ContextComponent;
-import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.SpecWriter;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.validation.ExecutableElementValidator;
 import io.jbock.simple.processor.validation.TypeElementValidator;
-import io.jbock.simple.processor.writing.Generator;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -73,6 +72,11 @@ public class ComponentStep implements Step {
         typeElementValidator.validate(typeElement);
         ContextComponent context = contextComponentFactory.create(typeElement);
         KeyFactory keyFactory = context.keyFactory();
+        for (TypeElement module : context.componentElement().modules()) {
+            if (module.getAnnotation(Modulus.class) == null) {
+                throw new ValidationFailure("The module must be annotated with @Modulus", typeElement);
+            }
+        }
         keyFactory.factoryElement().ifPresent(factory -> {
             ExecutableElement method = factory.singleAbstractMethod();
             if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
@@ -84,9 +88,7 @@ public class ComponentStep implements Step {
                 executableElementValidator.validate(m);
             }
         }
-        Generator generator = context.generator();
-        List<Binding> bindings = context.topologicalSorter().sortedBindings();
-        TypeSpec typeSpec = generator.generate(bindings);
+        TypeSpec typeSpec = context.componentImpl().generate();
         specWriter.write(context.componentElement().generatedClass(), typeSpec);
     }
 }

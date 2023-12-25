@@ -47,18 +47,18 @@ public class ComponentImpl {
     private final FactoryImpl factoryImpl;
     private final Modifier[] modifiers;
 
-    private ComponentImpl(
+    @Inject
+    public ComponentImpl(
             KeyFactory keyFactory,
             ComponentElement component,
-            Map<Key, NamedBinding> sorted,
-            Function<Key, ParameterSpec> names,
+            Context context,
             MockBuilder mockBuilder,
             BuilderImpl builderImpl,
             FactoryImpl factoryImpl) {
         this.keyFactory = keyFactory;
         this.component = component;
-        this.sorted = sorted;
-        this.names = names;
+        this.sorted = context.sorted();
+        this.names = context.names();
         this.modifiers = component.element().getModifiers().stream()
                 .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
         this.mockBuilder = mockBuilder;
@@ -66,7 +66,7 @@ public class ComponentImpl {
         this.factoryImpl = factoryImpl;
     }
 
-    TypeSpec generate() {
+    public TypeSpec generate() {
         TypeSpec.Builder spec = TypeSpec.classBuilder(component.generatedClass())
                 .addModifiers(modifiers)
                 .addModifiers(FINAL)
@@ -218,39 +218,5 @@ public class ComponentImpl {
             constructor.addStatement("this.$1N = $1N", param);
         }
         return constructor.build();
-    }
-
-    public static final class Factory {
-        private final KeyFactory keyFactory;
-        private final ComponentElement component;
-        private final MockBuilder.Factory mockBuilderFactory;
-        private final BuilderImpl.Factory builderImplFactory;
-        private final FactoryImpl.Factory factoryImplFactory;
-
-        @Inject
-        public Factory(
-                KeyFactory keyFactory,
-                ComponentElement component,
-                MockBuilder.Factory mockBuilderFactory,
-                BuilderImpl.Factory builderImplFactory,
-                FactoryImpl.Factory factoryImplFactory) {
-            this.keyFactory = keyFactory;
-            this.component = component;
-            this.mockBuilderFactory = mockBuilderFactory;
-            this.builderImplFactory = builderImplFactory;
-            this.factoryImplFactory = factoryImplFactory;
-        }
-
-        ComponentImpl create(
-                Map<Key, NamedBinding> sorted,
-                Function<Key, ParameterSpec> names) {
-            return new ComponentImpl(
-                    keyFactory, component,
-                    sorted,
-                    names,
-                    mockBuilderFactory.create(sorted, names),
-                    builderImplFactory.create(sorted, names),
-                    factoryImplFactory.create(sorted, names));
-        }
     }
 }

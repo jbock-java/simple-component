@@ -9,7 +9,7 @@ public final class NamedBinding {
     private final String auxName;
     private final boolean componentRequest;
 
-    NamedBinding(
+    public NamedBinding(
             Binding binding,
             String name,
             String auxName,
@@ -24,7 +24,7 @@ public final class NamedBinding {
         return binding;
     }
 
-    String name() {
+    public String name() {
         return name;
     }
 
