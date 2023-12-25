@@ -31,7 +31,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public @interface Component {
 
     /**
-     * A list of classes annotated with {@link Module} whose bindings are used to generate the
+     * A list of classes annotated with {@link Modulus} whose bindings are used to generate the
      * component implementation.
      */
     Class<?>[] modules() default {};

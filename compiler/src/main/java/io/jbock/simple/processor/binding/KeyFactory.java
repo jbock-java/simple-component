@@ -14,6 +14,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -119,10 +120,14 @@ public class KeyFactory {
     });
 
     private final Supplier<Map<Key, InjectBinding>> providesBindings = memoize(() -> {
-        List<ExecutableElement> methods = methodsIn(componentElement().element().getEnclosedElements());
+        List<ExecutableElement> methods = new ArrayList<>();
+        methods.addAll(methodsIn(componentElement().element().getEnclosedElements()));
+        for (TypeElement module : componentElement().modules()) {
+            methods.addAll(methodsIn(module.getEnclosedElements()));
+        }
         Map<Key, InjectBinding> result = new LinkedHashMap<>();
         for (ExecutableElement method : methods) {
-            if (method.getAnnotation(Provides.class) == null && !tool().hasInjectAnnotation(method)) {
+            if (!hasProvidesOrInjectAnnotation(method)) {
                 continue; // ignore
             }
             Key key = keyCache().getKey(method);
@@ -139,7 +144,7 @@ public class KeyFactory {
             if (method.getModifiers().contains(Modifier.STATIC)) {
                 continue; // ignore
             }
-            if (method.getAnnotation(Provides.class) != null || tool().hasInjectAnnotation(method)) {
+            if (hasProvidesOrInjectAnnotation(method)) {
                 continue; // ignore
             }
             if (!method.getParameters().isEmpty()) {
@@ -156,6 +161,10 @@ public class KeyFactory {
         }
         return result;
     });
+
+    private boolean hasProvidesOrInjectAnnotation(ExecutableElement method) {
+        return method.getAnnotation(Provides.class) != null || tool().hasInjectAnnotation(method);
+    }
 
     public Optional<BuilderElement> builderElement() {
         return builderElement.get();
