@@ -40,10 +40,9 @@ class CoffeeApp {
 ```
 
 This dependency injector uses the following annotations:
-1. `@Inject` declares an injection point. It can be a constructor or a static method.
-2. `@Provides` declares an injection point within the component. It must be a static method.
-3. `@Qualifier` and its default implementation `@Named`.
-4. And of course, `@Component`, `@Component.Factory` and `@Component.Builder`.
+1. `@Inject` declares an injection point. It can be a constructor or a static method in the bean class. It can also be a static method in the component class.
+2. `@Qualifier` and its default implementation `@Named`.
+3. And of course, `@Component`, `@Component.Factory` and `@Component.Builder`.
 
 Note this is not a complete implementation of `javax.inject` or `jakarta.inject`, because:
 
