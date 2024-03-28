@@ -6,3 +6,4 @@ build
 .gradle
 /gradlew.bat
 /compiler/out
+/.DS_Store
