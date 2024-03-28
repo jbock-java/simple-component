@@ -1,149 +1,144 @@
 plugins {
-    id('java')
-    id('maven-publish')
-    id('com.github.johnrengelman.shadow') version('8.1.1')
-    id('signing')
+	id('java')
+	id('maven-publish')
+	id('com.github.johnrengelman.shadow') version('8.1.1')
+	id('signing')
 }
 
 group = 'io.github.jbock-java'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
-
 compileJava {
-    options.encoding = 'UTF-8'
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
-    options.compilerArgs << '--release'
-    options.compilerArgs << '11'
+	options.encoding = 'UTF-8'
+	sourceCompatibility = '11'
+	targetCompatibility = '11'
+	options.compilerArgs << '--release'
+	options.compilerArgs << '11'
 }
 
 javadoc {
-    options.encoding = 'UTF-8'
+	options.encoding = 'UTF-8'
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 shadowJar {
-    minimize()
-    archiveClassifier.set('')
+	minimize()
+	archiveClassifier.set('')
 }
 
 tasks.withType(AbstractArchiveTask) {
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
+	preserveFileTimestamps = false
+	reproducibleFileOrder = true
 }
 
 tasks.withType(GenerateModuleMetadata) {
-    enabled = true
+	enabled = true
 }
 
 shadowJar {
-    minimize()
-    archiveClassifier.set('')
-    relocate('io.jbock.auto.common', 'io.jbock.simple.auto.common')
-    relocate('io.jbock.javapoet', 'io.jbock.simple.javapoet')
+	minimize()
+	archiveClassifier.set('')
+	relocate('io.jbock.auto.common', 'io.jbock.simple.auto.common')
+	relocate('io.jbock.javapoet', 'io.jbock.simple.javapoet')
 }
 
 dependencies {
-    def simple_component = project(':simple-component')
-    implementation('io.github.jbock-java:javapoet:1.15')
-    implementation('io.github.jbock-java:auto-common:1.2.3')
-    shadow(simple_component)
-    annotationProcessor('io.github.jbock-java:simple-component-compiler:1.024')
-    testImplementation('io.github.jbock-java:compile-testing:0.19.12')
-    testImplementation('org.junit.jupiter:junit-jupiter:5.10.1')
-    testImplementation(simple_component)
-    testImplementation('jakarta.inject:jakarta.inject-api:2.0.1')
-    testImplementation('javax.inject:javax.inject:1')
+	def simple_component = project(':simple-component')
+	implementation('io.github.jbock-java:javapoet:1.15')
+	implementation('io.github.jbock-java:auto-common:1.2.3')
+	shadow(simple_component)
+	annotationProcessor('io.github.jbock-java:simple-component-compiler:1.024')
+	testImplementation('io.github.jbock-java:compile-testing:0.19.12')
+	testImplementation('org.junit.jupiter:junit-jupiter:5.10.1')
+	testImplementation(simple_component)
+	testImplementation('jakarta.inject:jakarta.inject-api:2.0.1')
+	testImplementation('javax.inject:javax.inject:1')
+	testRuntimeOnly('org.junit.platform:junit-platform-launcher')
 }
 
 jar {
-    manifest {
-        attributes(
-                'Implementation-Version': project.properties['version']
-        )
-    }
+	manifest {
+		attributes(
+			'Implementation-Version': project.properties['version']
+		)
+	}
 }
 
 test {
-    useJUnitPlatform()
-    testLogging {
-        events('failed')
-    }
+	useJUnitPlatform()
+	testLogging {
+		events('failed')
+	}
 }
 
 task javadocJar(type: Jar) {
-    from javadoc
-    archiveClassifier.set('javadoc')
+	from javadoc
+	archiveClassifier.set('javadoc')
 }
 
 task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier.set('sources')
+	from sourceSets.main.allJava
+	archiveClassifier.set('sources')
 }
 
 artifacts {
-    archives(javadocJar, sourcesJar)
+	archives(javadocJar, sourcesJar)
 }
 
 // https://central.sonatype.org/pages/gradle.html
 publishing {
-    publications {
-        shadow(MavenPublication) { publication ->
-            project.shadow.component(publication)
-            artifactId = 'simple-component-compiler'
+	publications {
+		shadow(MavenPublication) { publication ->
+			project.shadow.component(publication)
+			artifactId = 'simple-component-compiler'
 
-            artifact sourcesJar
-            artifact javadocJar
+			artifact sourcesJar
+			artifact javadocJar
 
-            pom {
-                name = 'simple-component-compiler'
-                packaging = 'jar'
-                description = 'simple-component'
-                url = 'https://github.com/jbock-java/simple-component'
+			pom {
+				name = 'simple-component-compiler'
+				packaging = 'jar'
+				description = 'simple-component'
+				url = 'https://github.com/jbock-java/simple-component'
 
-                licenses {
-                    license {
-                        name = 'MIT License'
-                        url = 'https://opensource.org/licenses/MIT'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'Various'
-                        name = 'Various'
-                        email = 'jbock-java@gmx.de'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:https://github.com/jbock-java/simple-component.git'
-                    developerConnection = 'scm:git:https://github.com/jbock-java/simple-component.git'
-                    url = 'https://github.com/jbock-java/simple-component'
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            credentials {
-                username = System.getenv('OSS_USER')
-                password = System.getenv('OSS_PASS')
-            }
-        }
-    }
+				licenses {
+					license {
+						name = 'MIT License'
+						url = 'https://opensource.org/licenses/MIT'
+					}
+				}
+				developers {
+					developer {
+						id = 'Various'
+						name = 'Various'
+						email = 'jbock-java@gmx.de'
+					}
+				}
+				scm {
+					connection = 'scm:git:https://github.com/jbock-java/simple-component.git'
+					developerConnection = 'scm:git:https://github.com/jbock-java/simple-component.git'
+					url = 'https://github.com/jbock-java/simple-component'
+				}
+			}
+		}
+	}
+	repositories {
+		maven {
+			url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+			credentials {
+				username = System.getenv('OSS_USER')
+				password = System.getenv('OSS_PASS')
+			}
+		}
+	}
 }
 
 // https://docs.gradle.org/current/userguide/signing_plugin.html
 signing {
-    def signingKey = findProperty('signingKey')
-    def signingPassword = findProperty('signingPassword')
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications.shadow
+	def signingKey = findProperty('signingKey')
+	def signingPassword = findProperty('signingPassword')
+	useInMemoryPgpKeys(signingKey, signingPassword)
+	sign publishing.publications.shadow
 }
