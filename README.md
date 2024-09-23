@@ -52,7 +52,7 @@ Instead there's the following rule:
 
 > If two beans of the *same type* and *same qualifier* are injected by the *same component*, then they are the *same instance*.
 
-Intuitively this means the same bean instance is injected everywhere (unless you're using qualifiers, or inject a provider).
+Intuitively this means the same bean instance is injected everywhere (unless you're using qualifiers, or inject a provider). So everything is a "singleton".
 In the example above, if multiple beans would request the logger, they would all get the same logger instance.
 
 If you want to re-use a bean instance across multiple components, or multiple instances of the same component, use a `@Factory` or a `@Builder` to pass it around.
