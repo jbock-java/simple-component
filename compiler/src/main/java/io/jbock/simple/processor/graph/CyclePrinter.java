@@ -23,7 +23,7 @@ final class CyclePrinter {
     }
 
     ValidationFailure fail() {
-        Report report = cycleMessage();
+        Report report = createReport();
         return new ValidationFailure(report.message, report.binding.element());
     }
 
@@ -37,17 +37,17 @@ final class CyclePrinter {
         }
     }
 
-    Report cycleMessage() {
+    private Report createReport() {
         for (Binding binding : graph.nodes()) {
             Optional<List<Edge>> cycle = findProperCycle(binding);
             if (cycle.isPresent()) {
-                return new Report(cycleMessage(cycle.orElseThrow()), binding);
+                return new Report(createReport(cycle.orElseThrow()), binding);
             }
         }
         throw new AssertionError("input didn't contain a cycle");
     }
 
-    private String cycleMessage(List<Edge> cycle) {
+    private String createReport(List<Edge> cycle) {
         List<String> message = new ArrayList<>();
         message.add("Found a dependency cycle:");
         for (Edge edge : cycle) {
