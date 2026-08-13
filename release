@@ -19,18 +19,19 @@ if ! git pull origin $(git rev-parse --abbrev-ref HEAD); then
   die "pull failed"
 fi
 
-if ! ./gradlew clean -Pversion=${VERSION} simple-component:publish; then
+if ! ./gradlew clean -Pversion=${VERSION} simple-component:publishToMavenCentral; then
   die "build failed"
 fi
 
 
-if ! ./gradlew clean -Pversion=${VERSION} compiler:test compiler:publish; then
+if ! ./gradlew clean -Pversion=${VERSION} compiler:test compiler:publishToMavenCentral; then
   die "build failed"
 fi
+
+echo "Now go to https://central.sonatype.com"
 
 read -e -p "Upload successful. Also tag? [y/N]"
 if [[ "$REPLY" == [Yy]* ]]; then
   git tag "${VERSION}"
   git push origin --tags
 fi
-

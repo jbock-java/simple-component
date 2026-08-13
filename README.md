@@ -1,7 +1,7 @@
-[![simple-component-compiler](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component-compiler/badge.svg?color=grey&subject=simple-component-compiler)](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component-compiler)
-[![simple-component](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component/badge.svg?subject=simple-component)](https://maven-badges.herokuapp.com/maven-central/io.github.jbock-java/simple-component)
+[![simple-component-compiler](https://img.shields.io/maven-central/v/io.github.jbock-java/simple-component-compiler?label=simple-component-compiler)](https://central.sonatype.com/artifact/io.github.jbock-java/simple-component-compiler)
+[![simple-component](https://img.shields.io/maven-central/v/io.github.jbock-java/simple-component?label=simple-component)](https://central.sonatype.com/artifact/io.github.jbock-java/simple-component)
 
-tl;dr minimal example:
+### Coffee time
 
 ```java
 class CoffeeApp {
@@ -40,6 +40,7 @@ class CoffeeApp {
 ```
 
 This dependency injector uses the following annotations:
+
 1. `@Inject` declares an injection point. It can be a constructor or a static method in the bean class. It can also be a static method in the component class.
 2. `@Qualifier` and its default implementation `@Named`.
 3. And of course, `@Component`, `@Component.Factory` and `@Component.Builder`.
@@ -52,20 +53,18 @@ Instead there's the following rule:
 
 > If two beans of the *same type* and *same qualifier* are injected by the *same component*, then they are the *same instance*.
 
-Intuitively this means the same bean instance is injected everywhere (unless you're using qualifiers, or inject a provider). So everything is a "singleton".
-In the example above, if multiple beans would request the logger, they would all get the same logger instance.
+Intuitively this means the same bean instance is injected everywhere (unless you're using qualifiers, or inject a provider).
 
-If you want to re-use a bean instance across multiple components, or multiple instances of the same component, use a `@Factory` or a `@Builder` to pass it around.
-Components will prefer using an existing bean instance over creating a new one.
+If you want to re-use a bean instance across multiple components, or multiple instances of the same component, pass it via a `@Factory` or a `@Builder`.
 
-If you inject `Provider<TheBean>`, rather than `TheBean` directly, calling `provider.get()` will create a fresh bean instance every time.
+If you inject `Provider<TheBean> provider`, calling `provider.get()` will create a fresh bean instance every time.
 
 ### Mocking
 
 If you want create a component where some beans are swapped for mock instances, use `@Component(mockBuilder = true)`.
-A static `mockBuilder` method will be generated, which returns a MockBuilder that can be used to register your mocks.
-(If your component uses `@Component.Builder`, the generated builder will have a `withMocks` method that returns the MockBuilder.)
-[Usage example](https://github.com/jbock-java/modular-thermosiphon):
+A static `mockBuilder` method will be generated, which returns a MockBuilder where you can register your mocks.
+
+Alternatively, if your component uses `@Component.Builder`, the generated builder will have a `withMocks` method that returns the MockBuilder.
 
 ```java
 List<String> messages = new ArrayList<>();
