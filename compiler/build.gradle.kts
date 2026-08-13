@@ -78,4 +78,6 @@ mavenPublishing {
       url = "https://github.com/jbock-java/simple-component"
     }
   }
+  publishToMavenCentral()
+  signAllPublications()
 }
