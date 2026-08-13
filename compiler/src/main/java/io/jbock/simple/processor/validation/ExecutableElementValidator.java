@@ -5,11 +5,10 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
-
+import java.util.Optional;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import java.util.Optional;
 
 public final class ExecutableElementValidator {
 

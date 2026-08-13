@@ -6,17 +6,16 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.validation.ExecutableElementValidator;
 import io.jbock.simple.processor.validation.TypeElementValidator;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ComponentFactoryStep implements Step {
 

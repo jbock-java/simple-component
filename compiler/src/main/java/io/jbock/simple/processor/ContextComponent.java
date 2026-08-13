@@ -7,7 +7,6 @@ import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.writing.ComponentImpl;
 import io.jbock.simple.processor.writing.ContextModule;
-
 import javax.lang.model.element.TypeElement;
 
 @Component(modules = ContextModule.class)

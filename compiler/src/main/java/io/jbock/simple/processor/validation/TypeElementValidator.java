@@ -2,11 +2,10 @@ package io.jbock.simple.processor.validation;
 
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.ValidationFailure;
-
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
 
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 import static javax.lang.model.element.Modifier.PRIVATE;

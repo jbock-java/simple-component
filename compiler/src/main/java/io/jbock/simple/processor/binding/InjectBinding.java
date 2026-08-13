@@ -6,16 +6,15 @@ import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeName;
 import io.jbock.simple.processor.util.Visitors;
 import io.jbock.simple.processor.writing.NamedBinding;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 

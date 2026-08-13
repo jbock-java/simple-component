@@ -11,13 +11,12 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
-
-import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.lang.model.element.ExecutableElement;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;

@@ -2,10 +2,9 @@ package io.jbock.simple.processor;
 
 import io.jbock.auto.common.BasicAnnotationProcessor;
 import io.jbock.simple.processor.util.ClearableCache;
-
+import java.util.List;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
-import java.util.List;
 
 public final class SimpleComponentProcessor extends BasicAnnotationProcessor {
 

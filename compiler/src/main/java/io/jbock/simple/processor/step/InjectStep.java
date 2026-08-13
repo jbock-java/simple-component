@@ -6,15 +6,14 @@ import io.jbock.simple.processor.util.TypeNames;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.validation.ExecutableElementValidator;
 import io.jbock.simple.processor.validation.InjectBindingValidator;
-
-import javax.annotation.processing.Messager;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
 
 import static javax.lang.model.util.ElementFilter.constructorsIn;
 import static javax.lang.model.util.ElementFilter.fieldsIn;

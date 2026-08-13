@@ -4,17 +4,16 @@ import com.palantir.javapoet.ClassName;
 import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.Visitors;
-
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 import static io.jbock.simple.processor.util.Visitors.ANNOTATION_VALUE_AS_TYPE;

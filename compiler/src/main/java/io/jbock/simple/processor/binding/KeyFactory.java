@@ -6,14 +6,6 @@ import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -21,6 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 import static javax.lang.model.util.ElementFilter.methodsIn;
@@ -120,8 +119,7 @@ public class KeyFactory {
     });
 
     private final Supplier<Map<Key, InjectBinding>> providesBindings = memoize(() -> {
-        List<ExecutableElement> methods = new ArrayList<>();
-        methods.addAll(methodsIn(componentElement().element().getEnclosedElements()));
+      List<ExecutableElement> methods = new ArrayList<>(methodsIn(componentElement().element().getEnclosedElements()));
         for (TypeElement module : componentElement().modules()) {
             methods.addAll(methodsIn(module.getEnclosedElements()));
         }

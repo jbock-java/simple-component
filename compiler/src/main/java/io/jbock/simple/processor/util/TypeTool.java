@@ -2,30 +2,26 @@ package io.jbock.simple.processor.util;
 
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.ProviderType.ProviderKind;
-
+import java.util.List;
+import java.util.Optional;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import java.util.List;
-import java.util.Optional;
 
 import static io.jbock.simple.processor.util.TypeNames.JAKARTA_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.JAVAX_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.SIMPLE_INJECT;
 import static io.jbock.simple.processor.util.Visitors.DECLARED_TYPE_VISITOR;
 
-public final class TypeTool {
-
-    private final SafeElements elements;
-    private final SafeTypes types;
+public record TypeTool(
+        SafeElements elements,
+        SafeTypes types) {
 
     @Inject
-    public TypeTool(SafeElements elements, SafeTypes types) {
-        this.elements = elements;
-        this.types = types;
+    public TypeTool {
     }
 
     /**
@@ -105,13 +101,5 @@ public final class TypeTool {
             return Optional.of(typeArguments.get(0));
         }
         return Optional.empty();
-    }
-
-    public SafeElements elements() {
-        return elements;
-    }
-
-    public SafeTypes types() {
-        return types;
     }
 }

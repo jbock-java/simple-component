@@ -2,15 +2,9 @@ package io.jbock.simple.processor.util;
 
 import javax.lang.model.type.TypeMirror;
 
-public class ProviderType {
-
-    private final ProviderKind kind;
-    private final TypeMirror innerType;
-
-    public ProviderType(ProviderKind kind, TypeMirror innerType) {
-        this.kind = kind;
-        this.innerType = innerType;
-    }
+public record ProviderType(
+        ProviderType.ProviderKind kind,
+        TypeMirror innerType) {
 
     public enum ProviderKind {
         SIMPLE(TypeNames.SIMPLE_PROVIDER),
@@ -26,14 +20,6 @@ public class ProviderType {
         public String className() {
             return className;
         }
-    }
-
-    public ProviderKind kind() {
-        return kind;
-    }
-
-    public TypeMirror innerType() {
-        return innerType;
     }
 
     @Override

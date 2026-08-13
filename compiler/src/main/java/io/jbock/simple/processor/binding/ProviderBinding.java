@@ -4,11 +4,10 @@ import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.ParameterSpec;
 import io.jbock.simple.processor.util.ProviderType;
 import io.jbock.simple.processor.writing.NamedBinding;
-
-import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import javax.lang.model.element.Element;
 
 public class ProviderBinding extends Binding {
 

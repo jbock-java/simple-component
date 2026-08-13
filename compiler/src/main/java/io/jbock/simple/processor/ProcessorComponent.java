@@ -10,13 +10,12 @@ import io.jbock.simple.processor.step.InjectStep;
 import io.jbock.simple.processor.step.ProvidesStep;
 import io.jbock.simple.processor.util.ClearableCache;
 import io.jbock.simple.processor.util.SafeElements;
-
+import java.util.List;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.util.List;
 
 @Component
 interface ProcessorComponent {

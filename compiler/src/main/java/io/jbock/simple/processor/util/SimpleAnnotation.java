@@ -1,16 +1,15 @@
 package io.jbock.simple.processor.util;
 
 import com.palantir.javapoet.TypeName;
-
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.type.DeclaredType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.type.DeclaredType;
 
 import static io.jbock.simple.processor.util.Suppliers.memoizeInt;
 

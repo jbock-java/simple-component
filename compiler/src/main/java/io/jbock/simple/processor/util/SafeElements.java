@@ -1,16 +1,15 @@
 package io.jbock.simple.processor.util;
 
 import io.jbock.simple.Inject;
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public final class SafeElements implements ClearableCache {
 

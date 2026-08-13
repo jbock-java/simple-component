@@ -3,7 +3,6 @@ package io.jbock.simple.processor.graph;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ValidationFailure;
-
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,14 +26,7 @@ final class CyclePrinter {
         return new ValidationFailure(report.message, report.binding.element());
     }
 
-    private static final class Report {
-        final String message;
-        final Binding binding;
-
-        Report(String message, Binding binding) {
-            this.message = message;
-            this.binding = binding;
-        }
+    private record Report(String message, Binding binding) {
     }
 
     private Report createReport() {
@@ -52,8 +44,7 @@ final class CyclePrinter {
         message.add("Found a dependency cycle:");
         for (Edge edge : cycle) {
             Binding destination = edge.destination();
-            if (destination instanceof ProviderBinding) {
-                ProviderBinding b = (ProviderBinding) destination;
+            if (destination instanceof ProviderBinding b) {
                 message.add(INDENT + edge.source().key().typeName() + " is injected at");
                 message.add(DOUBLE_INDENT + bindingElementToString(b.sourceBinding().element()));
                 continue;

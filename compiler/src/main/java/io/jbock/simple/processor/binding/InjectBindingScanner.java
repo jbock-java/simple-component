@@ -3,12 +3,11 @@ package io.jbock.simple.processor.binding;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.Util;
-
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 
 import static io.jbock.simple.processor.util.Visitors.EXECUTABLE_ELEMENT_VISITOR;
 

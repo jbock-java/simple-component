@@ -9,7 +9,6 @@ import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ProviderBinding;
 import io.jbock.simple.processor.util.ProviderType;
 import io.jbock.simple.processor.util.TypeTool;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;

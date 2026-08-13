@@ -2,15 +2,14 @@ package io.jbock.simple.processor.binding;
 
 import com.palantir.javapoet.ClassName;
 import io.jbock.simple.processor.util.ValidationFailure;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.ElementFilter;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 import static javax.lang.model.element.Modifier.STATIC;
@@ -26,7 +25,7 @@ public class BuilderElement {
         List<ExecutableElement> methods = ElementFilter.methodsIn(element().getEnclosedElements()).stream()
                 .filter(m -> !m.getModifiers().contains(STATIC))
                 .filter(m -> qualifiers().tool().isSameType(m.getReturnType(), componentElement.asType()))
-                .collect(Collectors.toList());
+                .toList();
         if (methods.isEmpty()) {
             throw new ValidationFailure("Build method not found", element());
         }

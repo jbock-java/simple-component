@@ -3,12 +3,11 @@ package io.jbock.simple.processor.binding;
 import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.ParameterSpec;
 import io.jbock.simple.processor.writing.NamedBinding;
-
-import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.lang.model.element.Element;
 
 /**
  * A node in the dependency graph.

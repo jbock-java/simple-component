@@ -2,11 +2,10 @@ package io.jbock.simple.processor.binding;
 
 import com.palantir.javapoet.TypeName;
 import io.jbock.simple.processor.util.SimpleAnnotation;
-
-import javax.lang.model.type.TypeMirror;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntSupplier;
+import javax.lang.model.type.TypeMirror;
 
 import static io.jbock.simple.processor.util.Suppliers.memoizeInt;
 

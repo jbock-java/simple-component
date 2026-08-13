@@ -4,7 +4,6 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.util.ValidationFailure;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +30,7 @@ public final class MissingBindingPrinter {
     private ValidationFailure failInternal(List<DependencyRequest> trace) {
         DependencyRequest request = trace.get(0);
         StringBuilder message = new StringBuilder();
-        message.append("No binding found for " + request.key().toString() + ".");
+        message.append("No binding found for ").append(request.key().toString()).append(".");
         for (int i = 0; i < trace.size(); i++) {
             DependencyRequest r = trace.get(i);
             String formatted = format(r, i == trace.size() - 1 ? "requested" : "injected");

@@ -8,13 +8,12 @@ import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.util.UniqueNameSet;
-
-import javax.lang.model.SourceVersion;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import javax.lang.model.SourceVersion;
 
 @Modulus
 public interface ContextModule {

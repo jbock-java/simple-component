@@ -2,11 +2,10 @@ package io.jbock.simple.processor.binding;
 
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.ClearableCache;
-
-import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import javax.lang.model.element.TypeElement;
 
 public class InjectBindingCache implements ClearableCache {
 

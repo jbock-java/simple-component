@@ -4,11 +4,10 @@ import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.JavaFile;
 import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
-
-import javax.annotation.processing.Messager;
-import javax.tools.Diagnostic;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import javax.annotation.processing.Messager;
+import javax.tools.Diagnostic;
 
 public final class SpecWriter {
 

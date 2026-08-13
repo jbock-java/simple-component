@@ -5,7 +5,10 @@ import io.jbock.simple.processor.util.ClearableCache;
 import io.jbock.simple.processor.util.SimpleAnnotation;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -13,12 +16,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
@@ -63,7 +60,7 @@ public class KeyCache implements ClearableCache  {
         List<SimpleAnnotation> qualifiers = element.getAnnotationMirrors().stream()
                 .filter(this::hasQualifierAnnotation)
                 .map(mirror -> SimpleAnnotation.create(mirror, tool.elements(), tool.types()))
-                .collect(Collectors.toList());
+                .toList();
         if (qualifiers.isEmpty()) {
             return Optional.empty();
         }

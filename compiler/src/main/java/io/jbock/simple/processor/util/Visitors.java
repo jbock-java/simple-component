@@ -1,5 +1,6 @@
 package io.jbock.simple.processor.util;
 
+import java.util.List;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.AnnotationValueVisitor;
 import javax.lang.model.element.ElementVisitor;
@@ -13,7 +14,6 @@ import javax.lang.model.type.TypeVisitor;
 import javax.lang.model.util.SimpleAnnotationValueVisitor9;
 import javax.lang.model.util.SimpleElementVisitor9;
 import javax.lang.model.util.SimpleTypeVisitor9;
-import java.util.List;
 
 public final class Visitors {
 

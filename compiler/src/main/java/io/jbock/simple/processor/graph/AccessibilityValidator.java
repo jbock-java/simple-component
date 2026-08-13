@@ -3,13 +3,12 @@ package io.jbock.simple.processor.graph;
 import com.palantir.javapoet.TypeName;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.util.ValidationFailure;
-
+import java.util.Locale;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import java.util.Locale;
 
 import static io.jbock.simple.processor.util.Visitors.PACKAGE_VISITOR;
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;

@@ -17,14 +17,13 @@ import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ParameterBinding;
-
-import javax.annotation.processing.Generated;
-import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.annotation.processing.Generated;
+import javax.lang.model.element.Modifier;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;

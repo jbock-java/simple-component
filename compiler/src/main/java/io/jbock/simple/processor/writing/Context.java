@@ -2,7 +2,6 @@ package io.jbock.simple.processor.writing;
 
 import com.palantir.javapoet.ParameterSpec;
 import io.jbock.simple.processor.binding.Key;
-
 import java.util.Map;
 import java.util.function.Function;
 

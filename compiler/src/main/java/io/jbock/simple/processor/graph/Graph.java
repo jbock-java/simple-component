@@ -1,21 +1,12 @@
 package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.processor.binding.Binding;
-
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-final class Graph {
-
-    private final Set<Edge> edges;
-    private final Set<Binding> nodes;
-
-    Graph(Set<Edge> edges, Set<Binding> nodes) {
-        this.edges = edges;
-        this.nodes = nodes;
-    }
+record Graph(Set<Edge> edges, Set<Binding> nodes) {
 
     void addAll(Graph other) {
         edges.addAll(other.edges);
@@ -42,13 +33,5 @@ final class Graph {
 
     void removeEdge(Edge edge) {
         edges.remove(edge);
-    }
-
-    Set<Binding> nodes() {
-        return nodes;
-    }
-
-    Set<Edge> edges() {
-        return edges;
     }
 }

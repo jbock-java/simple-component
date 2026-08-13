@@ -12,12 +12,11 @@ import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
-
-import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import javax.lang.model.element.Modifier;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;

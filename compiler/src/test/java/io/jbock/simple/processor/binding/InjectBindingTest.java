@@ -1,12 +1,11 @@
 package io.jbock.simple.processor.binding;
 
-import io.jbock.javapoet.ClassName;
-import io.jbock.javapoet.ParameterizedTypeName;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.ParameterizedTypeName;
 import java.util.Map;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class InjectBindingTest {
 

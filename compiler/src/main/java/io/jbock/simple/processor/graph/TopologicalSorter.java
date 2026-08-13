@@ -6,7 +6,6 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ParameterBinding;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;

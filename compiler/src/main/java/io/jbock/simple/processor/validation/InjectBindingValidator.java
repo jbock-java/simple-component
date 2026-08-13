@@ -8,13 +8,12 @@ import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.Util;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
-
+import java.util.List;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
-import java.util.List;
 
 import static io.jbock.simple.processor.util.TypeNames.JAKARTA_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.JAVAX_INJECT;

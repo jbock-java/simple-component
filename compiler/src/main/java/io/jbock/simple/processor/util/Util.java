@@ -1,7 +1,7 @@
 package io.jbock.simple.processor.util;
 
-import javax.lang.model.element.TypeElement;
 import java.util.List;
+import javax.lang.model.element.TypeElement;
 
 public final class Util {
 

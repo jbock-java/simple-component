@@ -4,11 +4,10 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyCache;
 import io.jbock.simple.processor.util.ValidationFailure;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import java.util.HashMap;
 import java.util.Map;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 
 public class BindingRegistry {
 

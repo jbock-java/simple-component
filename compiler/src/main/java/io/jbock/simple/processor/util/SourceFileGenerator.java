@@ -2,13 +2,12 @@ package io.jbock.simple.processor.util;
 
 import com.palantir.javapoet.JavaFile;
 import io.jbock.simple.Inject;
-
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.lang.model.element.Element;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.Element;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
