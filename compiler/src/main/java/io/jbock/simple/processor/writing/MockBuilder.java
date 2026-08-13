@@ -1,12 +1,12 @@
 package io.jbock.simple.processor.writing;
 
-import io.jbock.javapoet.ClassName;
-import io.jbock.javapoet.CodeBlock;
-import io.jbock.javapoet.FieldSpec;
-import io.jbock.javapoet.MethodSpec;
-import io.jbock.javapoet.ParameterSpec;
-import io.jbock.javapoet.TypeName;
-import io.jbock.javapoet.TypeSpec;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.CodeBlock;
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.ParameterSpec;
+import com.palantir.javapoet.TypeName;
+import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
@@ -144,7 +144,7 @@ public final class MockBuilder {
             Binding b = namedBinding.binding();
             Key key = b.key();
             ParameterSpec param = names.apply(key);
-            MethodSpec.Builder method = MethodSpec.methodBuilder(param.name)
+            MethodSpec.Builder method = MethodSpec.methodBuilder(param.name())
                     .addModifiers(modifiers)
                     .addParameter(param)
                     .addStatement("this.$1N = $1N", param);

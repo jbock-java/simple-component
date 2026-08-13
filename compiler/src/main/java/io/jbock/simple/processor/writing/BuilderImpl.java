@@ -1,11 +1,11 @@
 package io.jbock.simple.processor.writing;
 
-import io.jbock.javapoet.CodeBlock;
-import io.jbock.javapoet.FieldSpec;
-import io.jbock.javapoet.MethodSpec;
-import io.jbock.javapoet.ParameterSpec;
-import io.jbock.javapoet.TypeName;
-import io.jbock.javapoet.TypeSpec;
+import com.palantir.javapoet.CodeBlock;
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.ParameterSpec;
+import com.palantir.javapoet.TypeName;
+import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.BuilderElement;
@@ -99,7 +99,7 @@ public final class BuilderImpl {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             if (b instanceof ParameterBinding) {
-                result.add(FieldSpec.builder(b.key().typeName(), names.apply(b.key()).name).build());
+                result.add(FieldSpec.builder(b.key().typeName(), names.apply(b.key()).name()).build());
             }
         }
         return result;

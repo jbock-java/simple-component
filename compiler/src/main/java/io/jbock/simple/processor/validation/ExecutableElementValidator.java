@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.validation;
 
-import io.jbock.javapoet.TypeName;
+import com.palantir.javapoet.TypeName;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;

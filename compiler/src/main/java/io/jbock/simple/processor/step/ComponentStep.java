@@ -1,7 +1,7 @@
 package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
-import io.jbock.javapoet.TypeSpec;
+import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
 import io.jbock.simple.Modulus;

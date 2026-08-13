@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
 	var simple_component = project(":simple-component")
-	implementation("io.github.jbock-java:javapoet:1.15")
+  implementation("com.palantir.javapoet:javapoet:0.18.0")
 	implementation("io.github.jbock-java:auto-common:1.2.3")
 	compileOnly(simple_component)
 	annotationProcessor("io.github.jbock-java:simple-component-compiler:1.024")

@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.binding;
 
-import io.jbock.javapoet.ClassName;
+import com.palantir.javapoet.ClassName;
 import io.jbock.simple.processor.util.ValidationFailure;
 
 import javax.lang.model.element.ExecutableElement;

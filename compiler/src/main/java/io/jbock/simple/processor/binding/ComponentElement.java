@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.binding;
 
-import io.jbock.javapoet.ClassName;
+import com.palantir.javapoet.ClassName;
 import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.Visitors;

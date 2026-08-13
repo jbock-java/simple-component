@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.util;
 
-import io.jbock.javapoet.TypeName;
+import com.palantir.javapoet.TypeName;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;

@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.util;
 
-import io.jbock.javapoet.TypeName;
+import com.palantir.javapoet.TypeName;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;

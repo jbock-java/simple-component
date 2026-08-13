@@ -1,8 +1,8 @@
 package io.jbock.simple.processor.util;
 
-import io.jbock.javapoet.ClassName;
-import io.jbock.javapoet.JavaFile;
-import io.jbock.javapoet.TypeSpec;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 
 import javax.annotation.processing.Messager;
@@ -27,18 +27,18 @@ public final class SpecWriter {
         } catch (Exception e) {
             StringWriter errors = new StringWriter();
             e.printStackTrace(new PrintWriter(errors));
-            messager.printMessage(Diagnostic.Kind.ERROR, errors.toString(), typeSpec.originatingElements.get(0));
+            messager.printMessage(Diagnostic.Kind.ERROR, errors.toString(), typeSpec.originatingElements().get(0));
         }
     }
 
     private void writeSpec(ClassName generatedClass, TypeSpec typeSpec) {
-        if (typeSpec.originatingElements.size() != 1) {
+        if (typeSpec.originatingElements().size() != 1) {
             throw new AssertionError();
         }
         String packageName = generatedClass.packageName();
         JavaFile javaFile = JavaFile.builder(packageName, typeSpec)
                 .skipJavaLangImports(true)
                 .build();
-        sourceFileGenerator.write(typeSpec.originatingElements.get(0), javaFile);
+        sourceFileGenerator.write(typeSpec.originatingElements().get(0), javaFile);
     }
 }

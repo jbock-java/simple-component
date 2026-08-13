@@ -1,9 +1,9 @@
 package io.jbock.simple.processor.binding;
 
-import io.jbock.javapoet.CodeBlock;
-import io.jbock.javapoet.ParameterSpec;
-import io.jbock.javapoet.ParameterizedTypeName;
-import io.jbock.javapoet.TypeName;
+import com.palantir.javapoet.CodeBlock;
+import com.palantir.javapoet.ParameterSpec;
+import com.palantir.javapoet.ParameterizedTypeName;
+import com.palantir.javapoet.TypeName;
 import io.jbock.simple.processor.util.Visitors;
 import io.jbock.simple.processor.writing.NamedBinding;
 
@@ -53,8 +53,8 @@ public final class InjectBinding extends Binding {
 
     static String simpleTypeName(ParameterizedTypeName type) {
         StringBuilder sb = new StringBuilder();
-        sb.append(type.rawType.simpleName());
-        for (TypeName typeName : type.typeArguments) {
+        sb.append(type.rawType().simpleName());
+        for (TypeName typeName : type.typeArguments()) {
             if (typeName instanceof ParameterizedTypeName) {
                 sb.append(simpleTypeName((ParameterizedTypeName) typeName));
             } else {

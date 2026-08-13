@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.graph;
 
-import io.jbock.javapoet.TypeName;
+import com.palantir.javapoet.TypeName;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.util.ValidationFailure;
 

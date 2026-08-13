@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.writing;
 
-import io.jbock.javapoet.ParameterSpec;
+import com.palantir.javapoet.ParameterSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.Modulus;
 import io.jbock.simple.processor.binding.Binding;

@@ -1,7 +1,7 @@
 package io.jbock.simple.processor.binding;
 
-import io.jbock.javapoet.CodeBlock;
-import io.jbock.javapoet.ParameterSpec;
+import com.palantir.javapoet.CodeBlock;
+import com.palantir.javapoet.ParameterSpec;
 import io.jbock.simple.processor.writing.NamedBinding;
 
 import javax.lang.model.element.Element;
