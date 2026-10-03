@@ -12,7 +12,7 @@ public final class TypeNames {
 
     public static final String JAVAX_PROVIDER = "javax.inject.Provider";
     public static final String JAKARTA_PROVIDER = "jakarta.inject.Provider";
-    public static final String SIMPLE_PROVIDER = "io.jbock.simple.Provider";
+    public static final String SUPPLIER = "java.util.function.Supplier";
 
     private TypeNames() {
     }

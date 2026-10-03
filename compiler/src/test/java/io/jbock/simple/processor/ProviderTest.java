@@ -18,12 +18,12 @@ class ProviderTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
-                "import io.jbock.simple.Provider;",
+                "import java.util.function.Supplier;",
                 "import io.jbock.simple.Named;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
-                "    @Inject A(@Named(\"b\") Provider<B> bProvider) {}",
+                "    @Inject A(@Named(\"b\") Supplier<B> bProvider) {}",
                 "  }",
                 "",
                 "  static class B {",
@@ -38,7 +38,7 @@ class ProviderTest {
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("No binding found for io.jbock.simple.Provider<test.TestClass.B> with qualifier @Named(\"b\").")
+        assertThat(compilation).hadErrorContaining("No binding found for java.util.function.Supplier<test.TestClass.B> with qualifier @Named(\"b\").")
                 .inFile(component)
                 .onLineContaining("interface AComponent");
     }
@@ -50,13 +50,13 @@ class ProviderTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
-                "import io.jbock.simple.Provider;",
+                "import java.util.function.Supplier;",
                 "import io.jbock.simple.Provides;",
                 "import io.jbock.simple.Named;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
-                "    @Inject A(@Named(\"b\") Provider<B> bProvider, @Named(\"b\") B b) {}",
+                "    @Inject A(@Named(\"b\") Supplier<B> bProvider, @Named(\"b\") B b) {}",
                 "  }",
                 "",
                 "  static class B {",
@@ -96,13 +96,13 @@ class ProviderTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
-                "import io.jbock.simple.Provider;",
+                "import java.util.function.Supplier;",
                 "import io.jbock.simple.Provides;",
                 "import io.jbock.simple.Named;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
-                "    @Inject A(Provider<B> bProvider, @Named(\"b\") Provider<B> b) {}",
+                "    @Inject A(Supplier<B> bProvider, @Named(\"b\") Supplier<B> b) {}",
                 "  }",
                 "",
                 "  static class B {",

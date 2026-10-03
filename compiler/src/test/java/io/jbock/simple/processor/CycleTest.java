@@ -62,7 +62,7 @@ class CycleTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
-                "import io.jbock.simple.Provider;",
+                "import java.util.function.Supplier;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
@@ -78,7 +78,7 @@ class CycleTest {
                 "  }",
                 "",
                 "  static class D {",
-                "    @Inject D(Provider<B> bProvider) {}",
+                "    @Inject D(Supplier<B> bProvider) {}",
                 "  }",
                 "",
                 "  @Component",
@@ -93,8 +93,8 @@ class CycleTest {
                 "Found a dependency cycle:",
                 "    test.TestClass.C is injected at",
                 "        B(test.TestClass.C)",
-                "    io.jbock.simple.Provider<test.TestClass.B> is injected at",
-                "        D(io.jbock.simple.Provider<test.TestClass.B>)",
+                "    java.util.function.Supplier<test.TestClass.B> is injected at",
+                "        D(java.util.function.Supplier<test.TestClass.B>)",
                 "    test.TestClass.D is injected at",
                 "        C(test.TestClass.D)"));
     }
@@ -106,7 +106,7 @@ class CycleTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
-                "import io.jbock.simple.Provider;",
+                "import java.util.function.Supplier;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
@@ -122,7 +122,7 @@ class CycleTest {
                 "  }",
                 "",
                 "  static class D {",
-                "    @Inject D(Provider<Provider<B>> bProvider) {}",
+                "    @Inject D(Supplier<Supplier<B>> bProvider) {}",
                 "  }",
                 "",
                 "  @Component",
@@ -133,6 +133,6 @@ class CycleTest {
 
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("No binding found for io.jbock.simple.Provider<io.jbock.simple.Provider<test.TestClass.B>>");
+        assertThat(compilation).hadErrorContaining("No binding found for java.util.function.Supplier<java.util.function.Supplier<test.TestClass.B>>");
     }
 }

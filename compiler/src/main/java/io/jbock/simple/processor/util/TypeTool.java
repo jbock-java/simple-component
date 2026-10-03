@@ -28,13 +28,6 @@ public record TypeTool(
     /**
      * Works for classes with no type parameters.
      */
-    public boolean isSameType(TypeMirror mirror, Class<?> cl) {
-        return isSameType(mirror, cl.getCanonicalName());
-    }
-
-    /**
-     * Works for classes with no type parameters.
-     */
     public boolean isSameType(TypeMirror mirror, String canonicalName) {
         TypeElement typeElement = elements.getTypeElement(canonicalName);
         if (typeElement == null) {
@@ -83,30 +76,31 @@ public record TypeTool(
     }
 
     public Optional<ProviderType> getProviderType(TypeMirror mirror) {
-        return getSingleTypeArgument(mirror, elements.getTypeElement(TypeNames.JAVAX_PROVIDER))
-                .map(m -> new ProviderType(ProviderKind.JAVAX, m))
-                .or(() -> getSingleTypeArgument(mirror, elements.getTypeElement(TypeNames.JAKARTA_PROVIDER))
-                        .map(m -> new ProviderType(ProviderKind.JAKARTA, m)))
-                .or(() -> getSingleTypeArgument(mirror, elements.getTypeElement(TypeNames.SIMPLE_PROVIDER))
-                        .map(m -> new ProviderType(ProviderKind.SIMPLE, m)));
-    }
-
-    private Optional<TypeMirror> getSingleTypeArgument(
-            TypeMirror mirror, TypeElement someClass) {
-        if (someClass == null) {
-            return Optional.empty();
-        }
         DeclaredType declaredType = DECLARED_TYPE_VISITOR.visit(mirror);
         if (declaredType == null) {
             return Optional.empty();
         }
-        List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
-        if (typeArguments.size() != 1) {
-            return Optional.empty();
-        }
-        if (types.isSameType(types.erasure(declaredType), types.erasure(someClass.asType()))) {
-            return Optional.of(typeArguments.getFirst());
+        for (ProviderKind providerKind : ProviderKind.values()) {
+            TypeMirror m = getSingleTypeArgument(declaredType, elements.getTypeElement(providerKind.className()));
+            if (m != null) {
+                return Optional.of(new ProviderType(providerKind, m));
+            }
         }
         return Optional.empty();
+    }
+
+    private TypeMirror getSingleTypeArgument(
+            DeclaredType declaredType, TypeElement someClass) {
+        if (someClass == null) {
+            return null;
+        }
+        List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+        if (typeArguments.size() != 1) {
+            return null;
+        }
+        if (types.isSameType(types.erasure(declaredType), types.erasure(someClass.asType()))) {
+            return typeArguments.getFirst();
+        }
+        return null;
     }
 }

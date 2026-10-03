@@ -7,9 +7,10 @@ public record ProviderType(
         TypeMirror innerType) {
 
     public enum ProviderKind {
-        SIMPLE(TypeNames.SIMPLE_PROVIDER),
         JAVAX(TypeNames.JAVAX_PROVIDER),
-        JAKARTA(TypeNames.JAKARTA_PROVIDER);
+        JAKARTA(TypeNames.JAKARTA_PROVIDER),
+        SUPPLIER(TypeNames.SUPPLIER)
+        ;
 
         private final String className;
 
