@@ -17,32 +17,15 @@ class BindingValidationTest {
                 "package test;",
                 "",
                 "import io.jbock.simple.Component;",
-                "import io.jbock.simple.Inject;",
+                "import io.jbock.simple.Provides;",
                 "",
                 "final class TestClass {",
                 "",
-                "  @Inject static TestClass createTestClass1() { return null; }",
-                "  @Inject static TestClass createTestClass2() { return null; }",
+                "  @Provides static TestClass createTestClass1() { return null; }",
+                "  @Provides static TestClass createTestClass2() { return null; }",
                 "}");
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("Duplicate binding for test.TestClass");
-    }
-
-    @Test
-    void staticMethodBindingDoesNotReturnEnclosing() {
-        JavaFileObject component = forSourceLines("test.TestClass",
-                "package test;",
-                "",
-                "import io.jbock.simple.Component;",
-                "import io.jbock.simple.Inject;",
-                "",
-                "final class TestClass {",
-                "",
-                "  @Inject static String createSomethingElse() { return null; }",
-                "}");
-        Compilation compilation = simpleCompiler().compile(component);
-        assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("The factory method must return the type of its enclosing class");
+        assertThat(compilation).hadErrorContaining("The @Provides method must be nested inside a @Component or @Modulus");
     }
 }

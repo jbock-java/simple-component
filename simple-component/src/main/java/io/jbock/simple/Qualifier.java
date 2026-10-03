@@ -7,7 +7,7 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Identifies qualifier annotations.
+ * Identifies a qualifier annotation.
  */
 @Target(ANNOTATION_TYPE)
 @Retention(RUNTIME)

@@ -29,8 +29,8 @@ class CycleTest {
                 "    @Inject B(C c) {}",
                 "  }",
                 "",
-                "  interface C {",
-                "    @Inject static C createC(D d) { return null; }",
+                "  static class C {",
+                "    @Inject C(D d) {}",
                 "  }",
                 "",
                 "  static class D {",
@@ -50,7 +50,7 @@ class CycleTest {
                 "    test.TestClass.B is injected at",
                 "        D(test.TestClass.B)",
                 "    test.TestClass.D is injected at",
-                "        C.createC(test.TestClass.D)",
+                "        C(test.TestClass.D)",
                 "    test.TestClass.C is injected at",
                 "        B(test.TestClass.C)"));
     }
@@ -73,8 +73,8 @@ class CycleTest {
                 "    @Inject B(C c) {}",
                 "  }",
                 "",
-                "  interface C {",
-                "    @Inject static C createC(D d) { return null; }",
+                "  static class C {",
+                "    @Inject C(D d) {}",
                 "  }",
                 "",
                 "  static class D {",
@@ -96,7 +96,7 @@ class CycleTest {
                 "    io.jbock.simple.Provider<test.TestClass.B> is injected at",
                 "        D(io.jbock.simple.Provider<test.TestClass.B>)",
                 "    test.TestClass.D is injected at",
-                "        C.createC(test.TestClass.D)"));
+                "        C(test.TestClass.D)"));
     }
 
     @Test
@@ -117,8 +117,8 @@ class CycleTest {
                 "    @Inject B(C c) {}",
                 "  }",
                 "",
-                "  interface C {",
-                "    @Inject static C createC(D d) { return null; }",
+                "  static class C {",
+                "    @Inject C(D d) {}",
                 "  }",
                 "",
                 "  static class D {",

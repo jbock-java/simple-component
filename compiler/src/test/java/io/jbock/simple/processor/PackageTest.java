@@ -12,40 +12,6 @@ import static io.jbock.testing.compile.JavaFileObjects.forSourceLines;
 class PackageTest {
 
     @Test
-    void inaccessibleStaticMethod() {
-        JavaFileObject dd = forSourceLines("test.b.DD",
-                "package test.b;",
-                "",
-                "import io.jbock.simple.Inject;",
-                "",
-                "public class DD {",
-                "  @Inject static DD createDD() { return null; }",
-                "}");
-        JavaFileObject dep = forSourceLines("test.b.Dep",
-                "package test.b;",
-                "",
-                "import io.jbock.simple.Inject;",
-                "",
-                "public class Dep {",
-                "  @Inject public Dep(DD dd) {}",
-                "}");
-        JavaFileObject component = forSourceLines("test.a.AComponent",
-                "package test.a;",
-                "",
-                "import io.jbock.simple.Component;",
-                "import test.b.Dep;",
-                "",
-                "@Component",
-                "interface AComponent {",
-                "  Dep getDep();",
-                "}");
-
-        Compilation compilation = simpleCompiler().compile(dd, dep, component);
-        assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("method is not accessible from test.a.AComponent");
-    }
-
-    @Test
     void inaccessibleConstructor() {
         JavaFileObject dd = forSourceLines("test.b.DD",
                 "package test.b;",
@@ -88,7 +54,7 @@ class PackageTest {
                 "import io.jbock.simple.Inject;",
                 "",
                 "class DD {",
-                "  @Inject public static DD createDD() {}",
+                "  @Inject public DD() {}",
                 "}");
         JavaFileObject dep = forSourceLines("test.b.Dep",
                 "package test.b;",

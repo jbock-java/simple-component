@@ -1,24 +1,25 @@
 package io.jbock.simple.processor.writing;
 
 import com.palantir.javapoet.ParameterSpec;
-import io.jbock.simple.Inject;
 import io.jbock.simple.Modulus;
+import io.jbock.simple.Provides;
 import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.util.UniqueNameSet;
+
+import javax.lang.model.SourceVersion;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import javax.lang.model.SourceVersion;
 
 @Modulus
 public interface ContextModule {
 
-    @Inject
+    @Provides
     static Context createContext(
             TopologicalSorter topologicalSorter,
             KeyFactory keyFactory) {
