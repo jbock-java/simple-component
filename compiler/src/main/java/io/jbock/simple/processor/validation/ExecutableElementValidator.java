@@ -1,26 +1,23 @@
 package io.jbock.simple.processor.validation;
 
-import com.palantir.javapoet.TypeName;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeTool;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.util.Visitors;
-import java.util.Optional;
+
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import java.util.Optional;
 
 public final class ExecutableElementValidator {
 
     private final TypeTool tool;
-    private final TypeElementValidator typeElementValidator;
 
     @Inject
-    public ExecutableElementValidator(
-            TypeTool tool,
-            TypeElementValidator typeElementValidator) {
+    public ExecutableElementValidator(TypeTool tool) {
         this.tool = tool;
-        this.typeElementValidator = typeElementValidator;
     }
 
     public void validate(ExecutableElement element) {
@@ -30,32 +27,35 @@ public final class ExecutableElementValidator {
         checkExceptionsInDeclaration(element);
     }
 
-    public void checkExceptionsInDeclaration(ExecutableElement element) {
-        for (TypeMirror thrown : element.getThrownTypes()) {
-            checkChecked(element, thrown, thrown);
+    public void checkExceptionsInDeclaration(ExecutableElement el) throws ValidationFailure {
+        for (TypeMirror thrownType : el.getThrownTypes()) {
+            if (isChecked(thrownType)) {
+                throw new ValidationFailure("Checked exception is not allowed here.", el);
+            }
         }
     }
 
-    private void checkChecked(
-            ExecutableElement element,
-            TypeMirror thrown,
-            TypeMirror mirror) {
-        if (tool.isSameType(mirror, RuntimeException.class) ||
-                tool.isSameType(mirror, Error.class)) {
-            return;
+    private boolean isChecked(TypeMirror typeMirror) {
+        TypeMirror check = typeMirror;
+        while (true) {
+            if (check == null) {
+                return false;
+            }
+            if (check.getKind() == TypeKind.NONE) {
+                return false;
+            }
+            Optional<TypeElement> typeElement = tool.types().asElement(check).map(Visitors.TYPE_ELEMENT_VISITOR::visit);
+            if (typeElement.isEmpty()) {
+                return false;
+            }
+            TypeElement tel = typeElement.orElseThrow();
+            if (tel.getQualifiedName().contentEquals("java.lang.RuntimeException")) {
+                return false;
+            }
+            if (tel.getQualifiedName().contentEquals("java.lang.Exception")) {
+                return true;
+            }
+            check = tel.getSuperclass();
         }
-        if (tool.isSameType(mirror, Throwable.class)) {
-            throw new ValidationFailure("invalid throws clause:" +
-                    " found checked exception " +
-                    TypeName.get(thrown), element);
-        }
-        Optional<TypeElement> tel = tool.types().asElement(thrown)
-                .flatMap(el -> Optional.ofNullable(Visitors.TYPE_ELEMENT_VISITOR.visit(el)));
-        if (tel.isEmpty()) {
-            return;
-        }
-        TypeElement typeElement = tel.orElseThrow();
-        typeElementValidator.checkNesting(typeElement);
-        checkChecked(element, thrown, typeElement.getSuperclass());
     }
 }

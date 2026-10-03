@@ -28,7 +28,7 @@ public final class MissingBindingPrinter {
     }
 
     private ValidationFailure failInternal(List<DependencyRequest> trace) {
-        DependencyRequest request = trace.get(0);
+        DependencyRequest request = trace.getFirst();
         StringBuilder message = new StringBuilder();
         message.append("No binding found for ").append(request.key().toString()).append(".");
         for (int i = 0; i < trace.size(); i++) {

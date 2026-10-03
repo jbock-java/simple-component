@@ -8,7 +8,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * An alternative to the {@code @Inject} annotation that can be used
- * on static methods which are direct children of the component interface.
+ * on static methods in the component interface.
  */
 @Target(METHOD)
 @Retention(SOURCE)

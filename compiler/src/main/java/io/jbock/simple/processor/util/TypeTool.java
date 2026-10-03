@@ -2,14 +2,15 @@ package io.jbock.simple.processor.util;
 
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.ProviderType.ProviderKind;
-import java.util.List;
-import java.util.Optional;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import java.util.List;
+import java.util.Optional;
 
 import static io.jbock.simple.processor.util.TypeNames.JAKARTA_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.JAVAX_INJECT;
@@ -47,6 +48,12 @@ public record TypeTool(
     }
 
     public boolean hasInjectAnnotation(Element m) {
+        if (m.getKind() == ElementKind.CLASS || m.getKind() == ElementKind.RECORD) {
+            return m.getAnnotationMirrors().stream().anyMatch(mirror -> {
+                DeclaredType annotationType = mirror.getAnnotationType();
+                return isSameType(annotationType, SIMPLE_INJECT);
+            });
+        }
         if (m.getKind() != ElementKind.CONSTRUCTOR && m.getKind() != ElementKind.METHOD) {
             return false;
         }
@@ -98,7 +105,7 @@ public record TypeTool(
             return Optional.empty();
         }
         if (types.isSameType(types.erasure(declaredType), types.erasure(someClass.asType()))) {
-            return Optional.of(typeArguments.get(0));
+            return Optional.of(typeArguments.getFirst());
         }
         return Optional.empty();
     }

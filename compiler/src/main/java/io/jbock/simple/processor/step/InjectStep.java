@@ -6,14 +6,16 @@ import io.jbock.simple.processor.util.TypeNames;
 import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.validation.ExecutableElementValidator;
 import io.jbock.simple.processor.validation.InjectBindingValidator;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.ElementFilter;
 
 import static javax.lang.model.util.ElementFilter.constructorsIn;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
@@ -51,18 +53,30 @@ public class InjectStep implements Step {
         try {
             List<Element> elements = elementsByAnnotation.values().stream()
                     .flatMap(Set::stream)
-                    .collect(Collectors.toList());
-            List<ExecutableElement> constructors = constructorsIn(elements);
-            List<ExecutableElement> methods = methodsIn(elements);
-            for (ExecutableElement constructor : constructors) {
+                    .toList();
+            for (ExecutableElement constructor : constructorsIn(elements)) {
                 executableElementValidator.validate(constructor);
                 validator.validateConstructor(constructor);
                 bindingRegistry.register(constructor);
             }
-            for (ExecutableElement method : methods) {
+            for (ExecutableElement method : methodsIn(elements)) {
                 executableElementValidator.validate(method);
                 validator.validateStaticMethod(method);
                 bindingRegistry.register(method);
+            }
+            for (TypeElement tel : ElementFilter.typesIn(elements)) {
+                List<ExecutableElement> constructors = constructorsIn(tel.getEnclosedElements());
+                if (constructors.isEmpty()) {
+                    throw new ValidationFailure("constructor not found", tel);
+                }
+                if (constructors.size() >= 2) {
+                    throw new ValidationFailure("more than one constructor found", tel);
+                }
+                for (ExecutableElement constructor : constructors) {
+                    executableElementValidator.validate(constructor);
+                    validator.validateConstructor(constructor);
+                    bindingRegistry.register(constructor);
+                }
             }
             checkFields(elements);
         } catch (ValidationFailure f) {

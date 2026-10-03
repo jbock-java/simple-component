@@ -5,10 +5,11 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Identifies injectable constructors and {@code static} methods.
+ * Identifies injectable records, classes, constructors and {@code static} methods.
  * An {@code @Inject}-annotated static method is allowed in the following places:
  *
  * <ul>
@@ -17,11 +18,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *   <li>If the class or interface that defines its return type is nested
  *     inside an enclosing class, then the method may also be a direct child of the
  *     enclosing class.
- *   <li>The method can be a direct child of the component interface.
- *     Alternatively, the {@link Provides} annotation can be used in that case.
+ *   <li>For a static method in the component interface.
+ *     the {@link Provides} annotation serves the same purpose.
  * </ul>
  */
-@Target({METHOD, CONSTRUCTOR})
+@Target({TYPE, METHOD, CONSTRUCTOR})
 @Retention(RUNTIME)
 public @interface Inject {
 }
