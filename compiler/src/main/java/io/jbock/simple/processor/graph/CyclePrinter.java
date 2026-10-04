@@ -15,9 +15,9 @@ import static io.jbock.simple.processor.util.Printing.bindingElementToString;
 
 final class CyclePrinter {
 
-    private final Graph graph;
+    private final Graph<Node> graph;
 
-    CyclePrinter(Graph graph) {
+    CyclePrinter(Graph<Node> graph) {
         this.graph = graph;
     }
 

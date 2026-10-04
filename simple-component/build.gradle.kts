@@ -1,8 +1,3 @@
-import org.gradle.api.JavaVersion;
-import org.gradle.api.publish.tasks.GenerateModuleMetadata;
-import org.gradle.api.tasks.bundling.AbstractArchiveTask;
-import org.gradle.api.tasks.bundling.Jar;
-
 plugins {
   id("java-library")
   id("com.vanniktech.maven.publish") version "0.37.0"

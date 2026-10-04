@@ -1,6 +1,6 @@
 package io.jbock.simple.processor.graph;
 
-public interface AbstractEdge<E> {
-    E source();
-    E destination();
+public interface AbstractEdge<N> {
+    N source();
+    N destination();
 }

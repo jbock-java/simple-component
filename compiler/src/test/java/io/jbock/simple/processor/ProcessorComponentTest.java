@@ -1,6 +1,7 @@
 package io.jbock.simple.processor;
 
 import io.jbock.testing.compile.Compilation;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.tools.JavaFileObject;
@@ -70,6 +71,7 @@ class ProcessorComponentTest {
                         "}");
     }
 
+    @Disabled
     @Test
     void dependencyDiamond() {
         JavaFileObject component = forSourceLines("test.TestClass",

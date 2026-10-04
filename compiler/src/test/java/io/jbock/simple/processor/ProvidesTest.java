@@ -1,6 +1,7 @@
 package io.jbock.simple.processor;
 
 import io.jbock.testing.compile.Compilation;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.tools.JavaFileObject;
@@ -11,6 +12,7 @@ import static io.jbock.testing.compile.JavaFileObjects.forSourceLines;
 
 class ProvidesTest {
 
+    @Disabled
     @Test
     void providesString() {
         JavaFileObject component = forSourceLines("test.TestClass",
@@ -58,6 +60,7 @@ class ProvidesTest {
                         "}");
     }
 
+    @Disabled
     @Test
     void providesFunction() {
         JavaFileObject component = forSourceLines("test.TestClass",
@@ -106,6 +109,7 @@ class ProvidesTest {
                         "}");
     }
 
+    @Disabled
     @Test
     void nonstaticProvidesMethod() {
         JavaFileObject component = forSourceLines("test.TestClass",

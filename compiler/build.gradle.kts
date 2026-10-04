@@ -24,15 +24,15 @@ repositories {
 }
 
 dependencies {
-  var simple_component = "io.github.jbock-java:simple-component:1.026"
+  var simpleComponent = "io.github.jbock-java:simple-component:1.026"
   implementation("com.palantir.javapoet:javapoet:0.18.0")
   implementation("io.github.jbock-java:auto-common:1.2.3")
-  implementation(simple_component)
+  implementation(simpleComponent)
   annotationProcessor("io.github.jbock-java:simple-component-compiler:1.026")
   testImplementation("io.github.jbock-java:compile-testing:0.19.12")
   testImplementation(platform("org.junit:junit-bom:6.1.2"))
   testImplementation("org.junit.jupiter:junit-jupiter")
-  testImplementation(simple_component)
+  testImplementation(simpleComponent)
   testImplementation("jakarta.inject:jakarta.inject-api:2.0.1")
   testImplementation("javax.inject:javax.inject:1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")

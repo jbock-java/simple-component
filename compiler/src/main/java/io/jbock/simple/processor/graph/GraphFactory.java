@@ -49,14 +49,14 @@ public class GraphFactory {
         return bindingCache.computeIfAbsent(request.key(), this::getBindingMiss);
     }
 
-    Graph getGraph(DependencyRequest request) {
+    Graph<Node> getGraph(DependencyRequest request) {
         List<DependencyRequest> dependencyTrace = List.of(request);
         Node startNode = getBinding(request).orElseThrow(() -> missingBindingPrinter.fail(dependencyTrace));
         Set<AbstractEdge<Node>> edges = new LinkedHashSet<>();
         Set<Node> nodes = new LinkedHashSet<>();
         nodes.add(startNode);
         addDependencies(dependencyTrace, nodes, edges, startNode);
-        return new Graph(edges, nodes);
+        return new Graph<>(edges, nodes);
     }
 
     private void addDependencies(

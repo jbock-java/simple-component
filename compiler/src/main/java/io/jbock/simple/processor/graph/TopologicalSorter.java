@@ -30,7 +30,7 @@ public final class TopologicalSorter {
 
     public List<Node> sortedBindings() {
         AccessibilityValidator validator = AccessibilityValidator.create(component);
-        Graph graph = Graph.newGraph();
+        Graph<Node> graph = Graph.newGraph();
         for (ParameterBinding request : keyFactory.parameterBindings().values()) {
             // preserve parameter order
             graph.nodes().add(request);
@@ -43,26 +43,30 @@ public final class TopologicalSorter {
                 validator.checkAccessible(binding.element());
             }
         }
-        return kahnSort(graph);
+        try {
+            return kahnSort(graph);
+        } catch (IllegalStateException e) {
+            throw new CyclePrinter(graph).fail();
+        }
     }
 
     // https://en.wikipedia.org/wiki/Topological_sorting
-    List<Node> kahnSort(Graph graph) {
-        List<Node> result = new ArrayList<>(graph.nodes().size());
-        Deque<Node> s = new ArrayDeque<>(graph.startNodes());
+    <N> List<N> kahnSort(Graph<N> graph) {
+        List<N> result = new ArrayList<>(graph.nodes().size());
+        Deque<N> s = new ArrayDeque<>(graph.startNodes());
         while (!s.isEmpty()) {
-            Node n = s.pop();
+            N n = s.pop();
             result.add(n);
-            for (AbstractEdge<Node> e : graph.edgesFrom(n)) {
+            for (AbstractEdge<N> e : graph.edgesFrom(n)) {
                 graph.removeEdge(e);
-                Node m = e.destination();
+                N m = e.destination();
                 if (graph.edgesTo(m).isEmpty()) {
                     s.push(m);
                 }
             }
         }
         if (!graph.edges().isEmpty()) {
-            throw new CyclePrinter(graph).fail();
+            throw new IllegalStateException("sorting failed");
         }
         return result;
     }

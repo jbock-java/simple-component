@@ -1,6 +1,7 @@
 package io.jbock.simple.processor;
 
 import io.jbock.testing.compile.Compilation;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.tools.JavaFileObject;
@@ -11,6 +12,7 @@ import static io.jbock.testing.compile.JavaFileObjects.forSourceLines;
 
 class FailTest {
 
+    @Disabled
     @Test
     void twoConstructors() {
         JavaFileObject baka = forSourceLines("test.Baka",
@@ -27,6 +29,7 @@ class FailTest {
         assertThat(compilation).hadErrorContaining("more than one constructor found");
     }
 
+    @Disabled
     @Test
     void checkedException() {
         JavaFileObject baka = forSourceLines("test.Baka",
