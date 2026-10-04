@@ -6,15 +6,15 @@ import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeName;
 import io.jbock.simple.processor.util.Visitors;
 import io.jbock.simple.processor.writing.NamedBinding;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 
@@ -112,14 +112,13 @@ public final class InjectBinding extends Binding {
 
     @Override
     public CodeBlock invocation(
-            Function<Key, ParameterSpec> names,
             Map<Key, NamedBinding> bindings,
             boolean paramsAreFields) {
         CodeBlock params = requests().stream()
                 .map(d -> {
                     NamedBinding namedBinding = bindings.get(d.key());
-                    ParameterSpec param = names.apply(d.key());
-                    boolean isParameter = namedBinding != null && namedBinding.binding() instanceof ParameterBinding;
+                    ParameterSpec param = namedBinding.parameter();
+                    boolean isParameter = namedBinding.binding() instanceof ParameterBinding;
                     return isParameter && paramsAreFields ?
                             CodeBlock.of("this.$N", param) :
                             CodeBlock.of("$N", param);

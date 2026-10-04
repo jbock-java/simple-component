@@ -12,12 +12,12 @@ import io.jbock.simple.processor.binding.BuilderElement;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
+
+import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.lang.model.type.TypeMirror;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PROTECTED;
@@ -28,7 +28,6 @@ public final class BuilderImpl {
 
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
-    private final Function<Key, ParameterSpec> names;
 
     @Inject
     public BuilderImpl(
@@ -36,7 +35,6 @@ public final class BuilderImpl {
             Context context) {
         this.component = component;
         this.sorted = context.sorted();
-        this.names = context.names();
     }
 
     TypeSpec generate(BuilderElement builder, MockBuilder mockBuilder) {
@@ -58,8 +56,8 @@ public final class BuilderImpl {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names, sorted, true);
-            ParameterSpec param = names.apply(key);
+            CodeBlock invocation = b.invocation(sorted, true);
+            ParameterSpec param = namedBinding.parameter();
             if (!(b instanceof ParameterBinding)) {
                 buildMethod.addStatement("$T $N = $L", key.typeName(), param, invocation);
             }
@@ -81,7 +79,7 @@ public final class BuilderImpl {
             if (!(b instanceof ParameterBinding)) {
                 continue;
             }
-            ParameterSpec param = names.apply(b.key());
+            ParameterSpec param = namedBinding.parameter();
             constructorParameters.add(CodeBlock.of("this.$N", param));
         }
         if (component.publicMockBuilder()) {
@@ -98,7 +96,7 @@ public final class BuilderImpl {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             if (b instanceof ParameterBinding) {
-                result.add(FieldSpec.builder(b.key().typeName(), names.apply(b.key()).name()).build());
+                result.add(FieldSpec.builder(b.key().typeName(), namedBinding.parameter().name()).build());
             }
         }
         return result;
@@ -113,8 +111,8 @@ public final class BuilderImpl {
             }
             MethodSpec.Builder setterMethod = MethodSpec.methodBuilder(b.element().getSimpleName().toString());
             setterMethod.addAnnotation(Override.class);
-            setterMethod.addParameter(names.apply(b.key()));
-            setterMethod.addStatement("this.$1N = $1N", names.apply(b.key()));
+            setterMethod.addParameter(namedBinding.parameter());
+            setterMethod.addStatement("this.$1N = $1N", namedBinding.parameter());
             setterMethod.addStatement("return this");
             setterMethod.returns(builder.generatedClass());
             setterMethod.addModifiers(b.element().getModifiers().stream()
@@ -128,9 +126,8 @@ public final class BuilderImpl {
         List<CodeBlock> result = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
-            Key key = b.key();
             if (namedBinding.isComponentRequest()) {
-                result.add(CodeBlock.of("$N", names.apply(key)));
+                result.add(CodeBlock.of("$N", namedBinding.parameter()));
             }
         }
         return result;

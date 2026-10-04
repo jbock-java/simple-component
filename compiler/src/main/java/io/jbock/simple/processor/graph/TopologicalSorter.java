@@ -30,7 +30,7 @@ public final class TopologicalSorter {
     public List<Binding> sortedBindings() {
         AccessibilityValidator validator = AccessibilityValidator.create(component);
         Graph graph = Graph.newGraph();
-        for (ParameterBinding request : keyFactory.parameterBindings()) {
+        for (ParameterBinding request : keyFactory.parameterBindings().values()) {
             // preserve parameter order
             graph.nodes().add(request);
         }

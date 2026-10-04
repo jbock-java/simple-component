@@ -31,7 +31,7 @@ public final class Key {
         return new Key(mirror, typeName, qualifier);
     }
 
-    public Key changeType(TypeMirror newType) {
+    public Key withType(TypeMirror newType) {
         return create(newType, qualifier);
     }
 

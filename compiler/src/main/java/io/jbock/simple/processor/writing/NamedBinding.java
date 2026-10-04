@@ -1,6 +1,11 @@
 package io.jbock.simple.processor.writing;
 
+import com.palantir.javapoet.ParameterSpec;
 import io.jbock.simple.processor.binding.Binding;
+
+import java.util.function.Supplier;
+
+import static io.jbock.simple.processor.util.Suppliers.memoize;
 
 public final class NamedBinding {
 
@@ -8,6 +13,11 @@ public final class NamedBinding {
     private final String name;
     private final String auxName;
     private final boolean componentRequest;
+
+    private Supplier<ParameterSpec> parameter = memoize(() -> {
+        String name = name();
+        return ParameterSpec.builder(binding().key().typeName(), name).build();
+    });
 
     public NamedBinding(
             Binding binding,
@@ -34,6 +44,10 @@ public final class NamedBinding {
 
     String auxName() {
         return auxName;
+    }
+
+    public ParameterSpec parameter() {
+        return parameter.get();
     }
 
     @Override

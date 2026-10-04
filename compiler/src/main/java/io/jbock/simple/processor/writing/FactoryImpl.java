@@ -11,12 +11,12 @@ import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
+
+import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.lang.model.element.ExecutableElement;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
@@ -28,7 +28,6 @@ public final class FactoryImpl {
 
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
-    private final Function<Key, ParameterSpec> names;
 
     @Inject
     public FactoryImpl(
@@ -36,7 +35,6 @@ public final class FactoryImpl {
             Context context) {
         this.component = component;
         this.sorted = context.sorted();
-        this.names = context.names();
     }
 
     TypeSpec generate(FactoryElement factory) {
@@ -52,8 +50,8 @@ public final class FactoryImpl {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names, sorted, false);
-            ParameterSpec param = names.apply(key);
+            CodeBlock invocation = b.invocation(sorted, false);
+            ParameterSpec param = namedBinding.parameter();
             if (!(b instanceof ParameterBinding)) {
                 method.addStatement("$T $N = $L", key.typeName(), param, invocation);
             }
@@ -72,7 +70,7 @@ public final class FactoryImpl {
             Binding b = namedBinding.binding();
             Key key = b.key();
             if (namedBinding.isComponentRequest()) {
-                result.add(CodeBlock.of("$N", names.apply(key)));
+                result.add(CodeBlock.of("$N", namedBinding.parameter()));
             }
         }
         return result;
@@ -82,9 +80,8 @@ public final class FactoryImpl {
         List<ParameterSpec> result = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
-            Key key = b.key();
             if (b instanceof ParameterBinding) {
-                result.add(names.apply(key));
+                result.add(namedBinding.parameter());
             }
         }
         return result;

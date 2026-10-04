@@ -12,11 +12,11 @@ import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
+
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import javax.lang.model.element.Modifier;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
@@ -27,7 +27,6 @@ public final class MockBuilder {
 
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
-    private final Function<Key, ParameterSpec> names;
     private final Modifier[] modifiers;
 
     @Inject
@@ -36,7 +35,6 @@ public final class MockBuilder {
             Context context) {
         this.component = component;
         this.sorted = context.sorted();
-        this.names = context.names();
         this.modifiers = component.element().getModifiers().stream()
                 .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
     }
@@ -63,7 +61,7 @@ public final class MockBuilder {
             Key key = b.key();
             TypeName type = key.typeName();
             FieldSpec field = FieldSpec.builder(type, namedBinding.name(), PRIVATE, FINAL).build();
-            ParameterSpec param = names.apply(key);
+            ParameterSpec param = namedBinding.parameter();
             constructor.addParameter(param);
             constructor.addStatement("this.$N = $N", field, param);
         }
@@ -83,10 +81,10 @@ public final class MockBuilder {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names, sorted, true);
-            ParameterSpec param = names.apply(key);
+            CodeBlock invocation = b.invocation(sorted, true);
+            ParameterSpec param = namedBinding.parameter();
             if (namedBinding.isComponentRequest()) {
-                constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
+                constructorParameters.add(CodeBlock.of("$N", param));
             }
             if (namedBinding.binding() instanceof ParameterBinding) {
                 continue;
@@ -140,9 +138,7 @@ public final class MockBuilder {
             if (namedBinding.binding() instanceof ParameterBinding) {
                 continue;
             }
-            Binding b = namedBinding.binding();
-            Key key = b.key();
-            ParameterSpec param = names.apply(key);
+            ParameterSpec param = namedBinding.parameter();
             MethodSpec.Builder method = MethodSpec.methodBuilder(param.name())
                     .addModifiers(modifiers)
                     .addParameter(param)

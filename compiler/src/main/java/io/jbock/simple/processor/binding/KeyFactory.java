@@ -99,8 +99,8 @@ public class KeyFactory {
         return Optional.ofNullable(parameterBindings.get().get(key));
     }
 
-    public Collection<ParameterBinding> parameterBindings() {
-        return parameterBindings.get().values();
+    public Map<Key, ParameterBinding> parameterBindings() {
+        return parameterBindings.get();
     }
 
     private final Supplier<Optional<BuilderElement>> builderElement = memoize(() -> {

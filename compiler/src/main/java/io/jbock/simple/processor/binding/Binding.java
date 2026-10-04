@@ -1,13 +1,11 @@
 package io.jbock.simple.processor.binding;
 
 import com.palantir.javapoet.CodeBlock;
-import com.palantir.javapoet.ParameterSpec;
 import io.jbock.simple.processor.writing.NamedBinding;
+
+import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import javax.lang.model.element.Element;
 
 /**
  * A node in the dependency graph.
@@ -16,7 +14,8 @@ import javax.lang.model.element.Element;
  * From the constructor's perspective, each of its parameters is an "incoming edge"
  * which connects it to another "node".
  */
-public abstract class Binding {
+public abstract sealed class Binding
+        permits InjectBinding, ParameterBinding, ProviderBinding {
 
     private final Key key;
 
@@ -34,7 +33,7 @@ public abstract class Binding {
 
     @Override
     public final int hashCode() {
-        return Objects.hash(key);
+        return key.hashCode();
     }
 
     public final Key key() {
@@ -46,7 +45,6 @@ public abstract class Binding {
     public abstract List<DependencyRequest> requests();
 
     public abstract CodeBlock invocation(
-            Function<Key, ParameterSpec> names,
             Map<Key, NamedBinding> bindings,
             boolean paramsAreFields);
 

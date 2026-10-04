@@ -36,9 +36,9 @@ public class GraphFactory {
     }
 
     private Optional<Binding> getBindingUncached(Key key) {
-        Optional<Binding> parameterBinding = keyFactory.parameterBinding(key);
-        if (parameterBinding.isPresent()) {
-            return parameterBinding;
+        Binding parameterBinding = keyFactory.parameterBindings().get(key);
+        if (parameterBinding != null) {
+            return Optional.of(parameterBinding);
         }
         InjectBinding providesBinding = keyFactory.providesBindings().get(key);
         if (providesBinding != null) {
@@ -61,8 +61,10 @@ public class GraphFactory {
             return Optional.empty();
         }
         ProviderType provider = providerType.orElseThrow();
-        Key innerKey = key.changeType(provider.innerType());
-        return keyFactory.parameterBinding(innerKey).or(() -> Optional.ofNullable(keyFactory.providesBindings().get(innerKey))).or(() -> injectBindingFactory.binding(innerKey)).map(b -> new ProviderBinding(key, b, provider));
+        Key innerKey = key.withType(provider.innerType());
+        return keyFactory.parameterBinding(innerKey).or(() -> Optional.ofNullable(keyFactory.providesBindings().get(innerKey)))
+                .or(() -> injectBindingFactory.binding(innerKey))
+                .map(b -> new ProviderBinding(key, b, provider));
     }
 
     Graph getGraph(DependencyRequest request) {

@@ -17,13 +17,13 @@ import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.binding.ParameterBinding;
+
+import javax.annotation.processing.Generated;
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import javax.annotation.processing.Generated;
-import javax.lang.model.element.Modifier;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
@@ -40,7 +40,6 @@ public class ComponentImpl {
     private final KeyFactory keyFactory;
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
-    private final Function<Key, ParameterSpec> names;
     private final MockBuilder mockBuilder;
     private final BuilderImpl builderImpl;
     private final FactoryImpl factoryImpl;
@@ -57,7 +56,6 @@ public class ComponentImpl {
         this.keyFactory = keyFactory;
         this.component = component;
         this.sorted = context.sorted();
-        this.names = context.names();
         this.modifiers = component.element().getModifiers().stream()
                 .filter(m -> m == PUBLIC).toArray(Modifier[]::new);
         this.mockBuilder = mockBuilder;
@@ -143,10 +141,10 @@ public class ComponentImpl {
         for (NamedBinding namedBinding : sorted.values()) {
             Binding b = namedBinding.binding();
             Key key = b.key();
-            CodeBlock invocation = b.invocation(names, sorted, true);
-            ParameterSpec param = names.apply(key);
+            CodeBlock invocation = b.invocation(sorted, true);
+            ParameterSpec param = namedBinding.parameter();
             if (namedBinding.isComponentRequest()) {
-                constructorParameters.add(CodeBlock.of("$N", names.apply(key)));
+                constructorParameters.add(CodeBlock.of("$N", namedBinding.parameter()));
             }
             method.addStatement("$T $N = $L", key.typeName(), param, invocation);
         }
@@ -180,7 +178,7 @@ public class ComponentImpl {
             if (!(b instanceof ParameterBinding)) {
                 continue;
             }
-            ParameterSpec param = names.apply(b.key());
+            ParameterSpec param = namedBinding.parameter();
             constructorParameters.add(CodeBlock.of("$N", param));
         }
         if (component.publicMockBuilder()) {
@@ -212,7 +210,7 @@ public class ComponentImpl {
             if (!namedBinding.isComponentRequest()) {
                 continue;
             }
-            ParameterSpec param = names.apply(namedBinding.binding().key());
+            ParameterSpec param = namedBinding.parameter();
             constructor.addParameter(param);
             constructor.addStatement("this.$1N = $1N", param);
         }

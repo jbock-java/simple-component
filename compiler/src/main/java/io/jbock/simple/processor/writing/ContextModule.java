@@ -1,6 +1,5 @@
 package io.jbock.simple.processor.writing;
 
-import com.palantir.javapoet.ParameterSpec;
 import io.jbock.simple.Modulus;
 import io.jbock.simple.Provides;
 import io.jbock.simple.processor.binding.Binding;
@@ -10,11 +9,9 @@ import io.jbock.simple.processor.graph.TopologicalSorter;
 import io.jbock.simple.processor.util.UniqueNameSet;
 
 import javax.lang.model.SourceVersion;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 @Modulus
 public interface ContextModule {
@@ -25,7 +22,7 @@ public interface ContextModule {
             KeyFactory keyFactory) {
         List<Binding> bindings = topologicalSorter.sortedBindings();
         Map<Key, NamedBinding> sorted = ContextModule.addNames(keyFactory, bindings);
-        return new Context(sorted, ContextModule.createNames(sorted));
+        return new Context(sorted);
     }
 
     private static Map<Key, NamedBinding> addNames(
@@ -42,17 +39,6 @@ public interface ContextModule {
             result.put(b.key(), new NamedBinding(b, name, auxName, keyFactory.isComponentRequest(b)));
         }
         return result;
-    }
-
-    private static Function<Key, ParameterSpec> createNames(
-            Map<Key, NamedBinding> sorted) {
-        Map<Key, ParameterSpec> cache = new HashMap<>();
-        return key -> {
-            return cache.computeIfAbsent(key, k -> {
-                String name = sorted.get(k).name();
-                return ParameterSpec.builder(k.typeName(), name).build();
-            });
-        };
     }
 
     private static String validJavaName(String name) {
