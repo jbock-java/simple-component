@@ -7,19 +7,18 @@ import io.jbock.simple.processor.util.ValidationFailure;
 import io.jbock.simple.processor.validation.ExecutableElementValidator;
 import io.jbock.simple.processor.validation.InjectBindingValidator;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static javax.lang.model.util.ElementFilter.constructorsIn;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
-import static javax.lang.model.util.ElementFilter.methodsIn;
 
 public class InjectStep implements Step {
 
@@ -58,11 +57,6 @@ public class InjectStep implements Step {
                 executableElementValidator.validate(constructor);
                 validator.validateConstructor(constructor);
                 bindingRegistry.register(constructor);
-            }
-            for (ExecutableElement method : methodsIn(elements)) {
-                executableElementValidator.validate(method);
-                validator.validateStaticMethod(method);
-                bindingRegistry.register(method);
             }
             for (TypeElement tel : ElementFilter.typesIn(elements)) {
                 List<ExecutableElement> constructors = constructorsIn(tel.getEnclosedElements());

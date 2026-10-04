@@ -31,12 +31,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public @interface Component {
 
     /**
-     * A list of classes annotated with {@link Modulus} whose bindings are used to generate the
-     * component implementation.
-     */
-    Class<?>[] modules() default {};
-
-    /**
      * A factory for a component. Components <em>may</em> have a single nested {@code interface}
      * annotated with {@code @Component.Factory}.
      *
@@ -80,21 +74,7 @@ public @interface Component {
 
     /**
      * By default, the {@code mockBuilder} (or {@code withMocks}) method is only package-private.
-     * This makes it harder to accidentally invoke from production code.
-     *
-     * <p>In test code, {@code mockBuilder} can always be invoked, even if it is only package-visible,
-     * by placing a forwarding delegate class in the correct package.
-     * For example, if {@code MyComponent} is defined in package {@code com.my.component},
-     * the forwarding delegate class could live in {@code src/test/java/com/my/component} and look
-     * like this:
-     *
-     * <pre>{@code
-     * public class MyComponentAccess {
-     *   public static MyComponent_Impl.MockBuilder mockBuilder() {
-     *       return MyComponent_Impl.mockBuilder();
-     *   }
-     * }
-     * }</pre>
+     * This makes it less likely to be accidentally invoked from production code.
      *
      * @return {@code true} if the {@code mockBuilder} (or {@code withMocks}) method
      * should have the same visibility as the component.

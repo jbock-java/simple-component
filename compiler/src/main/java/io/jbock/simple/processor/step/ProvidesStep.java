@@ -1,21 +1,19 @@
 package io.jbock.simple.processor.step;
 
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
-import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
-import io.jbock.simple.Modulus;
 import io.jbock.simple.Provides;
 import io.jbock.simple.processor.util.ValidationFailure;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ProvidesStep implements Step {
 
@@ -40,7 +38,7 @@ public class ProvidesStep implements Step {
         try {
             List<Element> elements = elementsByAnnotation.values().stream()
                     .flatMap(Set::stream)
-                    .collect(Collectors.toList());
+                    .toList();
             List<ExecutableElement> methods = ElementFilter.methodsIn(elements);
             for (ExecutableElement m : methods) {
                 if (!m.getModifiers().contains(Modifier.STATIC)) {
@@ -48,10 +46,6 @@ public class ProvidesStep implements Step {
                 }
                 if (m.getReturnType().getKind() == TypeKind.VOID) {
                     throw new ValidationFailure("The @Provides method may not return void", m);
-                }
-                Element enclosing = m.getEnclosingElement();
-                if (enclosing.getAnnotation(Component.class) == null && enclosing.getAnnotation(Modulus.class) == null) {
-                    throw new ValidationFailure("The @Provides method must be nested inside a @Component or @Modulus", m);
                 }
                 bindingRegistry.register(m);
             }

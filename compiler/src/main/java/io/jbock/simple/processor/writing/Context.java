@@ -8,7 +8,7 @@ public final class Context {
 
     private final Map<Key, NamedBinding> sorted;
 
-    Context(Map<Key, NamedBinding> sorted) {
+    public Context(Map<Key, NamedBinding> sorted) {
         this.sorted = sorted;
     }
 

@@ -26,6 +26,6 @@ class BindingValidationTest {
                 "}");
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("The @Provides method must be nested inside a @Component or @Modulus");
+        assertThat(compilation).hadErrorContaining("Duplicate binding for test.TestClass");
     }
 }

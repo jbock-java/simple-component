@@ -121,9 +121,6 @@ public class KeyFactory {
 
     private final Supplier<Map<Key, InjectBinding>> providesBindings = memoize(() -> {
         List<ExecutableElement> methods = new ArrayList<>(methodsIn(componentElement().element().getEnclosedElements()));
-        for (TypeElement module : componentElement().modules()) {
-            methods.addAll(methodsIn(module.getEnclosedElements()));
-        }
         Map<Key, InjectBinding> result = new LinkedHashMap<>();
         for (ExecutableElement method : methods) {
             if (!hasProvidesOrInjectAnnotation(method)) {

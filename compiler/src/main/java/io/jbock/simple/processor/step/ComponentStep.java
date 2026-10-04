@@ -4,7 +4,6 @@ import com.palantir.javapoet.TypeSpec;
 import io.jbock.auto.common.BasicAnnotationProcessor.Step;
 import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
-import io.jbock.simple.Modulus;
 import io.jbock.simple.processor.ContextComponent;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.util.SpecWriter;
@@ -71,11 +70,6 @@ public class ComponentStep implements Step {
         typeElementValidator.validate(typeElement);
         ContextComponent context = contextComponentFactory.create(typeElement);
         KeyFactory keyFactory = context.keyFactory();
-        for (TypeElement module : context.componentElement().modules()) {
-            if (module.getAnnotation(Modulus.class) == null) {
-                throw new ValidationFailure("The module must be annotated with @Modulus", typeElement);
-            }
-        }
         keyFactory.factoryElement().ifPresent(factory -> {
             ExecutableElement method = factory.singleAbstractMethod();
             if (!tool.types().isSameType(method.getReturnType(), typeElement.asType())) {
