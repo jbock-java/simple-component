@@ -8,22 +8,24 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * <p>Annotates an interface for which a dependency-injected
- * implementation is to be generated. The generated class will
- * have the name of the type annotated, appended with {@code _Impl}. For
- * example, {@code @Component interface MyComponent {...}} will produce an implementation named
- * {@code MyComponent_Impl}.
+ * implementation should be generated. The generated class will
+ * have the name of the annotated interface, plus the suffix {@code _Impl}. For
+ * example, if the annotated interface is called {@code interface MyComponent},
+ * the generated implementation will be called
+ * {@code class MyComponent_Impl implement MyComponent}.
  *
- * <h2>Component methods</h2>
+ * <h2>Component methods
  *
- * <p>Every type annotated with {@code @Component} must contain at least one abstract component
- * method. Component methods may have any name, but must have no parameters and return a bound type.
- * A bound type is one of the following:
+ * <p>Every type annotated with {@code @Component} must contain at least one nullary abstract
+ * method. The type returned by this method must be either
  *
  * <ul>
- *     <li>an {@link Inject injected} type
- *     <li>a {@link Provides provided} type
- *     <li>the type of one of the parameters of the {@link Component.Factory factory method}
- *     <li>{@code Provider<T>}, where {@code T} is one of the types described above
+ *     <li>a class or record annotated with {@code @Inject}
+ *     <li>a {@code @Provides}-annotated method's return type
+ *     <li>the parameter type of one of the parameters of the SAM of a
+ *         component factory interface
+ *     <li>the parameter type of one of the setters of a
+ *         component builder interface
  * </ul>
  */
 @Target(TYPE)
@@ -31,14 +33,15 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public @interface Component {
 
     /**
-     * A factory for a component. Components <em>may</em> have a single nested {@code interface}
-     * annotated with {@code @Component.Factory}.
+     * Annotation for a component factory interface. This interface must be nested directly
+     * inside the component interface.
      *
-     * <p>A factory is an interface with a single method that returns a new component instance each time it
-     * is called. The parameters of that method provide the bound instances
-     * required by the component.
+     * <p>The factory interface must be a single-abstract-method interface, and its single method must return
+     * the component type.
+     * The runtime parameters of this method will be available for injection.
      *
-     * <p>The generated implementation of the factory will be immutable.
+     * <p>The implementation of the factory interface is immutable and can be re-used to create
+     * more component instances.
      */
     @Target(TYPE)
     @Retention(SOURCE)
@@ -46,38 +49,18 @@ public @interface Component {
     }
 
     /**
-     * A builder for a component. Components <em>may</em> have a single nested {@code interface}
-     * annotated with {@code @Component.Builder}.
+     * Annotation for a component builder interface. This interface must be nested directly
+     * inside the component interface.
      *
-     * <p>The builder is an interface with zero or more setter methods that return the builder type.
-     * Additionally, there must be exactly one abstract no-argument method that returns the component
-     * type, called the "build method". The setter methods provide the bound instances
-     * required by the component.
+     * <p>The builder interface can have any number of unary abstract methods which must return the builder type.
+     * Additionally, there must be exactly one nullary abstract method which returns the component
+     * type. The runtime parameters of the setter methods will be available for injection.
      *
-     * <p>If the {@code mockBuilder} attribute is {@code true}, then the generated implementation
-     * of the builder will contain an additional method called {@code withMocks} which
-     * returns a new {@code MockBuilder}.
+     * <p>The implementation of the builder interface is immutable and can be re-used to create
+     * more component instances.
      */
     @Retention(SOURCE)
     @Target(TYPE)
     @interface Builder {
     }
-
-    /**
-     * If {@code true}, the generated component implementation will contain
-     * a static {@code mockBuilder} method. However, if this component uses a {@code Builder},
-     * the {@code mockBuilder} method will not be generated; see {@linkplain Builder}.
-     *
-     * @return {@code true} if the {@code mockBuilder} method should be generated.
-     */
-    boolean mockBuilder() default false;
-
-    /**
-     * By default, the {@code mockBuilder} (or {@code withMocks}) method is only package-private.
-     * This makes it less likely to be accidentally invoked from production code.
-     *
-     * @return {@code true} if the {@code mockBuilder} (or {@code withMocks}) method
-     * should have the same visibility as the component.
-     */
-    boolean publicMockBuilder() default false;
 }

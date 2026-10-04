@@ -1,11 +1,12 @@
 package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.KeyFactory;
+import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.binding.ParameterBinding;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -42,11 +43,11 @@ public final class TopologicalSorter {
                 validator.checkAccessible(binding.element());
             }
         }
-        return sort(graph);
+        return kahnSort(graph);
     }
 
     // https://en.wikipedia.org/wiki/Topological_sorting
-    List<Node> sort(Graph graph) {
+    List<Node> kahnSort(Graph graph) {
         List<Node> result = new ArrayList<>(graph.nodes().size());
         Deque<Node> s = new ArrayDeque<>(graph.startNodes());
         while (!s.isEmpty()) {

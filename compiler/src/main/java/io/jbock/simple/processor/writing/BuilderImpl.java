@@ -37,14 +37,11 @@ public final class BuilderImpl {
         this.sorted = context.sorted();
     }
 
-    TypeSpec generate(BuilderElement builder, MockBuilder mockBuilder) {
+    TypeSpec generate(BuilderElement builder) {
         TypeMirror builderType = builder.element().asType();
         TypeSpec.Builder spec = TypeSpec.classBuilder(builder.generatedClass());
         spec.addFields(fields());
         spec.addMethods(setterMethods(builder));
-        if (component.mockBuilder()) {
-            spec.addMethod(generateWithMocksMethod(mockBuilder));
-        }
         spec.addModifiers(PUBLIC, STATIC, FINAL);
         spec.addSuperinterface(builderType);
         spec.addMethod(generateBuildMethod(builder));
@@ -69,26 +66,6 @@ public final class BuilderImpl {
         buildMethod.addStatement("return new $T($L)", component.generatedClass(), constructorParameters().stream()
                 .collect(CodeBlock.joining(", ")));
         return buildMethod.build();
-    }
-
-    private MethodSpec generateWithMocksMethod(MockBuilder mockBuilder) {
-        MethodSpec.Builder method = MethodSpec.methodBuilder("withMocks");
-        List<CodeBlock> constructorParameters = new ArrayList<>();
-        for (NamedBinding namedBinding : sorted.values()) {
-            Node b = namedBinding.binding();
-            if (!(b instanceof ParameterBinding)) {
-                continue;
-            }
-            ParameterSpec param = namedBinding.parameter();
-            constructorParameters.add(CodeBlock.of("this.$N", param));
-        }
-        if (component.publicMockBuilder()) {
-            method.addModifiers(PUBLIC);
-        }
-        method.returns(mockBuilder.getClassName());
-        method.addStatement("return new $T($L)", mockBuilder.getClassName(),
-                constructorParameters.stream().collect(CodeBlock.joining(", ")));
-        return method.build();
     }
 
     private List<FieldSpec> fields() {
