@@ -2,12 +2,13 @@ package io.jbock.simple.processor.binding;
 
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.util.TypeTool;
+
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 
 import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 
@@ -44,7 +45,7 @@ public final class InjectBindingFactory {
         return result;
     }
 
-    public Optional<Binding> binding(Key key) {
+    public Optional<InjectBinding> binding(Key key) {
         return tool.types().asElement(key.type())
                 .map(TYPE_ELEMENT_VISITOR::visit)
                 .flatMap(typeElement -> {

@@ -9,17 +9,21 @@ import java.util.Map;
 
 /**
  * A node in the dependency graph.
- * For instance, consider an {@code @Inject}-annotated constructor.
- * The constructor itself is a "node".
- * From the constructor's perspective, each of its parameters is an "incoming edge"
- * which connects it to another "node".
+ *
+ * <h1>Motivating example:
+ *
+ * <p>Consider an {@code @Inject}-annotated record.
+ * The {@code @Inject} annotation makes the type of the record a node.
+ * The types of the record's constructor parameters must also be nodes.
+ * Each parameter declares an edge connecting the record's node
+ * to its own type's node.
  */
-public abstract sealed class Binding
-        permits InjectBinding, ParameterBinding, ProviderBinding {
+public abstract sealed class Node
+        permits InjectBinding, ParameterBinding {
 
     private final Key key;
 
-    Binding(Key key) {
+    Node(Key key) {
         this.key = key;
     }
 
@@ -27,7 +31,7 @@ public abstract sealed class Binding
     public final boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Binding binding = (Binding) o;
+        Node binding = (Node) o;
         return key.equals(binding.key);
     }
 

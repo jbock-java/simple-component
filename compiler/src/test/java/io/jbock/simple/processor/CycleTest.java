@@ -56,50 +56,6 @@ class CycleTest {
     }
 
     @Test
-    void providerCycle() {
-        JavaFileObject component = forSourceLines("test.TestClass",
-                "package test;",
-                "",
-                "import io.jbock.simple.Component;",
-                "import io.jbock.simple.Inject;",
-                "import java.util.function.Supplier;",
-                "",
-                "final class TestClass {",
-                "  static class A {",
-                "    @Inject A(B b) {}",
-                "  }",
-                "",
-                "  static class B {",
-                "    @Inject B(C c) {}",
-                "  }",
-                "",
-                "  static class C {",
-                "    @Inject C(D d) {}",
-                "  }",
-                "",
-                "  static class D {",
-                "    @Inject D(Supplier<B> bProvider) {}",
-                "  }",
-                "",
-                "  @Component",
-                "  interface AComponent {",
-                "    A getA();",
-                "  }",
-                "}");
-
-        Compilation compilation = simpleCompiler().compile(component);
-        assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining(message(
-                "Found a dependency cycle:",
-                "    test.TestClass.C is injected at",
-                "        B(test.TestClass.C)",
-                "    java.util.function.Supplier<test.TestClass.B> is injected at",
-                "        D(java.util.function.Supplier<test.TestClass.B>)",
-                "    test.TestClass.D is injected at",
-                "        C(test.TestClass.D)"));
-    }
-
-    @Test
     void providerProvider() {
         JavaFileObject component = forSourceLines("test.TestClass",
                 "package test;",

@@ -1,15 +1,12 @@
 package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.InjectBinding;
 import io.jbock.simple.processor.binding.InjectBindingFactory;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
-import io.jbock.simple.processor.binding.ProviderBinding;
-import io.jbock.simple.processor.util.ProviderType;
-import io.jbock.simple.processor.util.TypeTool;
+import io.jbock.simple.processor.binding.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,22 +18,23 @@ import java.util.Set;
 
 public class GraphFactory {
 
-    private final TypeTool tool;
     private final KeyFactory keyFactory;
     private final InjectBindingFactory injectBindingFactory;
-    private final Map<Key, Optional<Binding>> bindingCache = new HashMap<>();
+    private final Map<Key, Optional<? extends Node>> bindingCache = new HashMap<>();
     private final MissingBindingPrinter missingBindingPrinter;
 
     @Inject
-    public GraphFactory(TypeTool tool, KeyFactory keyFactory, InjectBindingFactory injectBindingFactory, MissingBindingPrinter missingBindingPrinter) {
-        this.tool = tool;
+    public GraphFactory(
+            KeyFactory keyFactory,
+            InjectBindingFactory injectBindingFactory,
+            MissingBindingPrinter missingBindingPrinter) {
         this.keyFactory = keyFactory;
         this.injectBindingFactory = injectBindingFactory;
         this.missingBindingPrinter = missingBindingPrinter;
     }
 
-    private Optional<Binding> getBindingUncached(Key key) {
-        Binding parameterBinding = keyFactory.parameterBindings().get(key);
+    private Optional<? extends Node> getBindingMiss(Key key) {
+        Node parameterBinding = keyFactory.parameterBindings().get(key);
         if (parameterBinding != null) {
             return Optional.of(parameterBinding);
         }
@@ -44,45 +42,29 @@ public class GraphFactory {
         if (providesBinding != null) {
             return Optional.of(providesBinding);
         }
-        Optional<Binding> injectBinding = injectBindingFactory.binding(key);
-        if (injectBinding.isPresent()) {
-            return injectBinding;
-        }
-        return providerBinding(key);
+        return injectBindingFactory.binding(key);
     }
 
-    private Optional<Binding> getBinding(DependencyRequest request) {
-        return bindingCache.computeIfAbsent(request.key(), this::getBindingUncached);
-    }
-
-    private Optional<Binding> providerBinding(Key key) {
-        Optional<ProviderType> providerType = tool.getProviderType(key.type());
-        if (providerType.isEmpty()) {
-            return Optional.empty();
-        }
-        ProviderType provider = providerType.orElseThrow();
-        Key innerKey = key.withType(provider.innerType());
-        return keyFactory.parameterBinding(innerKey).or(() -> Optional.ofNullable(keyFactory.providesBindings().get(innerKey)))
-                .or(() -> injectBindingFactory.binding(innerKey))
-                .map(b -> new ProviderBinding(key, b, provider));
+    private Optional<? extends Node> getBinding(DependencyRequest request) {
+        return bindingCache.computeIfAbsent(request.key(), this::getBindingMiss);
     }
 
     Graph getGraph(DependencyRequest request) {
         List<DependencyRequest> dependencyTrace = List.of(request);
-        Binding startNode = getBinding(request).orElseThrow(() -> missingBindingPrinter.fail(dependencyTrace));
+        Node startNode = getBinding(request).orElseThrow(() -> missingBindingPrinter.fail(dependencyTrace));
         Set<Edge> edges = new LinkedHashSet<>();
-        Set<Binding> nodes = new LinkedHashSet<>();
+        Set<Node> nodes = new LinkedHashSet<>();
         nodes.add(startNode);
         addDependencies(dependencyTrace, nodes, edges, startNode);
         return new Graph(edges, nodes);
     }
 
-    private void addDependencies(List<DependencyRequest> trace, Set<Binding> nodes, Set<Edge> edges, Binding node) {
+    private void addDependencies(List<DependencyRequest> trace, Set<Node> nodes, Set<Edge> edges, Node node) {
         for (DependencyRequest request : node.requests()) {
             List<DependencyRequest> dependencyTrace = new ArrayList<>(trace.size() + 1);
             dependencyTrace.addAll(trace);
             dependencyTrace.add(request);
-            Binding dependency = getBinding(request).orElseThrow(() -> missingBindingPrinter.fail(dependencyTrace));
+            Node dependency = getBinding(request).orElseThrow(() -> missingBindingPrinter.fail(dependencyTrace));
             Edge edge = new Edge(dependency, node);
             edges.add(edge);
             if (!nodes.add(dependency)) {

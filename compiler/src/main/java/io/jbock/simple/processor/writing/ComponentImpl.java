@@ -9,7 +9,7 @@ import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
 import io.jbock.simple.processor.SimpleComponentProcessor;
-import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.binding.BuilderElement;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
@@ -139,7 +139,7 @@ public class ComponentImpl {
         List<CodeBlock> constructorParameters = new ArrayList<>();
         MethodSpec.Builder method = MethodSpec.methodBuilder(CREATE_METHOD);
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             Key key = b.key();
             CodeBlock invocation = b.invocation(sorted, true);
             ParameterSpec param = namedBinding.parameter();
@@ -174,7 +174,7 @@ public class ComponentImpl {
         MethodSpec.Builder method = MethodSpec.methodBuilder(MOCK_BUILDER_METHOD);
         List<CodeBlock> constructorParameters = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             if (!(b instanceof ParameterBinding)) {
                 continue;
             }

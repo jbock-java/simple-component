@@ -7,7 +7,7 @@ import com.palantir.javapoet.ParameterSpec;
 import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.binding.BuilderElement;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.Key;
@@ -54,7 +54,7 @@ public final class BuilderImpl {
     private MethodSpec generateBuildMethod(BuilderElement builder) {
         MethodSpec.Builder buildMethod = MethodSpec.methodBuilder(builder.buildMethod().getSimpleName().toString());
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             Key key = b.key();
             CodeBlock invocation = b.invocation(sorted, true);
             ParameterSpec param = namedBinding.parameter();
@@ -75,7 +75,7 @@ public final class BuilderImpl {
         MethodSpec.Builder method = MethodSpec.methodBuilder("withMocks");
         List<CodeBlock> constructorParameters = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             if (!(b instanceof ParameterBinding)) {
                 continue;
             }
@@ -94,7 +94,7 @@ public final class BuilderImpl {
     private List<FieldSpec> fields() {
         List<FieldSpec> result = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             if (b instanceof ParameterBinding) {
                 result.add(FieldSpec.builder(b.key().typeName(), namedBinding.parameter().name()).build());
             }
@@ -105,7 +105,7 @@ public final class BuilderImpl {
     private List<MethodSpec> setterMethods(BuilderElement builder) {
         List<MethodSpec> result = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             if (!(b instanceof ParameterBinding)) {
                 continue;
             }
@@ -125,7 +125,7 @@ public final class BuilderImpl {
     private List<CodeBlock> constructorParameters() {
         List<CodeBlock> result = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             if (namedBinding.isComponentRequest()) {
                 result.add(CodeBlock.of("$N", namedBinding.parameter()));
             }

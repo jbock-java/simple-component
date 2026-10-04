@@ -86,19 +86,15 @@ assertEquals(List.of(
 
 There are no "subcomponents" or "component dependencies".
 
-There is no `@Module`, but you can still have `@Provides` methods, only you declare them directly in your component.
-A `@Provides` method must be `static`.
+`@Module` is called `@Modulus`.
 
-There is no `@Binds`.
-It can be emulated with a `@Provides` method, or, if you control the source code of the interface, a static `@Inject` method.
+There is no `@Binds`.  Use a `@Provides` method.
 
-There is no need for the `@BindsInstance` annotation. Every factory parameter or builder parameter is a bound instance.
+There is no `Provider`. Create a factory if you need one.
 
-There is no `@AssistedInject`, it's a can of worms.
+There is no `@IntoList` or `@IntoSet`. Collections can be assembled in a `@Provides` method.
 
-There is no `@IntoList` or `@IntoSet`, you can return these collections from a `@Provides` method.
-
-There is no `Lazy<T>`, please check if `Provider<T>` covers your use case.
+There is no `@Lazy`, `@BindsInstance` or `@AssistedInject`. I don't even know what these do.
 
 ### Samples
 

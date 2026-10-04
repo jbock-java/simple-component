@@ -1,7 +1,7 @@
 package io.jbock.simple.processor.writing;
 
 import com.palantir.javapoet.ParameterSpec;
-import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.Node;
 
 import java.util.function.Supplier;
 
@@ -9,7 +9,7 @@ import static io.jbock.simple.processor.util.Suppliers.memoize;
 
 public final class NamedBinding {
 
-    private final Binding binding;
+    private final Node binding;
     private final String name;
     private final String auxName;
     private final boolean componentRequest;
@@ -20,7 +20,7 @@ public final class NamedBinding {
     });
 
     public NamedBinding(
-            Binding binding,
+            Node binding,
             String name,
             String auxName,
             boolean componentRequest) {
@@ -30,7 +30,7 @@ public final class NamedBinding {
         this.componentRequest = componentRequest;
     }
 
-    public Binding binding() {
+    public Node binding() {
         return binding;
     }
 

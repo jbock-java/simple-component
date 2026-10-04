@@ -14,15 +14,14 @@ import javax.lang.model.element.TypeElement;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static io.jbock.simple.processor.util.Suppliers.memoize;
 
 /**
- * This class represents either a {@code @Inject}-annotated constructor
- * or a {@code @Inject}-annotated static method.
+ * This class represents an {@code @Inject}-annotated constructor,
+ * class or record, or a {@code @Provides}-annotated static method.
  */
-public final class InjectBinding extends Binding {
+public final class InjectBinding extends Node {
 
     private final ExecutableElement bindingElement;
 
@@ -84,7 +83,7 @@ public final class InjectBinding extends Binding {
 
     private final Supplier<List<DependencyRequest>> requests = memoize(() -> element().getParameters().stream()
             .map(parameter -> new DependencyRequest(keyFactory().getKey(parameter), parameter, element()))
-            .collect(Collectors.toList()));
+            .toList());
 
     InjectBinding(
             Key key,
@@ -124,11 +123,13 @@ public final class InjectBinding extends Binding {
                             CodeBlock.of("$N", param);
                 })
                 .collect(CodeBlock.joining(", "));
+        CodeBlock result;
         if (bindingElement.getKind() == ElementKind.CONSTRUCTOR) {
-            return CodeBlock.of("new $T($L)", bindingElement.getEnclosingElement().asType(), params);
+            result = CodeBlock.of("new $T($L)", bindingElement.getEnclosingElement().asType(), params);
         } else {
-            return CodeBlock.of("$T.$L($L)", bindingElement.getEnclosingElement().asType(), bindingElement.getSimpleName().toString(), params);
+            result = CodeBlock.of("$T.$L($L)", bindingElement.getEnclosingElement().asType(), bindingElement.getSimpleName().toString(), params);
         }
+        return result;
     }
 
     @Override

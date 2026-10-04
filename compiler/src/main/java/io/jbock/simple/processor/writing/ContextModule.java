@@ -2,7 +2,7 @@ package io.jbock.simple.processor.writing;
 
 import io.jbock.simple.Modulus;
 import io.jbock.simple.Provides;
-import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.KeyFactory;
 import io.jbock.simple.processor.graph.TopologicalSorter;
@@ -20,20 +20,20 @@ public interface ContextModule {
     static Context createContext(
             TopologicalSorter topologicalSorter,
             KeyFactory keyFactory) {
-        List<Binding> bindings = topologicalSorter.sortedBindings();
+        List<Node> bindings = topologicalSorter.sortedBindings();
         Map<Key, NamedBinding> sorted = ContextModule.addNames(keyFactory, bindings);
         return new Context(sorted);
     }
 
     private static Map<Key, NamedBinding> addNames(
             KeyFactory keyFactory,
-            List<Binding> bindings) {
+            List<Node> bindings) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
         uniqueNameSet.claim("mockBuilder");
         uniqueNameSet.claim("withMocks");
         uniqueNameSet.claim("build");
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
-        for (Binding b : bindings) {
+        for (Node b : bindings) {
             String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));
             String auxName = uniqueNameSet.getUniqueName(name + "_isSet");
             result.put(b.key(), new NamedBinding(b, name, auxName, keyFactory.isComponentRequest(b)));

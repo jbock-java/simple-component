@@ -106,7 +106,6 @@ class ProvidesTest {
                         "}");
     }
 
-
     @Test
     void nonstaticProvidesMethod() {
         JavaFileObject component = forSourceLines("test.TestClass",
@@ -136,5 +135,22 @@ class ProvidesTest {
         Compilation compilation = simpleCompiler().compile(component);
         assertThat(compilation).failed();
         assertThat(compilation).hadErrorContaining("The @Provides method must be static");
+    }
+
+    @Test
+    void simpleProvides() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "import io.jbock.simple.Component;",
+                "import io.jbock.simple.Provides;",
+                "",
+                "@Component",
+                "interface TestClass {",
+                "    int getInt();",
+                "    @Provides static int provideInt() { return 5; }",
+                "}");
+
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
     }
 }

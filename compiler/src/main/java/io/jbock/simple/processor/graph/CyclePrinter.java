@@ -1,8 +1,8 @@
 package io.jbock.simple.processor.graph;
 
-import io.jbock.simple.processor.binding.Binding;
-import io.jbock.simple.processor.binding.ProviderBinding;
+import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.util.ValidationFailure;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,11 +26,11 @@ final class CyclePrinter {
         return new ValidationFailure(report.message, report.binding.element());
     }
 
-    private record Report(String message, Binding binding) {
+    private record Report(String message, Node binding) {
     }
 
     private Report createReport() {
-        for (Binding binding : graph.nodes()) {
+        for (Node binding : graph.nodes()) {
             Optional<List<Edge>> cycle = findProperCycle(binding);
             if (cycle.isPresent()) {
                 return new Report(createReport(cycle.orElseThrow()), binding);
@@ -43,35 +43,30 @@ final class CyclePrinter {
         List<String> message = new ArrayList<>();
         message.add("Found a dependency cycle:");
         for (Edge edge : cycle) {
-            Binding destination = edge.destination();
-            if (destination instanceof ProviderBinding b) {
-                message.add(INDENT + edge.source().key().typeName() + " is injected at");
-                message.add(DOUBLE_INDENT + bindingElementToString(b.sourceBinding().element()));
-                continue;
-            }
+            Node destination = edge.destination();
             message.add(INDENT + edge.source().key().typeName() + " is injected at");
             message.add(DOUBLE_INDENT + bindingElementToString(destination.element()));
         }
         return String.join("\n", message);
     }
 
-    private Optional<List<Edge>> findProperCycle(Binding node) {
-        Set<Binding> seen = new LinkedHashSet<>();
+    private Optional<List<Edge>> findProperCycle(Node node) {
+        Set<Node> seen = new LinkedHashSet<>();
         seen.add(node);
         List<Edge> cycle = findCycle(node, List.of(), seen);
         if (cycle.isEmpty()) {
             return Optional.empty();
         }
-        if (!cycle.get(cycle.size() - 1).destination().equals(node)) {
+        if (!cycle.getLast().destination().equals(node)) {
             return Optional.empty();
         }
         return Optional.of(cycle);
     }
 
     private List<Edge> findCycle(
-            Binding node,
+            Node node,
             List<Edge> current,
-            Set<Binding> seen) {
+            Set<Node> seen) {
         List<Edge> edgesFrom = graph.edgesFrom(node);
         for (Edge edge : edgesFrom) {
             List<Edge> appended = append(current, edge);

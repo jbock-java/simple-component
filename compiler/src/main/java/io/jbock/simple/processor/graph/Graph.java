@@ -1,12 +1,12 @@
 package io.jbock.simple.processor.graph;
 
-import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.Node;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-record Graph(Set<Edge> edges, Set<Binding> nodes) {
+record Graph(Set<Edge> edges, Set<Node> nodes) {
 
     void addAll(Graph other) {
         edges.addAll(other.edges);
@@ -17,15 +17,15 @@ record Graph(Set<Edge> edges, Set<Binding> nodes) {
         return new Graph(new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
-    List<Edge> edgesFrom(Binding n) {
+    List<Edge> edgesFrom(Node n) {
         return edges.stream().filter(edge -> edge.source().equals(n)).collect(Collectors.toList());
     }
 
-    List<Edge> edgesTo(Binding m) {
+    List<Edge> edgesTo(Node m) {
         return edges.stream().filter(edge -> edge.destination().equals(m)).collect(Collectors.toList());
     }
 
-    List<Binding> startNodes() {
+    List<Node> startNodes() {
         return nodes.stream()
                 .filter(r -> edgesTo(r).isEmpty())
                 .collect(Collectors.toList());

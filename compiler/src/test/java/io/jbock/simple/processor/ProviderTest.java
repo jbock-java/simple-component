@@ -56,7 +56,7 @@ class ProviderTest {
                 "",
                 "final class TestClass {",
                 "  static class A {",
-                "    @Inject A(@Named(\"b\") Supplier<B> bProvider, @Named(\"b\") B b) {}",
+                "    @Inject A(@Named(\"b\") B bProvider, @Named(\"b\") B b) {}",
                 "  }",
                 "",
                 "  static class B {",
@@ -96,13 +96,12 @@ class ProviderTest {
                 "",
                 "import io.jbock.simple.Component;",
                 "import io.jbock.simple.Inject;",
-                "import java.util.function.Supplier;",
                 "import io.jbock.simple.Provides;",
                 "import io.jbock.simple.Named;",
                 "",
                 "final class TestClass {",
                 "  static class A {",
-                "    @Inject A(Supplier<B> bProvider, @Named(\"b\") Supplier<B> b) {}",
+                "    @Inject A(B bProvider, @Named(\"b\") B b) {}",
                 "  }",
                 "",
                 "  static class B {",
@@ -139,5 +138,42 @@ class ProviderTest {
                         "    return testClassA;",
                         "  }",
                         "}");
+    }
+
+    @Test
+    void simpleProvider() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "import io.jbock.simple.Component;",
+                "import io.jbock.simple.Provides;",
+                "import java.util.function.Supplier;",
+                "",
+                "@Component",
+                "interface TestClass {",
+                "  Supplier<Integer> getNumber();",
+                "  @Provides static Integer provideNumber() { return 5; }",
+                "}");
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).failed(); // supplier not supported
+    }
+
+    @Test
+    void simpleFactoryProvider() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "import io.jbock.simple.Component;",
+                "import io.jbock.simple.Provides;",
+                "import java.util.function.Supplier;",
+                "",
+                "@Component",
+                "interface TestClass {",
+                "  Supplier<Integer> getNumber();",
+                "  @Component.Factory",
+                "  interface Factory {",
+                "    TestClass create(B b);",
+                "  }",
+                "}");
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).failed(); // supplier not supported
     }
 }

@@ -118,7 +118,6 @@ class FactoryTest {
                         "}");
     }
 
-
     @Test
     void factoryParameter() {
         JavaFileObject component = forSourceLines("test.TestClass",
@@ -172,5 +171,44 @@ class FactoryTest {
                         "    }",
                         "  }",
                         "}");
+    }
+
+    @Test
+    void simpleFactory() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "import io.jbock.simple.Component;",
+                "",
+                "@Component",
+                "interface TestClass {",
+                "  int getNumber();",
+                "",
+                "  @Component.Factory",
+                "  interface Factory {",
+                "    TestClass create(int number);",
+                "  }",
+                "}");
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
+    }
+
+    @Test
+    void simpleBuilder() {
+        JavaFileObject component = forSourceLines("test.TestClass",
+                "package test;",
+                "import io.jbock.simple.Component;",
+                "",
+                "@Component",
+                "interface TestClass {",
+                "  int getNumber();",
+                "",
+                "  @Component.Builder",
+                "  interface Builder {",
+                "    Builder withNumber(int number);",
+                "    TestClass build();",
+                "  }",
+                "}");
+        Compilation compilation = simpleCompiler().compile(component);
+        assertThat(compilation).succeeded();
     }
 }

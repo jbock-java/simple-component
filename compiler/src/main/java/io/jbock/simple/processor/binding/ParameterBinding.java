@@ -10,7 +10,12 @@ import javax.lang.model.element.VariableElement;
 import java.util.List;
 import java.util.Map;
 
-public final class ParameterBinding extends Binding {
+/**
+ * This class represents an instance that gets injected
+ * via {@linkplain io.jbock.simple.Component.Factory Component.Factory} or
+ * {@linkplain io.jbock.simple.Component.Builder Component.Builder}.
+ */
+public final class ParameterBinding extends Node {
 
     private final Element element; // VariableElement or ExecutableElement (setter)
     private final String suggestedVariableName;
@@ -24,13 +29,17 @@ public final class ParameterBinding extends Binding {
         this.suggestedVariableName = suggestedVariableName;
     }
 
-    public static ParameterBinding create(VariableElement parameter, KeyFactory keyFactory) {
+    public static ParameterBinding create(
+            VariableElement parameter,
+            KeyFactory keyFactory) {
         Key key = keyFactory.getKey(parameter);
         return new ParameterBinding(key, parameter, parameter.getSimpleName().toString());
     }
 
-    public static ParameterBinding create(ExecutableElement setter, KeyFactory keyFactory) {
-        VariableElement parameter = setter.getParameters().get(0);
+    public static ParameterBinding create(
+            ExecutableElement setter,
+            KeyFactory keyFactory) {
+        VariableElement parameter = setter.getParameters().getFirst();
         Key key = keyFactory.getKey(parameter);
         return new ParameterBinding(key, setter, parameter.getSimpleName().toString());
     }
@@ -40,7 +49,13 @@ public final class ParameterBinding extends Binding {
             Map<Key, NamedBinding> bindings,
             boolean paramsAreFields) {
         ParameterSpec param = bindings.get(key()).parameter();
-        return paramsAreFields ? CodeBlock.of("this.$N", param) : CodeBlock.of("$N", param);
+        CodeBlock result;
+        if (paramsAreFields) {
+            result = CodeBlock.of("this.$N", param);
+        } else {
+            result = CodeBlock.of("$N", param);
+        }
+        return result;
     }
 
     @Override

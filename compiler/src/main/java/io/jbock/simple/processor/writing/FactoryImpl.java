@@ -6,10 +6,10 @@ import com.palantir.javapoet.ParameterSpec;
 import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.binding.Binding;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.FactoryElement;
 import io.jbock.simple.processor.binding.Key;
+import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.binding.ParameterBinding;
 
 import javax.lang.model.element.ExecutableElement;
@@ -48,7 +48,7 @@ public final class FactoryImpl {
                 .filter(m -> m == PUBLIC || m == PROTECTED).collect(Collectors.toList()));
         method.returns(TypeName.get(component.element().asType()));
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             Key key = b.key();
             CodeBlock invocation = b.invocation(sorted, false);
             ParameterSpec param = namedBinding.parameter();
@@ -67,7 +67,7 @@ public final class FactoryImpl {
     private List<CodeBlock> constructorParameters() {
         List<CodeBlock> result = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             Key key = b.key();
             if (namedBinding.isComponentRequest()) {
                 result.add(CodeBlock.of("$N", namedBinding.parameter()));
@@ -79,7 +79,7 @@ public final class FactoryImpl {
     List<ParameterSpec> parameters() {
         List<ParameterSpec> result = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             if (b instanceof ParameterBinding) {
                 result.add(namedBinding.parameter());
             }

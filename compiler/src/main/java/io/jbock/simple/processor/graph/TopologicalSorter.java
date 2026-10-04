@@ -1,7 +1,7 @@
 package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.binding.KeyFactory;
@@ -27,7 +27,7 @@ public final class TopologicalSorter {
         this.keyFactory = keyFactory;
     }
 
-    public List<Binding> sortedBindings() {
+    public List<Node> sortedBindings() {
         AccessibilityValidator validator = AccessibilityValidator.create(component);
         Graph graph = Graph.newGraph();
         for (ParameterBinding request : keyFactory.parameterBindings().values()) {
@@ -37,7 +37,7 @@ public final class TopologicalSorter {
         for (DependencyRequest request : keyFactory.requests()) {
             graph.addAll(graphFactory.getGraph(request));
         }
-        for (Binding binding : graph.nodes()) {
+        for (Node binding : graph.nodes()) {
             if (!(binding instanceof ParameterBinding)) {
                 validator.checkAccessible(binding.element());
             }
@@ -46,15 +46,15 @@ public final class TopologicalSorter {
     }
 
     // https://en.wikipedia.org/wiki/Topological_sorting
-    List<Binding> sort(Graph graph) {
-        List<Binding> result = new ArrayList<>(graph.nodes().size());
-        Deque<Binding> s = new ArrayDeque<>(graph.startNodes());
+    List<Node> sort(Graph graph) {
+        List<Node> result = new ArrayList<>(graph.nodes().size());
+        Deque<Node> s = new ArrayDeque<>(graph.startNodes());
         while (!s.isEmpty()) {
-            Binding n = s.pop();
+            Node n = s.pop();
             result.add(n);
             for (Edge e : graph.edgesFrom(n)) {
                 graph.removeEdge(e);
-                Binding m = e.destination();
+                Node m = e.destination();
                 if (graph.edgesTo(m).isEmpty()) {
                     s.push(m);
                 }

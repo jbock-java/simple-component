@@ -8,7 +8,7 @@ import com.palantir.javapoet.ParameterSpec;
 import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 import io.jbock.simple.Inject;
-import io.jbock.simple.processor.binding.Binding;
+import io.jbock.simple.processor.binding.Node;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.Key;
 import io.jbock.simple.processor.binding.ParameterBinding;
@@ -54,7 +54,7 @@ public final class MockBuilder {
     private MethodSpec generateConstructor() {
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(PRIVATE);
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             if (!(b instanceof ParameterBinding)) {
                 continue;
             }
@@ -79,7 +79,7 @@ public final class MockBuilder {
         method.returns(TypeName.get(component.element().asType()));
         List<CodeBlock> constructorParameters = new ArrayList<>();
         for (NamedBinding namedBinding : sorted.values()) {
-            Binding b = namedBinding.binding();
+            Node b = namedBinding.binding();
             Key key = b.key();
             CodeBlock invocation = b.invocation(sorted, true);
             ParameterSpec param = namedBinding.parameter();

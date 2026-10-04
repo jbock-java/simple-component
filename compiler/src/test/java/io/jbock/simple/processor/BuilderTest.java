@@ -211,7 +211,7 @@ class BuilderTest {
                         "    public TestClass.AComponent build() {",
                         "      TestClass.A testClassA = this.testClassA != null ? this.testClassA : new TestClass.A(this.s);",
                         "      TestClass.B testClassB = this.testClassB != null ? this.testClassB : new TestClass.B(testClassA);",
-                        "      return new TestClass_AComponent_Impl(testClassB);",                        "    }",
+                        "      return new TestClass_AComponent_Impl(testClassB);", "    }",
                         "",
                         "    public MockBuilder testClassA(TestClass.A testClassA) {",
                         "      this.testClassA = testClassA;",
