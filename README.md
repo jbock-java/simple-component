@@ -59,34 +59,12 @@ If you want to re-use a bean instance across multiple components, or multiple in
 
 If you inject `Provider<TheBean> provider`, calling `provider.get()` will create a fresh bean instance every time.
 
-### Mocking
 
-If you want create a component where some beans are swapped for mock instances, use `@Component(mockBuilder = true)`.
-A static `mockBuilder` method will be generated, which returns a MockBuilder where you can register your mocks.
-
-Alternatively, if your component uses `@Component.Builder`, the generated builder will have a `withMocks` method that returns the MockBuilder.
-
-```java
-List<String> messages = new ArrayList<>();
-CoffeeApp.Logger mockLogger = messages::add;
-CoffeeApp.CoffeeComponent app = CoffeeApp_CoffeeComponent_Impl.builder()
-        .logLevel("")
-        .withMocks()
-        .coffeeAppLogger(mockLogger)
-        .build();
-app.coffeeMaker().brew();
-assertEquals(List.of(
-                "~ ~ ~ heating ~ ~ ~",
-                "=> => pumping => =>",
-                " [_]P coffee! [_]P "),
-        messages);
-```
-
-### Note to dagger users
+### Use case?
 
 There are no "subcomponents" or "component dependencies".
 
-`@Module` is called `@Modulus`.
+There is no `@Module`.
 
 There is no `@Binds`.  Use a `@Provides` method.
 
