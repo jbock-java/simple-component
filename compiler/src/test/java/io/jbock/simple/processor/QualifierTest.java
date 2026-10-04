@@ -51,7 +51,7 @@ class QualifierTest {
                 "",
                 "final class TestClass {",
                 "",
-                "  @Component(mockBuilder = true)",
+                "  @Component",
                 "  interface AComponent {",
                 "    @Named(\"a\") String getS();",
                 "",
