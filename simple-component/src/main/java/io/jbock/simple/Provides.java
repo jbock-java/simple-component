@@ -11,6 +11,8 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  *
  * <p>This alternative to the {@code @Inject} annotation
  *    can only be used on static methods in the component interface.
+ *    The parameters of this method will be injected.
+ *    The return value of this method will be available for injection.
  */
 @Target(METHOD)
 @Retention(SOURCE)

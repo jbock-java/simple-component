@@ -52,14 +52,18 @@ public class GraphFactory {
     Graph getGraph(DependencyRequest request) {
         List<DependencyRequest> dependencyTrace = List.of(request);
         Node startNode = getBinding(request).orElseThrow(() -> missingBindingPrinter.fail(dependencyTrace));
-        Set<Edge> edges = new LinkedHashSet<>();
+        Set<AbstractEdge<Node>> edges = new LinkedHashSet<>();
         Set<Node> nodes = new LinkedHashSet<>();
         nodes.add(startNode);
         addDependencies(dependencyTrace, nodes, edges, startNode);
         return new Graph(edges, nodes);
     }
 
-    private void addDependencies(List<DependencyRequest> trace, Set<Node> nodes, Set<Edge> edges, Node node) {
+    private void addDependencies(
+            List<DependencyRequest> trace,
+            Set<Node> nodes,
+            Set<AbstractEdge<Node>> edges,
+            Node node) {
         for (DependencyRequest request : node.requests()) {
             List<DependencyRequest> dependencyTrace = new ArrayList<>(trace.size() + 1);
             dependencyTrace.addAll(trace);

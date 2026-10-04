@@ -5,7 +5,7 @@ import io.jbock.simple.processor.binding.Node;
 /**
  * Edge(FROM: source, TO: destination) :== source "IS INJECTED AT" destination
  */
-record Edge(Node source, Node destination) {
+record Edge(Node source, Node destination) implements AbstractEdge<Node> {
 
     @Override
     public String toString() {

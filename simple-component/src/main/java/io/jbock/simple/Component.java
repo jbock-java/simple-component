@@ -16,8 +16,8 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  *
  * <h2>Component methods
  *
- * <p>Every type annotated with {@code @Component} must contain at least one nullary abstract
- * method. The type returned by this method must be either
+ * <p>The component interface must have at least one nullary abstract
+ * method. The return type of each such method must be either
  *
  * <ul>
  *     <li>a class or record annotated with {@code @Inject}

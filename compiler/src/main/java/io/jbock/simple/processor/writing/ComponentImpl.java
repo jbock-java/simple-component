@@ -34,7 +34,6 @@ public class ComponentImpl {
     private static final String FACTORY_METHOD = "factory";
     private static final String BUILDER_METHOD = "builder";
     private static final String CREATE_METHOD = "create";
-    private static final String MOCK_BUILDER_METHOD = "mockBuilder";
 
     private final KeyFactory keyFactory;
     private final ComponentElement component;

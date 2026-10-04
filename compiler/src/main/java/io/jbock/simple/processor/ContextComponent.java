@@ -51,8 +51,6 @@ public interface ContextComponent {
             KeyFactory keyFactory,
             List<Node> bindings) {
         UniqueNameSet uniqueNameSet = new UniqueNameSet();
-        uniqueNameSet.claim("mockBuilder");
-        uniqueNameSet.claim("withMocks");
         uniqueNameSet.claim("build");
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
         for (Node b : bindings) {

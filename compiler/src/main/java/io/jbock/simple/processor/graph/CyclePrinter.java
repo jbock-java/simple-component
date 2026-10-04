@@ -31,7 +31,7 @@ final class CyclePrinter {
 
     private Report createReport() {
         for (Node binding : graph.nodes()) {
-            Optional<List<Edge>> cycle = findProperCycle(binding);
+            Optional<List<AbstractEdge<Node>>> cycle = findProperCycle(binding);
             if (cycle.isPresent()) {
                 return new Report(createReport(cycle.orElseThrow()), binding);
             }
@@ -39,10 +39,10 @@ final class CyclePrinter {
         throw new AssertionError("input didn't contain a cycle");
     }
 
-    private String createReport(List<Edge> cycle) {
+    private String createReport(List<AbstractEdge<Node>> cycle) {
         List<String> message = new ArrayList<>();
         message.add("Found a dependency cycle:");
-        for (Edge edge : cycle) {
+        for (AbstractEdge<Node> edge : cycle) {
             Node destination = edge.destination();
             message.add(INDENT + edge.source().key().typeName() + " is injected at");
             message.add(DOUBLE_INDENT + bindingElementToString(destination.element()));
@@ -50,10 +50,10 @@ final class CyclePrinter {
         return String.join("\n", message);
     }
 
-    private Optional<List<Edge>> findProperCycle(Node node) {
+    private Optional<List<AbstractEdge<Node>>> findProperCycle(Node node) {
         Set<Node> seen = new LinkedHashSet<>();
         seen.add(node);
-        List<Edge> cycle = findCycle(node, List.of(), seen);
+        List<AbstractEdge<Node>> cycle = findCycle(node, List.of(), seen);
         if (cycle.isEmpty()) {
             return Optional.empty();
         }
@@ -63,17 +63,17 @@ final class CyclePrinter {
         return Optional.of(cycle);
     }
 
-    private List<Edge> findCycle(
+    private List<AbstractEdge<Node>> findCycle(
             Node node,
-            List<Edge> current,
+            List<AbstractEdge<Node>> current,
             Set<Node> seen) {
-        List<Edge> edgesFrom = graph.edgesFrom(node);
-        for (Edge edge : edgesFrom) {
-            List<Edge> appended = append(current, edge);
+        List<AbstractEdge<Node>> edgesFrom = graph.edgesFrom(node);
+        for (AbstractEdge<Node> edge : edgesFrom) {
+            List<AbstractEdge<Node>> appended = append(current, edge);
             if (!seen.add(edge.destination())) {
                 return appended;
             }
-            List<Edge> cycle = findCycle(edge.destination(), appended, seen);
+            List<AbstractEdge<Node>> cycle = findCycle(edge.destination(), appended, seen);
             if (!cycle.isEmpty()) {
                 return cycle;
             }
@@ -81,8 +81,8 @@ final class CyclePrinter {
         return List.of();
     }
 
-    private List<Edge> append(List<Edge> current, Edge next) {
-        List<Edge> result = new ArrayList<>(current.size() + 1);
+    private List<AbstractEdge<Node>> append(List<AbstractEdge<Node>> current, AbstractEdge<Node> next) {
+        List<AbstractEdge<Node>> result = new ArrayList<>(current.size() + 1);
         result.addAll(current);
         result.add(next);
         return result;

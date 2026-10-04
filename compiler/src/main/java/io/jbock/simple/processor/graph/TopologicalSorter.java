@@ -53,7 +53,7 @@ public final class TopologicalSorter {
         while (!s.isEmpty()) {
             Node n = s.pop();
             result.add(n);
-            for (Edge e : graph.edgesFrom(n)) {
+            for (AbstractEdge<Node> e : graph.edgesFrom(n)) {
                 graph.removeEdge(e);
                 Node m = e.destination();
                 if (graph.edgesTo(m).isEmpty()) {

@@ -1,7 +1,6 @@
 package io.jbock.simple.processor.binding;
 
 import com.palantir.javapoet.ClassName;
-import io.jbock.simple.Component;
 import io.jbock.simple.Inject;
 
 import javax.lang.model.element.TypeElement;
@@ -32,21 +31,5 @@ public final class ComponentElement {
 
     public ClassName generatedClass() {
         return generatedClass.get();
-    }
-
-    public boolean publicMockBuilder() {
-        Component annotation = element.getAnnotation(Component.class);
-        if (annotation == null) {
-            return false;
-        }
-        return annotation.publicMockBuilder();
-    }
-
-    public boolean mockBuilder() {
-        Component annotation = element.getAnnotation(Component.class);
-        if (annotation == null) {
-            return false;
-        }
-        return annotation.mockBuilder();
     }
 }

@@ -1,12 +1,12 @@
 package io.jbock.simple.processor.graph;
 
 import io.jbock.simple.processor.binding.Node;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-record Graph(Set<Edge> edges, Set<Node> nodes) {
+record Graph(Set<AbstractEdge<Node>> edges, Set<Node> nodes) {
 
     void addAll(Graph other) {
         edges.addAll(other.edges);
@@ -17,21 +17,25 @@ record Graph(Set<Edge> edges, Set<Node> nodes) {
         return new Graph(new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
-    List<Edge> edgesFrom(Node n) {
-        return edges.stream().filter(edge -> edge.source().equals(n)).collect(Collectors.toList());
+    List<AbstractEdge<Node>> edgesFrom(Node n) {
+        return edges.stream()
+                .filter(edge -> edge.source().equals(n))
+                .toList();
     }
 
-    List<Edge> edgesTo(Node m) {
-        return edges.stream().filter(edge -> edge.destination().equals(m)).collect(Collectors.toList());
+    List<AbstractEdge<Node>> edgesTo(Node m) {
+        return edges.stream()
+                .filter(edge -> edge.destination().equals(m))
+                .toList();
     }
 
     List<Node> startNodes() {
         return nodes.stream()
                 .filter(r -> edgesTo(r).isEmpty())
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    void removeEdge(Edge edge) {
+    void removeEdge(AbstractEdge<Node> edge) {
         edges.remove(edge);
     }
 }
