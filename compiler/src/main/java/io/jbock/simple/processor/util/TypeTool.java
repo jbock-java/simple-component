@@ -17,13 +17,10 @@ import static io.jbock.simple.processor.util.TypeNames.JAVAX_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.SIMPLE_INJECT;
 import static io.jbock.simple.processor.util.Visitors.DECLARED_TYPE_VISITOR;
 
+@Inject
 public record TypeTool(
         SafeElements elements,
         SafeTypes types) {
-
-    @Inject
-    public TypeTool {
-    }
 
     /**
      * Works for classes with no type parameters.

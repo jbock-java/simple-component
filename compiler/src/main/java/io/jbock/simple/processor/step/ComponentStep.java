@@ -22,6 +22,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 
+@Inject
 public class ComponentStep implements Step {
 
     private final Messager messager;
@@ -31,7 +32,6 @@ public class ComponentStep implements Step {
     private final SpecWriter specWriter;
     private final ContextComponent.Factory contextComponentFactory;
 
-    @Inject
     public ComponentStep(
             Messager messager,
             TypeTool tool,

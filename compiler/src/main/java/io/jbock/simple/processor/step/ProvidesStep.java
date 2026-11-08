@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Inject
 public class ProvidesStep implements Step {
 
     private final Messager messager;
     private final BindingRegistry bindingRegistry;
 
-    @Inject
     public ProvidesStep(
             Messager messager,
             BindingRegistry bindingRegistry) {

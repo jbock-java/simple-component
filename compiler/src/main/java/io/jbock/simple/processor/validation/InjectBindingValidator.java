@@ -15,18 +15,10 @@ import static io.jbock.simple.processor.util.TypeNames.JAKARTA_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.JAVAX_INJECT;
 import static io.jbock.simple.processor.util.TypeNames.SIMPLE_INJECT;
 
-public final class InjectBindingValidator {
-
-    private final TypeTool tool;
-    private final InjectBindingScanner injectBindingScanner;
-
-    @Inject
-    public InjectBindingValidator(
-            TypeTool tool,
-            InjectBindingScanner injectBindingScanner) {
-        this.tool = tool;
-        this.injectBindingScanner = injectBindingScanner;
-    }
+@Inject
+public record InjectBindingValidator(
+        TypeTool tool,
+        InjectBindingScanner injectBindingScanner) {
 
     public void validateConstructor(ExecutableElement element) {
         validate(element);

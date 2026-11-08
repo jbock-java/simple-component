@@ -24,12 +24,12 @@ import static javax.lang.model.element.Modifier.PROTECTED;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
+@Inject
 public final class BuilderImpl {
 
     private final ComponentElement component;
     private final Map<Key, NamedBinding> sorted;
 
-    @Inject
     public BuilderImpl(
             ComponentElement component,
             Context context) {

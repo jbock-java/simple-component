@@ -11,11 +11,8 @@ import static io.jbock.simple.processor.util.Visitors.TYPE_ELEMENT_VISITOR;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
+@Inject
 public final class TypeElementValidator {
-
-    @Inject
-    public TypeElementValidator() {
-    }
 
     /**
      * Assert that the given TypeElement is a regular interface.

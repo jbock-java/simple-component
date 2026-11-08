@@ -9,12 +9,12 @@ import java.util.Map;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 
+@Inject
 public class BindingRegistry {
 
     private final Map<Key, Element> bindings = new HashMap<>();
     private final KeyCache keyCache;
 
-    @Inject
     public BindingRegistry(KeyCache keyCache) {
         this.keyCache = keyCache;
     }

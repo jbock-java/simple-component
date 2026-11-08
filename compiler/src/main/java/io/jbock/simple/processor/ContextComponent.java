@@ -55,8 +55,7 @@ public interface ContextComponent {
         Map<Key, NamedBinding> result = new LinkedHashMap<>();
         for (Node b : bindings) {
             String name = uniqueNameSet.getUniqueName(validJavaName(b.suggestedVariableName()));
-            String auxName = uniqueNameSet.getUniqueName(name + "_isSet");
-            result.put(b.key(), new NamedBinding(b, name, auxName, keyFactory.isComponentRequest(b)));
+            result.put(b.key(), new NamedBinding(b, name, keyFactory.isComponentRequest(b)));
         }
         return result;
     }

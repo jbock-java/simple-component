@@ -11,10 +11,9 @@ public final class NamedBinding {
 
     private final Node binding;
     private final String name;
-    private final String auxName;
     private final boolean componentRequest;
 
-    private Supplier<ParameterSpec> parameter = memoize(() -> {
+    private final Supplier<ParameterSpec> parameter = memoize(() -> {
         String name = name();
         return ParameterSpec.builder(binding().key().typeName(), name).build();
     });
@@ -22,11 +21,9 @@ public final class NamedBinding {
     public NamedBinding(
             Node binding,
             String name,
-            String auxName,
             boolean componentRequest) {
         this.binding = binding;
         this.name = name;
-        this.auxName = auxName;
         this.componentRequest = componentRequest;
     }
 
@@ -40,10 +37,6 @@ public final class NamedBinding {
 
     boolean isComponentRequest() {
         return componentRequest;
-    }
-
-    String auxName() {
-        return auxName;
     }
 
     public ParameterSpec parameter() {

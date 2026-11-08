@@ -9,11 +9,11 @@ import javax.lang.model.util.Types;
 /**
  * A wrapper around {@link Types} where none of the methods can return {@code null}.
  */
+@Inject
 public final class SafeTypes {
 
     private final Types types;
 
-    @Inject
     public SafeTypes(Types types) {
         this.types = types;
     }

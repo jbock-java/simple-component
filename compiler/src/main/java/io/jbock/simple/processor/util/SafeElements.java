@@ -11,13 +11,13 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 
+@Inject
 public final class SafeElements implements ClearableCache {
 
     private final Elements elements;
 
     private final Map<String, TypeElement> typeElementCache = new HashMap<>();
 
-    @Inject
     public SafeElements(Elements elements) {
         this.elements = elements;
     }

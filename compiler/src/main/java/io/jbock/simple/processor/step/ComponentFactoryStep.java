@@ -17,13 +17,13 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 
+@Inject
 public class ComponentFactoryStep implements Step {
 
     private final TypeElementValidator validator;
     private final ExecutableElementValidator executableElementValidator;
     private final Messager messager;
 
-    @Inject
     public ComponentFactoryStep(
             Messager messager,
             TypeElementValidator validator,

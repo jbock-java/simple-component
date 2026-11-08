@@ -20,6 +20,7 @@ import java.util.Set;
 import static javax.lang.model.util.ElementFilter.constructorsIn;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 
+@Inject
 public class InjectStep implements Step {
 
     private final InjectBindingValidator validator;
@@ -27,7 +28,6 @@ public class InjectStep implements Step {
     private final Messager messager;
     private final BindingRegistry bindingRegistry;
 
-    @Inject
     public InjectStep(
             InjectBindingValidator validator,
             ExecutableElementValidator executableElementValidator,

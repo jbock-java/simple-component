@@ -12,21 +12,11 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-public final class TopologicalSorter {
-
-    private final GraphFactory graphFactory;
-    private final ComponentElement component;
-    private final KeyFactory keyFactory;
-
-    @Inject
-    public TopologicalSorter(
-            GraphFactory graphFactory,
-            ComponentElement component,
-            KeyFactory keyFactory) {
-        this.graphFactory = graphFactory;
-        this.component = component;
-        this.keyFactory = keyFactory;
-    }
+@Inject
+public record TopologicalSorter(
+        GraphFactory graphFactory,
+        ComponentElement component,
+        KeyFactory keyFactory) {
 
     public List<Node> sortedBindings() {
         AccessibilityValidator validator = AccessibilityValidator.create(component);
@@ -46,7 +36,7 @@ public final class TopologicalSorter {
         try {
             return kahnSort(graph);
         } catch (IllegalStateException e) {
-            throw new CyclePrinter(graph).fail();
+            throw new CyclePrinter(graph).createValidationFailure();
         }
     }
 

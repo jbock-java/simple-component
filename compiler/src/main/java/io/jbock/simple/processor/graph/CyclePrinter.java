@@ -13,30 +13,16 @@ import static io.jbock.simple.processor.util.Printing.DOUBLE_INDENT;
 import static io.jbock.simple.processor.util.Printing.INDENT;
 import static io.jbock.simple.processor.util.Printing.bindingElementToString;
 
-final class CyclePrinter {
+record CyclePrinter(Graph<Node> graph) {
 
-    private final Graph<Node> graph;
-
-    CyclePrinter(Graph<Node> graph) {
-        this.graph = graph;
-    }
-
-    ValidationFailure fail() {
-        Report report = createReport();
-        return new ValidationFailure(report.message, report.binding.element());
-    }
-
-    private record Report(String message, Node binding) {
-    }
-
-    private Report createReport() {
+    ValidationFailure createValidationFailure() {
         for (Node binding : graph.nodes()) {
             Optional<List<AbstractEdge<Node>>> cycle = findProperCycle(binding);
             if (cycle.isPresent()) {
-                return new Report(createReport(cycle.orElseThrow()), binding);
+                return new ValidationFailure(createReport(cycle.orElseThrow()), binding.element());
             }
         }
-        throw new AssertionError("input didn't contain a cycle");
+        throw new AssertionError("input did not contain a cycle");
     }
 
     private String createReport(List<AbstractEdge<Node>> cycle) {

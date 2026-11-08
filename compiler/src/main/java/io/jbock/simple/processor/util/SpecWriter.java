@@ -9,16 +9,10 @@ import java.io.StringWriter;
 import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic;
 
-public final class SpecWriter {
-
-    private final SourceFileGenerator sourceFileGenerator;
-    private final Messager messager;
-
-    @Inject
-    public SpecWriter(SourceFileGenerator sourceFileGenerator, Messager messager) {
-        this.sourceFileGenerator = sourceFileGenerator;
-        this.messager = messager;
-    }
+@Inject
+public record SpecWriter(
+        SourceFileGenerator sourceFileGenerator,
+        Messager messager) {
 
     public void write(ClassName generatedClass, TypeSpec typeSpec) {
         try {

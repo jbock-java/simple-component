@@ -4,6 +4,8 @@ import io.jbock.simple.Inject;
 import io.jbock.simple.processor.binding.ComponentElement;
 import io.jbock.simple.processor.binding.DependencyRequest;
 import io.jbock.simple.processor.util.ValidationFailure;
+
+import javax.lang.model.element.Element;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,14 +14,8 @@ import static io.jbock.simple.processor.util.Printing.DOUBLE_INDENT;
 import static io.jbock.simple.processor.util.Printing.INDENT;
 import static io.jbock.simple.processor.util.Printing.bindingElementToString;
 
-public final class MissingBindingPrinter {
-
-    private final ComponentElement component;
-
-    @Inject
-    public MissingBindingPrinter(ComponentElement component) {
-        this.component = component;
-    }
+@Inject
+public record MissingBindingPrinter(ComponentElement component) {
 
     ValidationFailure fail(List<DependencyRequest> dependencyTrace) {
         List<DependencyRequest> trace = new ArrayList<>(dependencyTrace);
@@ -36,7 +32,8 @@ public final class MissingBindingPrinter {
             String formatted = format(r, i == trace.size() - 1 ? "requested" : "injected");
             message.append("\n").append(formatted);
         }
-        return new ValidationFailure(message.toString(), component.element());
+        Element about = trace.isEmpty() ? component.element() : trace.getFirst().requestingElement();
+        return new ValidationFailure(message.toString(), about);
     }
 
     private String format(DependencyRequest request, String verb) {

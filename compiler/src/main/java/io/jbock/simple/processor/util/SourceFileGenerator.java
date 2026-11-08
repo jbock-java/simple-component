@@ -11,16 +11,8 @@ import javax.lang.model.element.Element;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
-public final class SourceFileGenerator {
-
-    private final Filer filer;
-    private final Messager messager;
-
-    @Inject
-    public SourceFileGenerator(Filer filer, Messager messager) {
-        this.filer = filer;
-        this.messager = messager;
-    }
+@Inject
+public record SourceFileGenerator(Filer filer, Messager messager) {
 
     public void write(Element element, JavaFile javaFile) {
         try {

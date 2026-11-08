@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+@Inject
 public class GraphFactory {
 
     private final KeyFactory keyFactory;
@@ -23,7 +24,6 @@ public class GraphFactory {
     private final Map<Key, Optional<? extends Node>> bindingCache = new HashMap<>();
     private final MissingBindingPrinter missingBindingPrinter;
 
-    @Inject
     public GraphFactory(
             KeyFactory keyFactory,
             InjectBindingFactory injectBindingFactory,

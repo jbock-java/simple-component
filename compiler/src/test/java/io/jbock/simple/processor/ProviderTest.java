@@ -40,7 +40,7 @@ class ProviderTest {
         assertThat(compilation).failed();
         assertThat(compilation).hadErrorContaining("No binding found for java.util.function.Supplier<test.TestClass.B> with qualifier @Named(\"b\").")
                 .inFile(component)
-                .onLineContaining("interface AComponent");
+                .onLineContaining("@Inject A(");
     }
 
     @Test

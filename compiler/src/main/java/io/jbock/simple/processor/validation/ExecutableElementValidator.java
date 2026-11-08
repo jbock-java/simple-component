@@ -11,14 +11,8 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import java.util.Optional;
 
-public final class ExecutableElementValidator {
-
-    private final TypeTool tool;
-
-    @Inject
-    public ExecutableElementValidator(TypeTool tool) {
-        this.tool = tool;
-    }
+@Inject
+public record ExecutableElementValidator(TypeTool tool) {
 
     public void validate(ExecutableElement element) {
         if (!element.getTypeParameters().isEmpty()) {

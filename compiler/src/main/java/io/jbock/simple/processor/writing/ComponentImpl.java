@@ -29,6 +29,7 @@ import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
+@Inject
 public class ComponentImpl {
 
     private static final String FACTORY_METHOD = "factory";
@@ -42,7 +43,6 @@ public class ComponentImpl {
     private final FactoryImpl factoryImpl;
     private final Modifier[] modifiers;
 
-    @Inject
     public ComponentImpl(
             KeyFactory keyFactory,
             ComponentElement component,

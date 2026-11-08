@@ -35,7 +35,7 @@ class MissingBindingTest {
         assertThat(compilation).failed();
         assertThat(compilation).hadErrorContainingMatch("No binding found for java.lang.String.")
                 .inFile(component)
-                .onLineContaining("interface AComponent");
+                .onLineContaining("A(String s)");
     }
 
     @Test
@@ -84,7 +84,7 @@ class MissingBindingTest {
                                 "        TestComponent.bindTestInterface(p.TestImplementation)",
                                 "    p.TestInterface is requested at",
                                 "        TestComponent.testInterface()"))
-                .inFile(component)
-                .onLineContaining("interface TestComponent");
+                .inFile(implementationFile)
+                .onLineContaining("TestImplementation(String missingBinding)");
     }
 }
