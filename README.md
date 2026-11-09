@@ -6,12 +6,13 @@
 ```java
 class CoffeeApp {
 
-    @Component interface CoffeeComponent {
+    @Component
+    interface CoffeeComponent {
         CoffeeMaker coffeeMaker();
 
-        @Component.Builder interface Builder {
-            Builder logLevel(String logLevel);
-            CoffeeComponent buildComponent();
+        @Component.Factory
+        interface MyFactory {
+            CoffeeComponent buildComponent(Logger logger);
         }
     }
 
@@ -19,12 +20,8 @@ class CoffeeApp {
         void log(String msg);
     }
 
-    static class CoffeeMaker {
-        private final Logger logger;
-
-        @Inject CoffeeMaker(Logger logger) {
-            this.logger = logger;
-        }
+    @Inject
+    record CoffeeMaker(Logger logger) {
 
         void brew() {
             logger.log("~ ~ ~ heating ~ ~ ~");
@@ -32,12 +29,10 @@ class CoffeeApp {
             logger.log(" [_]P coffee! [_]P ");
         }
     }
-
-    @Inject static Logger createLogger(String level) {
-        return msg -> System.out.println(level + " " + msg);
-    }
 }
 ```
+
+([source](https://github.com/jbock-java/modular-thermosiphon))
 
 This dependency injector uses the following annotations:
 
